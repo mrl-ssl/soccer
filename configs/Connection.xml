@@ -1,0 +1,11 @@
+<configuration>
+  <Connection>
+    <AiName>127.0.0.1</AiName>
+    <AiPort>1011</AiPort>
+    <VisualizerName>127.0.0.1</VisualizerName>
+    <VisualizerPort>1017</VisualizerPort>
+    <VisionName>224.5.23.2</VisionName>
+    <VisionPort>10006</VisionPort>
+
+  </Connection>
+</configuration>
