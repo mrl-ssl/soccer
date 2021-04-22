@@ -2,7 +2,8 @@ namespace MRL.SSL.Common.Configuration
 {
     public class ConnectionConfig : ConfigBase
     {
-        public static ConnectionConfig Default { get => (ConnectionConfig)_default; }
+        public new static ConnectionConfig Default { get => (ConnectionConfig)_default[(int)ConfigType.Connection]; }
+        public override ConfigType Id => ConfigType.Connection;
         private string aiName;
         private int aiPort;
         private string visionName;
