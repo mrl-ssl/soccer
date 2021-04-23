@@ -1,16 +1,11 @@
 using System;
-using System.Linq;
 using System.Threading;
-using System.Diagnostics;
 using MRL.SSL.Common.Utils.Sockets;
 using MRL.SSL.Common.Configuration;
 using System.IO;
 using System.Net;
 using ProtoBuf;
 using MRL.SSL.Common.SSLWrapperCommunication;
-using MRL.SSL.Common.Math;
-using ProtoBuf.Meta;
-using System.Collections.Generic;
 
 namespace MRL.SSL.Ai.Engine
 {

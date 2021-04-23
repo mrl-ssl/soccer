@@ -23,12 +23,12 @@ namespace MRL.SSL.Common.Configuration
             var t = GetType().GetConstructor(new Type[] { }).Invoke(new object[] { }) as ConfigBase;
             var dom = new ConfigurationBuilder()
                             .SetBasePath(baseAddress)
-                            .AddXmlFile(name + ".xml")
+                            .AddJsonFile(name + ".json")
                             .Build();
 
             Name = name;
             _default.Add((int)t.Id, t);
-            dom.Bind(name, t);
+            dom.Bind(t);
         }
         public void Load()
         {
