@@ -1,4 +1,5 @@
 using System;
+using MRL.SSL.Common.Math.Helpers;
 
 namespace MRL.SSL.Common.Math
 {
@@ -240,7 +241,7 @@ namespace MRL.SSL.Common.Math
             float wx = w * x;
             float wy = w * y;
             float wz = w * z;
-            SquareMatrix<float> m = new SquareMatrix<float>(3, MatrixOperators.FloatOperator);
+            SquareMatrix<float> m = new SquareMatrix<float>(3);
             m[0, 0] = 1F - 2F * (y2 + z2); m[0, 1] = (2F * (xy - wz)); m[0, 2] = 2F * (xz - wy);
             m[1, 0] = 2F * (xy + wz); m[1, 1] = 1F - 2F * (x2 + z2); m[1, 2] = 2F * (yz - wx);
             m[2, 0] = 2F * (xz - wy); m[2, 1] = 2F * (yz + wx); m[2, 2] = 1F - 2F * (x2 + y2);

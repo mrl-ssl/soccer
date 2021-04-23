@@ -1,4 +1,5 @@
 using System;
+using MRL.SSL.Common.Math.Helpers;
 using ProtoBuf;
 
 namespace MRL.SSL.Common.Math
