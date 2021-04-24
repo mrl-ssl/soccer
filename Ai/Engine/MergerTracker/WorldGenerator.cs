@@ -25,12 +25,16 @@ namespace MRL.SSL.Ai.MergerTracker
                 selectedBallLoc = pos;
             }
         }
-        public WorldModel GenerateWorldModel4Cam(SSLWrapperPacket packet, bool isYellow, bool isReverse)
+        public WorldModel GenerateWorldModel(SSLWrapperPacket packet, bool isYellow, bool isReverse)
         {
             if (packet != null && packet.Geometry != null)
                 FieldConfig.Default.UpdateFromGeometry(packet.Geometry);
 
             var world = merger.Merge(packet, isReverse, isYellow, selectedBallLoc, ref ballIndexChanged);
+            if (world != null)
+            {
+
+            }
 
             return world;
         }
