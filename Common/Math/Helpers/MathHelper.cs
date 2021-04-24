@@ -19,7 +19,7 @@ namespace MRL.SSL.Common.Math.Helpers
                 return (IGenericMathHelper<T>)floatMathHelper;
             if (type == typeof(double))
                 return (IGenericMathHelper<T>)doubleMathHelper;
-            throw new Exception("There is no implement for given type");
+            throw new Exception($"There is no implement for IGenericMathHelper by given type {type}");
         }
 
         public static bool EqualFloat(float a, float b) => MathF.Abs(a - b) <= EpsilonF;

@@ -1,5 +1,6 @@
 using System;
 using MRL.SSL.Common.Math;
+using MRL.SSL.Common.Math.Helpers;
 
 namespace MRL.SSL.Common.KdTree
 {

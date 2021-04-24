@@ -7,9 +7,21 @@ namespace MRL.SSL.Common.Math
     {
         private readonly IGenericMathHelper<T> type_helper;
 
-        /// <param name="type_helper"> Structure wich derived from IGenericMathHelper wich do operations like add,subtract,multiply,...</param>
-        public MatrixBuilder(IGenericMathHelper<T> type_helper) { this.type_helper = type_helper; }
+        public MatrixBuilder() => type_helper = MathHelper.CreateGenericMathHelper<T>();
 
+        /// <param name="type_helper"> Structure wich derived from IGenericMathHelper wich do operations like add,subtract,multiply,...</param>
+        public MatrixBuilder(IGenericMathHelper<T> type_helper) => this.type_helper = type_helper;
+
+        /// <summary>
+        /// Function wich generates the random matrix.
+        /// </summary>
+        public Matrix<T> RandomMatrix(int iRows, int iCols)
+        {
+            Matrix<T> matrix = new Matrix<T>(iRows, iCols, type_helper);
+            for (int i = 0; i < iRows * iCols; i++)
+                matrix.Data[i] = type_helper.Random();
+            return matrix;
+        }
         /// <summary>
         /// Function wich generates the random matrix.
         /// </summary>
@@ -18,6 +30,16 @@ namespace MRL.SSL.Common.Math
             Matrix<T> matrix = new Matrix<T>(iRows, iCols, type_helper);
             for (int i = 0; i < iRows * iCols; i++)
                 matrix.Data[i] = type_helper.Random(minVal, maxVal);
+            return matrix;
+        }
+        /// <summary>
+        /// Function wich generates the random square matrix.
+        /// </summary>
+        public SquareMatrix<T> RandomMatrix(int Dimention)
+        {
+            SquareMatrix<T> matrix = new SquareMatrix<T>(Dimention, type_helper);
+            for (int i = 0; i < Dimention * Dimention; i++)
+                matrix.Data[i] = type_helper.Random();
             return matrix;
         }
         /// <summary>

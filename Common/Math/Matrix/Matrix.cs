@@ -7,7 +7,7 @@ namespace MRL.SSL.Common.Math
     {
         protected readonly IGenericMathHelper<T> type_helper;
         protected readonly MatrixBuilder<T> matrixBuilder;
-        protected bool ValueChanged = false;
+        protected bool ValueChanged;
         protected int _rows, _cols;
         protected T[] _mat;
 
@@ -19,6 +19,10 @@ namespace MRL.SSL.Common.Math
         /// Number of columns.
         /// </summary>
         public int Cols { get => _cols; }
+        /// <summary>
+        /// Instance of MatrixBuilder
+        /// </summary>
+        public MatrixBuilder<T> MatrixBuilder { get => matrixBuilder; }
         /// <summary>
         /// Elements of this matrix as 1D array.
         /// </summary>
@@ -145,6 +149,26 @@ namespace MRL.SSL.Common.Math
             if (row >= _rows || row < 0) throw new Exception("Wrong row index");
             for (int j = 0; j < _cols; j++)
                 _mat[row * _cols + j] = type_helper.Zero;
+            ValueChanged = true;
+        }
+
+        ///<summary>
+        /// Fill elements randomly
+        ///</summary>
+        public void FillRandom()
+        {
+            for (int i = 0; i < _rows * _cols; i++)
+                _mat[i] = type_helper.Random();
+            ValueChanged = true;
+        }
+
+        ///<summary>
+        /// Fill elements random between min and max
+        ///</summary>
+        public void FillRandom(T min,T max)
+        {
+            for (int i = 0; i < _rows * _cols; i++)
+                _mat[i] = type_helper.Random(min, max);
             ValueChanged = true;
         }
 
@@ -391,7 +415,7 @@ namespace MRL.SSL.Common.Math
         {
             Matrix<T> t = new Matrix<T>(_cols, _rows, type_helper);
             for (int i = 0; i < _rows; i++)
-                for (int j = 0; j < _cols; i++)
+                for (int j = 0; j < _cols; j++)
                     t._mat[j * t._cols + i] = _mat[i * _cols + j];
             return t;
         }
