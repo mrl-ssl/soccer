@@ -3,7 +3,40 @@ using ProtoBuf;
 
 namespace MRL.SSL.Common.Math
 {
-    public abstract class Vector2D<T>
+    public class Vector2D<T> : Vector<T>
+    {
+        public T X { get => values[0]; set => values[0] = value; }
+        public T Y { get => values[1]; set => values[1] = value; }
+
+        public Vector2D(T x, T y) : base(new T[2] { x, y }) { }
+
+        public T AngleModInRadians(T angle)
+        {
+            if (type_helper.GreaterOrEqual(angle, type_helper.Zero))
+            {
+                if (type_helper.LessOrEqual(angle, type_helper.PI)) return angle;
+                return type_helper.Sub(angle, type_helper.PI);
+            }
+            else
+            {
+                if (type_helper.GreaterOrEqual(angle, type_helper.Multi(type_helper.NegativeOne, type_helper.PI)))
+                    return type_helper.Sum(angle, type_helper.PI);
+                return type_helper.Multi(type_helper.NegativeOne, angle);
+            }
+        }
+        public T AngleModInDegrees(T angle) => type_helper.Radian2Degree(AngleModInRadians(angle));
+        public T AngleInRadians() => type_helper.Atan2(Y, X);
+        public T AngleInDegrees() => type_helper.Radian2Degree(AngleInRadians());
+        public T Cosine(Vector2D<T> v)
+        {
+            T l = this.Dot(v);
+            T t = type_helper.Multi(Size(), v.Size());
+            if (type_helper.Equal(t, type_helper.Zero))
+                return type_helper.Zero;
+            return type_helper.Divide(l, t);
+        }
+    }
+    /*public abstract class Vector2D<T>
     {
         protected T x;
         protected T y;
@@ -109,5 +142,5 @@ namespace MRL.SSL.Common.Math
         {
             return base.GetHashCode();
         }
-    }
+    }*/
 }

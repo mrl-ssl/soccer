@@ -5,20 +5,30 @@ namespace MRL.SSL.Common.Math.Helpers
         T Zero { get; }
         T One { get; }
         T NegativeOne { get; }
-        
+        T PI { get; }
+
         T Random();
         T Random(T min, T max);
+        T Max(T a, T b);
+        T Bound(T x, T min, T max);
         T Abs(T a);
+        /// <returns>x power y (x^y)</returns>
+        T Pow(T x, T y);
+        /// <returns>x * x (x^2)</returns>
+        T Square(T x);
+        T Sqrt(T a);
+        T Atan2(T y,T x);
+        T Radian2Degree(T radian);
 
         /// <returns>a + b</returns>
         T Sum(T a, T b);
         /// <returns>a - b</returns>
         T Sub(T a, T b);
         /// <returns>a / b</returns>
-        T Dvide(T a, T b);
+        T Divide(T a, T b);
         /// <returns>a * b</returns>
         T Multi(T a, T b);
-        
+
         /// <returns>a == b</returns>
         bool Equal(T a, T b);
         /// <returns>a > b</returns>

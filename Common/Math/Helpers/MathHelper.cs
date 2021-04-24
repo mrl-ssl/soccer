@@ -6,11 +6,11 @@ namespace MRL.SSL.Common.Math.Helpers
     {
         public const float EpsilonF = 1e-8F;
 
-        public static readonly IGenericMathHelper<int> intMathHelper = new IntMathHelper();
-        public static readonly IGenericMathHelper<float> floatMathHelper = new FloatMathHelper();
-        public static readonly IGenericMathHelper<double> doubleMathHelper = new DoubleMathHelper();
+        private static readonly IGenericMathHelper<int> intMathHelper = new IntMathHelper();
+        private static readonly IGenericMathHelper<float> floatMathHelper = new FloatMathHelper();
+        private static readonly IGenericMathHelper<double> doubleMathHelper = new DoubleMathHelper();
 
-        public static IGenericMathHelper<T> CreateGenericMathHelper<T>()
+        public static IGenericMathHelper<T> GetGenericMathHelper<T>()
         {
             var type = typeof(T);
             if (type == typeof(int))

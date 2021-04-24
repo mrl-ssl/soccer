@@ -1,5 +1,4 @@
 using System;
-using MRL.SSL.Common.Math.Helpers;
 
 namespace MRL.SSL.Common.Math
 {
@@ -28,21 +27,14 @@ namespace MRL.SSL.Common.Math
             Dimention = dimention; detOfP = type_helper.One;
         }
 
-        ///<param name="dimention"> Row and column of square matrix.</param>
-        /// <param name="type_helper">Structure wich derived from IGenericMathHelper wich do operations like add,subtract,multiply,... </param>
-        public SquareMatrix(int dimention, IGenericMathHelper<T> type_helper) : base(dimention, dimention, type_helper)
-        {
-            Dimention = dimention; detOfP = type_helper.One;
-        }
-
         /// <summary>
         /// Create matrix from array source.
-        /// note : this constructor does not create new array
         /// </summary>
         /// <param name="dimention">Row and column of square matrix</param>
         /// <param name="mat">source array</param>
         /// <param name="type_helper">Structure wich derived from IGenericMathHelper wich do operations like add,subtract,multiply,...</param>
-        public SquareMatrix(int dimention, T[] mat, IGenericMathHelper<T> type_helper) : base(dimention, dimention, mat, type_helper)
+        /// <param name="deepCopy">if true create new array and copy values from src</param>
+        public SquareMatrix(int dimention, T[] mat, bool deepCopy = false) : base(dimention, dimention, mat, deepCopy)
         {
             Dimention = dimention; detOfP = type_helper.One;
         }
@@ -65,7 +57,7 @@ namespace MRL.SSL.Common.Math
         {
             if (_l == null || ValueChanged) MakeLU();
 
-            SquareMatrix<T> matrix = new SquareMatrix<T>(Dimention, type_helper);
+            SquareMatrix<T> matrix = new SquareMatrix<T>(Dimention);
             for (int i = 0; i < _rows; i++) matrix._mat[pi[i] * Dimention + i] = type_helper.One;
             return matrix;
         }
@@ -75,11 +67,11 @@ namespace MRL.SSL.Common.Math
         {
             if (_l == null || ValueChanged) MakeLU();
 
-            SquareMatrix<T> inv = new SquareMatrix<T>(Dimention, type_helper);
+            SquareMatrix<T> inv = new SquareMatrix<T>(Dimention);
 
             for (int i = 0; i < _rows; i++)
             {
-                Matrix<T> Ei = new Matrix<T>(_rows, 1, type_helper);
+                Matrix<T> Ei = new Matrix<T>(_rows, 1);
                 Ei.Data[i * Ei.Cols] = type_helper.One;
                 Matrix<T> col = SolveWith(Ei);
                 inv.SetCol(col, i);
@@ -94,7 +86,7 @@ namespace MRL.SSL.Common.Math
         {
             if (!ValueChanged && _l != null && _u != null) return;
             _l = matrixBuilder.Identity(Dimention);
-            _u = new SquareMatrix<T>(Dimention, type_helper);
+            _u = new SquareMatrix<T>(Dimention);
             for (int i = 0; i < _rows * _cols; i++) _u._mat[i] = _mat[i];   //Cloning this matrix to U
 
             pi = new int[_rows];
@@ -135,7 +127,7 @@ namespace MRL.SSL.Common.Math
 
                 for (int i = k + 1; i < _rows; i++)
                 {
-                    _l._mat[i * _l._cols + k] = type_helper.Dvide(_u._mat[i * _u._cols + k], _u._mat[k * _u._cols + k]);
+                    _l._mat[i * _l._cols + k] = type_helper.Divide(_u._mat[i * _u._cols + k], _u._mat[k * _u._cols + k]);
                     for (int j = k; j < _cols; j++)
                         _u._mat[i * _u._cols + j] = type_helper.Sub(_u._mat[i * _u._cols + j], type_helper.Multi(_l._mat[i * _l._cols + k], _u._mat[k * _u._cols + j]));
                 }
@@ -151,7 +143,7 @@ namespace MRL.SSL.Common.Math
             if (_rows != v.Rows) throw new Exception("Wrong number of results in solution vector!");
             if (_l == null || ValueChanged) MakeLU();
 
-            Matrix<T> b = new Matrix<T>(_rows, 1, type_helper);
+            Matrix<T> b = new Matrix<T>(_rows, 1);
             for (int i = 0; i < _rows; i++) b.Data[i * b.Cols] = v.Data[pi[i] * v.Cols];   // switch two items in "v" due to permutation matrix
 
             Matrix<T> z = SubsForth(_l, b);
@@ -168,13 +160,13 @@ namespace MRL.SSL.Common.Math
         {
             if (_l == null || ValueChanged) MakeLU();
             int n = _rows;
-            Matrix<T> x = new Matrix<T>(n, 1, type_helper);
+            Matrix<T> x = new Matrix<T>(n, 1);
 
             for (int i = n - 1; i > -1; i--)
             {
                 x.Data[i * x.Cols] = b.Data[i * b.Cols];
                 for (int j = n - 1; j > i; j--) x.Data[i * x.Cols] = type_helper.Sub(x.Data[i * x.Cols], type_helper.Multi(_mat[i * _cols + j], x.Data[j * x.Cols]));
-                x.Data[i * x.Cols] = type_helper.Dvide(x.Data[i * x.Cols], _mat[i * _cols + i]);
+                x.Data[i * x.Cols] = type_helper.Divide(x.Data[i * x.Cols], _mat[i * _cols + i]);
             }
             return x;
         }
@@ -187,13 +179,13 @@ namespace MRL.SSL.Common.Math
         {
             if (_l == null || ValueChanged) MakeLU();
             int n = _rows;
-            Matrix<T> x = new Matrix<T>(n, 1, type_helper);
+            Matrix<T> x = new Matrix<T>(n, 1);
 
             for (int i = 0; i < n; i++)
             {
                 x.Data[i * x.Cols] = b.Data[i * b.Cols];
                 for (int j = 0; j < i; j++) x.Data[i * x.Cols] = type_helper.Sub(x.Data[i * x.Cols], type_helper.Multi(_mat[i * _cols + j], x.Data[j * x.Cols]));
-                x.Data[i * x.Cols] = type_helper.Dvide(x.Data[i * x.Cols], _mat[i * _cols + i]);
+                x.Data[i * x.Cols] = type_helper.Divide(x.Data[i * x.Cols], _mat[i * _cols + i]);
             }
             return x;
         }

@@ -5,7 +5,7 @@ namespace MRL.SSL.Common.Math
 {
     public class Matrix<T>
     {
-        protected readonly IGenericMathHelper<T> type_helper;
+        protected static readonly IGenericMathHelper<T> type_helper = MathHelper.GetGenericMathHelper<T>();
         protected readonly MatrixBuilder<T> matrixBuilder;
         protected bool ValueChanged;
         protected int _rows, _cols;
@@ -50,39 +50,28 @@ namespace MRL.SSL.Common.Math
         public Matrix(int rows, int cols)
         {
             _rows = rows; _cols = cols; _mat = new T[cols * rows];
-            type_helper = MathHelper.CreateGenericMathHelper<T>();
-            matrixBuilder = new MatrixBuilder<T>(type_helper);
-        }
-
-        /// <param name="rows">Number of row.</param>
-        /// <param name="cols">Number of column.</param>
-        /// <param name="type_helper">Structure wich do operations like add,subtract,multiply,... for given type </param>
-        public Matrix(int rows, int cols, IGenericMathHelper<T> type_helper)
-        {
-            _rows = rows; _cols = cols; _mat = new T[cols * rows];
-            if (type_helper == null)
-                this.type_helper = MathHelper.CreateGenericMathHelper<T>();
-            else
-                this.type_helper = type_helper;
-            matrixBuilder = new MatrixBuilder<T>(this.type_helper);
+            matrixBuilder = new MatrixBuilder<T>();
         }
 
         /// <summary>
         /// Create matrix from array source.
-        /// note : this constructor does not create new array
         /// </summary>
         /// <param name="rows">Number of row</param>
         /// <param name="cols">Number of column</param>
         /// <param name="mat">source array</param>
-        /// <param name="type_helper">Structure wich do operations like add,subtract,multiply,... for given type</param>
-        public Matrix(int rows, int cols, T[] mat, IGenericMathHelper<T> type_helper)
+        /// <param name="deepCopy">if true create new array and copy values from src</param>
+        public Matrix(int rows, int cols, T[] mat, bool deepCopy = false)
         {
-            _rows = rows; _cols = cols; _mat = mat;
-            if (type_helper == null)
-                this.type_helper = MathHelper.CreateGenericMathHelper<T>();
+            _rows = rows; _cols = cols;
+            if (deepCopy)
+            {
+                _mat = new T[cols * rows];
+                for (int i = 0; i < cols * rows; i++)
+                    _mat[i] = mat[i];
+            }
             else
-                this.type_helper = type_helper;
-            matrixBuilder = new MatrixBuilder<T>(type_helper);
+                _mat = mat;
+            matrixBuilder = new MatrixBuilder<T>();
         }
 
         protected void CopyFieldsFrom(Matrix<T> src)
@@ -95,7 +84,7 @@ namespace MRL.SSL.Common.Math
         ///</summary>
         public Matrix<T> Append(Matrix<T> v)
         {
-            Matrix<T> t = new Matrix<T>(System.Math.Max(_rows, v._rows), _cols + v._cols, type_helper);
+            Matrix<T> t = new Matrix<T>(System.Math.Max(_rows, v._rows), _cols + v._cols);
             for (int i = 0; i < t._rows; i++)
             {
                 for (int j = 0; j < t._cols; j++)
@@ -165,7 +154,7 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         /// Fill elements random between min and max
         ///</summary>
-        public void FillRandom(T min,T max)
+        public void FillRandom(T min, T max)
         {
             for (int i = 0; i < _rows * _cols; i++)
                 _mat[i] = type_helper.Random(min, max);
@@ -209,7 +198,7 @@ namespace MRL.SSL.Common.Math
         ///</summary>
         public Matrix<T> Diagonal(Matrix<T> v)
         {
-            Matrix<T> t = new Matrix<T>(_rows + v._rows, _cols + v._cols, type_helper);
+            Matrix<T> t = new Matrix<T>(_rows + v._rows, _cols + v._cols);
             for (int i = 0; i < t._rows; i++)
             {
                 for (int j = 0; j < t._cols; j++)
@@ -227,7 +216,7 @@ namespace MRL.SSL.Common.Math
         /// </returns>
         public Matrix<T> Duplicate()
         {
-            Matrix<T> matrix = new Matrix<T>(_rows, _cols, type_helper);
+            Matrix<T> matrix = new Matrix<T>(_rows, _cols);
             for (int i = 0; i < _rows * _cols; i++)
                 matrix._mat[i] = _mat[i];
             return matrix;
@@ -251,7 +240,7 @@ namespace MRL.SSL.Common.Math
         /// </returns>
         public Matrix<T> GetCol(int k)
         {
-            Matrix<T> m = new Matrix<T>(_rows, 1, type_helper);
+            Matrix<T> m = new Matrix<T>(_rows, 1);
             for (int i = 0; i < _rows; i++) m._mat[i * m._cols] = _mat[i * _cols + k];
             return m;
         }
@@ -263,7 +252,7 @@ namespace MRL.SSL.Common.Math
         /// </returns>
         public Matrix<T> GetRow(int k)
         {
-            Matrix<T> m = new Matrix<T>(1, _cols, type_helper);
+            Matrix<T> m = new Matrix<T>(1, _cols);
             for (int i = 0; i < _cols; i++) m._mat[i] = _mat[k * _cols + i];
             return m;
         }
@@ -273,7 +262,7 @@ namespace MRL.SSL.Common.Math
         /// </returns>
         public Matrix<T> Map(Func<T, T> func)
         {
-            Matrix<T> t = new Matrix<T>(_rows, _cols, type_helper);
+            Matrix<T> t = new Matrix<T>(_rows, _cols);
             for (int i = 0; i < _rows * _cols; i++)
                 t._mat[i] = func(_mat[i]);
             return t;
@@ -303,7 +292,7 @@ namespace MRL.SSL.Common.Math
         public Matrix<T> RemoveCol(int col)
         {
             if (col >= _cols || col < 0) throw new Exception("Wrong col index");
-            Matrix<T> t = new Matrix<T>(_rows, _cols - 1, type_helper);
+            Matrix<T> t = new Matrix<T>(_rows, _cols - 1);
             for (int i = 0; i < _rows; i++)
             {
                 for (int j = 0, j1 = 0; j < _cols; j++, j1++)
@@ -321,7 +310,7 @@ namespace MRL.SSL.Common.Math
         public Matrix<T> RemoveRow(int row)
         {
             if (row >= _rows || row < 0) throw new Exception("Wrong row index");
-            Matrix<T> t = new Matrix<T>(_rows - 1, _cols, type_helper);
+            Matrix<T> t = new Matrix<T>(_rows - 1, _cols);
             int i1 = 0;
             for (int i = 0; i < _rows; i++, i1++)
             {
@@ -357,7 +346,7 @@ namespace MRL.SSL.Common.Math
         ///</summary>
         public Matrix<T> Stack(Matrix<T> v)
         {
-            Matrix<T> t = new Matrix<T>(_rows + v._rows, System.Math.Max(_cols, v._cols), type_helper);
+            Matrix<T> t = new Matrix<T>(_rows + v._rows, System.Math.Max(_cols, v._cols));
             for (int i = 0; i < t._rows; i++)
             {
                 for (int j = 0; j < t._cols; j++)
@@ -387,9 +376,9 @@ namespace MRL.SSL.Common.Math
         /// </returns>
         public SquareMatrix<T> ToSquareMatrix()
         {
-            if (_rows == _cols)
-                return new SquareMatrix<T>(_rows, _mat, type_helper);
-            SquareMatrix<T> m = new SquareMatrix<T>(System.Math.Max(_rows, _cols), type_helper);
+            if (this is SquareMatrix<T> sq) return sq;
+            if (_rows == _cols) return new SquareMatrix<T>(_rows, _mat);
+            SquareMatrix<T> m = new SquareMatrix<T>(System.Math.Max(_rows, _cols));
             m.CopyFrom(this);
             return m;
         }
@@ -413,7 +402,7 @@ namespace MRL.SSL.Common.Math
         /// </returns>
         public Matrix<T> Transpose()
         {
-            Matrix<T> t = new Matrix<T>(_cols, _rows, type_helper);
+            Matrix<T> t = new Matrix<T>(_cols, _rows);
             for (int i = 0; i < _rows; i++)
                 for (int j = 0; j < _cols; j++)
                     t._mat[j * t._cols + i] = _mat[i * _cols + j];
@@ -432,54 +421,54 @@ namespace MRL.SSL.Common.Math
 
         public static Matrix<T> operator -(Matrix<T> m)
         {
-            Matrix<T> r = new Matrix<T>(m._rows, m._cols, m.type_helper);
+            Matrix<T> r = new Matrix<T>(m._rows, m._cols);
             for (int i = 0; i < r._rows * r._cols; i++)
-                r._mat[i] = m.type_helper.Multi(m._mat[i], m.type_helper.NegativeOne);
+                r._mat[i] = type_helper.Multi(m._mat[i], type_helper.NegativeOne);
             return r;
         }
 
         public static Matrix<T> operator +(Matrix<T> m1, Matrix<T> m2)
         {
             if (m1._rows != m2._rows || m1._cols != m2._cols) throw new Exception("Matrices must have the same dimensions!");
-            Matrix<T> r = new Matrix<T>(m1._rows, m1._cols, m1.type_helper);
+            Matrix<T> r = new Matrix<T>(m1._rows, m1._cols);
             for (int i = 0; i < r._rows * r._cols; i++)
-                r._mat[i] = m1.type_helper.Sum(m1._mat[i], m2._mat[i]);
+                r._mat[i] = type_helper.Sum(m1._mat[i], m2._mat[i]);
             return r;
         }
 
         public static Matrix<T> operator -(Matrix<T> m1, Matrix<T> m2)
         {
             if (m1._rows != m2._rows || m1._cols != m2._cols) throw new Exception("Matrices must have the same dimensions!");
-            Matrix<T> r = new Matrix<T>(m1._rows, m1._cols, m1.type_helper);
+            Matrix<T> r = new Matrix<T>(m1._rows, m1._cols);
             for (int i = 0; i < r._rows * r._cols; i++)
-                r._mat[i] = m1.type_helper.Sub(m1._mat[i], m2._mat[i]);
+                r._mat[i] = type_helper.Sub(m1._mat[i], m2._mat[i]);
             return r;
         }
 
         public static Matrix<T> operator *(Matrix<T> m1, Matrix<T> m2)
         {
             if (m1._cols != m2._rows) throw new Exception("Wrong dimensions of matrix!");
-            Matrix<T> result = new Matrix<T>(m1.Rows, m2.Cols, m1.type_helper);
+            Matrix<T> result = new Matrix<T>(m1.Rows, m2.Cols);
             for (int i = 0; i < result._rows; i++)
                 for (int j = 0; j < result._cols; j++)
                     for (int k = 0; k < m1._cols; k++)
-                        result._mat[i * result._cols + j] = result.type_helper.Sum(result._mat[i * result._cols + j], result.type_helper.Multi(m1._mat[i * m1._cols + k], m2._mat[k * m2._cols + j]));
+                        result._mat[i * result._cols + j] = type_helper.Sum(result._mat[i * result._cols + j], type_helper.Multi(m1._mat[i * m1._cols + k], m2._mat[k * m2._cols + j]));
             return result;
         }
 
         public static Matrix<T> operator *(T n, Matrix<T> m)
         {
-            Matrix<T> r = new Matrix<T>(m._rows, m._cols, m.type_helper);
+            Matrix<T> r = new Matrix<T>(m._rows, m._cols);
             for (int i = 0; i < r._rows * r._cols; i++)
-                r._mat[i] = m.type_helper.Multi(m._mat[i], n);
+                r._mat[i] = type_helper.Multi(m._mat[i], n);
             return r;
         }
 
         public static Matrix<T> operator *(Matrix<T> m, T n)
         {
-            Matrix<T> r = new Matrix<T>(m._rows, m._cols, m.type_helper);
+            Matrix<T> r = new Matrix<T>(m._rows, m._cols);
             for (int i = 0; i < r._rows * r._cols; i++)
-                r._mat[i] = m.type_helper.Multi(m._mat[i], n);
+                r._mat[i] = type_helper.Multi(m._mat[i], n);
             return r;
         }
 
