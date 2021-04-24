@@ -17,13 +17,13 @@ namespace MRL.SSL.Common.Configuration
         {
 
         }
-        public void Load(string baseAddress)
+        public void Load(string address)
         {
             string name = GetType().Name.Substring(0, GetType().Name.LastIndexOf("Config"));
             var t = GetType().GetConstructor(new Type[] { }).Invoke(new object[] { }) as ConfigBase;
             var dom = new ConfigurationBuilder()
-                            .SetBasePath(baseAddress)
-                            .AddJsonFile(name + ".json")
+                            // .SetBasePath(baseAddress)
+                            .AddJsonFile(address)
                             .Build();
 
             t.Name = name;

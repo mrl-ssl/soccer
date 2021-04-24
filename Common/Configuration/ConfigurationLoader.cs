@@ -34,7 +34,7 @@ namespace MRL.SSL.Common.Configuration
                 if (t != null)
                 {
                     ConfigBase c = (ConfigBase)Activator.CreateInstance(t);
-                    c.Load(baseAdress);
+                    c.Load(item);
                 }
                 else
                     Console.WriteLine("Cannot find proper type for {0}.xml file", typeName.Substring(0, typeName.LastIndexOf("Config")));
