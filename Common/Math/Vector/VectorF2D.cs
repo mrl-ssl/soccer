@@ -425,11 +425,19 @@ namespace MRL.SSL.Common.Math
             return dp.Length(); // return the closest distance
         }
 
+        public override Vector2D<float> ToAiCoordinate(bool isReverse)
+        {
+            return Scale(isReverse ? -0.001f : 0.001f);
+        }
+
+        public override Vector2D<float> ToVisionCoordinate(bool isReverse)
+        {
+            return Scale(isReverse ? -1000f : 1000f);
+        }
         public override float VertexAngle(Vector2D<float> b, Vector2D<float> c)
         {
             return AngleModInRadians((this - b).AngleInRadians() - (c - b).AngleInRadians());
         }
-
         public override bool Equals(object obj)
         {
             if (obj != null && (obj is VectorF2D v))
@@ -446,5 +454,6 @@ namespace MRL.SSL.Common.Math
         {
             return base.ToString();
         }
+
     }
 }

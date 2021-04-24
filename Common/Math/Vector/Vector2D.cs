@@ -57,6 +57,9 @@ namespace MRL.SSL.Common.Math
         public abstract void Normalize();
         public abstract void NormTo(T newLength);
 
+        public abstract Vector2D<T> ToAiCoordinate(bool isReverse);
+        public abstract Vector2D<T> ToVisionCoordinate(bool isReverse);
+
         public static T Dot(Vector2D<T> v1, Vector2D<T> v2) { return v1.Dot(v2); }
         public static Vector2D<T> Interpolate(Vector2D<T> start, Vector2D<T> end, T amount) { return start.Interpolate(end, amount); }
         public static T Cosine(Vector2D<T> v1, Vector2D<T> v2) { return v1.Cosine(v2); }    // equivalent to Dot(v1.Norm(),v2.Norm())

@@ -26,7 +26,7 @@ namespace MRL.SSL.Common.Configuration
                             .AddJsonFile(name + ".json")
                             .Build();
 
-            Name = name;
+            t.Name = name;
             _default.Add((int)t.Id, t);
             dom.Bind(t);
         }
@@ -41,6 +41,7 @@ namespace MRL.SSL.Common.Configuration
     public enum ConfigType
     {
         Connection = 0,
-        MergerTracker = 1
+        MergerTracker = 1,
+        Field = 2
     }
 }

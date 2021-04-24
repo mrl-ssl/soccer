@@ -7,11 +7,11 @@ namespace MRL.SSL.Common.Utils.Extensions
     public static class StringExtensions
     {
         private static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
-        public static string ToPascalCase(this String str)
+        private static string ChangeCase(string str, bool pascal)
         {
             var sb = new StringBuilder(str.Length);
 
-            bool isNextUpper = true, isPrevLower = false;
+            bool isNextUpper = pascal, isPrevLower = false;
             for (int i = 0; i < str.Length; i++)
             {
                 var c = str[i];
@@ -27,6 +27,14 @@ namespace MRL.SSL.Common.Utils.Extensions
                 }
             }
             return sb.ToString();
+        }
+        public static string ToPascalCase(this String str)
+        {
+            return ChangeCase(str, true);
+        }
+        public static string ToCamelCase(this String str)
+        {
+            return ChangeCase(str, false);
         }
 
     }

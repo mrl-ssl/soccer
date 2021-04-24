@@ -1,29 +1,54 @@
-
 using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Common
 {
     public class RawObjectState
     {
-        private VectorF2D location;
-        private float angle;
+        public float Angle { get; set; }
+        public VectorF2D Location { get; set; }
+        private int lastSeen = -1;
+        public int LastSeen
+        {
+            get { return lastSeen; }
+            set { lastSeen = value; }
+        }
 
-        public VectorF2D Location { get => location; set => location = value; }
-        public float Angle { get => angle; set => angle = value; }
+        public int Camera { get; set; }
+        public double Time { get; set; }
+        public float Confidence { get; set; }
+
+        public RawObjectState()
+        {
+
+        }
 
         public RawObjectState(float x, float y)
         {
-            location = new VectorF2D(x, y);
+            Location = new VectorF2D(x, y);
         }
 
         public RawObjectState(float x, float y, float theta)
         {
-            location = new VectorF2D(x, y);
-            angle = theta;
+            Location = new VectorF2D(x, y);
+            Angle = theta;
+        }
+        public RawObjectState(float x, float y, float theta, float conf, double time, int cam)
+        {
+            Location = new VectorF2D(x, y);
+            Angle = theta;
+            Camera = cam;
+            Confidence = conf;
+            Time = time;
         }
         public RawObjectState(VectorF2D loc)
         {
-            location = loc;
+            Location = loc;
+        }
+
+        public RawObjectState(VectorF2D loc, float theta)
+        {
+            Location = loc;
+            Angle = theta;
         }
 
     }
