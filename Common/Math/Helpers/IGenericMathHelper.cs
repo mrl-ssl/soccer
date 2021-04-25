@@ -16,11 +16,24 @@ namespace MRL.SSL.Common.Math.Helpers
         T Pow(T x, T y);
         /// <returns>x * x (x^2)</returns>
         T Square(T x);
+        /// <returns>times * x</returns>
+        T Times(int times, T x);
+        /// <returns>times * x</returns>
+        T Times(float times, T x);
         T Sqrt(T a);
         T Cos(T a);
+        T ACos(T a);
         T Sin(T a);
         T Atan2(T y,T x);
         T Radian2Degree(T radian);
+        /// <returns>
+        /// A number that indicates the sign of x, as shown in the following table.
+        ///     Return value – Meaning
+        ///     -1 –x is less than zero.
+        ///     0 –x is equal to zero.
+        ///     1 –x is greater than zero.
+        /// </returns>
+        T Sign(T x);
         /// <returns>-x</returns>
         T Negative(T x);
 

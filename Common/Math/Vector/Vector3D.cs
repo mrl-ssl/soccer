@@ -1,29 +1,108 @@
-using System;
 using ProtoBuf;
 
 namespace MRL.SSL.Common.Math
 {
     [ProtoContract]
     [ProtoInclude(1, typeof(VectorF3D))]
-    public abstract class Vector3D<T>
+    public class Vector3D<T> : Vector<T>
     {
-        protected T z;
-        protected T x;
-        protected T y;
-
         [ProtoMember(1)]
-        public T X { get => x; set => x = value; }
-
+        public T X { get => values[0]; set => values[0] = value; }
         [ProtoMember(2)]
-        public T Y { get => y; set => y = value; }
-
+        public T Y { get => values[1]; set => values[1] = value; }
         [ProtoMember(3)]
-        public T Z { get => z; set => z = value; }
+        public T Z { get => values[2]; set => values[2] = value; }
 
-        protected Vector3D() { }
-        protected Vector3D(T X, T Y, T Z) { x = X; y = Y; z = Z; }
+        public Vector3D() : base(3) { }
+        public Vector3D(T x, T y, T z) : base(x, y, z) { }
+        /// <param name="data">src array</param>
+        /// <param name="deepCopy">if true create new array and copy values from src</param>
+        public Vector3D(T[] data, bool deepCopy = false)
+        {
+            if (data.Length == 3)
+            {
+                if (deepCopy)
+                {
+                    values = new T[data.Length];
+                    for (int i = 0; i < Length; i++)
+                        values[i] = data[i];
+                }
+                else
+                    values = data;
+            }
+            values = new T[3];
+            FillFrom(data);
+        }
 
-        public abstract T Dot(Vector3D<T> v);
+        public Vector3D<T> Cross(Vector3D<T> p)
+        {
+            return new Vector3D<T>
+            {
+                X = th.Sub(th.Multi(Y, p.Z), th.Multi(Z, p.Y)),
+                Y = th.Sub(th.Multi(Z, p.X), th.Multi(X, p.Z)),
+                Z = th.Sub(th.Multi(X, p.Y), th.Multi(Y, p.X))
+            };
+        }
+
+        /// <summary>
+        /// Rotate this vector around specefic axis
+        /// </summary>
+        /// <param name="angle">angle of rotation</param>
+        /// <param name="aboutAxis">x = 0, y = 1, z = 2</param>
+        public Vector3D<T> Rotate(T angle, int aboutAxis, bool clockwise = false)
+        {
+            Vector3D<T> r = new Vector3D<T>(values, true);
+            r.RotateSelf(angle, aboutAxis, clockwise);
+            return r;
+        }
+        /// <summary>
+        /// Rotate this vector around specefic axis
+        /// </summary>
+        /// <param name="angle">angle of rotation</param>
+        /// <param name="aboutAxis">x = 0, y = 1, z = 2</param>
+        public void RotateSelf(T angle, int aboutAxis, bool clockwise = false)
+        {
+            switch (aboutAxis)
+            {
+                case 0:
+                    RotateAboutX(angle, clockwise);
+                    return;
+                case 1:
+                    RotateAboutY(angle, clockwise);
+                    return;
+                case 2:
+                    RotateAboutZ(angle, clockwise);
+                    return;
+                default:
+                    throw new System.ArgumentOutOfRangeException("aboutAxis");
+            }
+        }
+
+        private void RotateAboutX(T angle, bool clockwise = false)
+        {
+            if (clockwise) angle = th.Negative(angle);
+            T cos = th.Cos(angle), sin = th.Sin(angle);
+            Y = th.Sub(th.Multi(cos, Y), th.Multi(sin, Z)); //Y = cos * Y - sin * Z;
+            Z = th.Sum(th.Multi(sin, Y), th.Multi(cos, Z)); //Z = sin * Y + cos * Z;
+        }
+        private void RotateAboutY(T angle, bool clockwise = false)
+        {
+            if (clockwise) angle = th.Negative(angle);
+            T cos = th.Cos(angle), sin = th.Sin(angle);
+            X = th.Sum(th.Multi(cos, X), th.Multi(sin, Z)); //X = cos * X + sin * Z;
+            Z = th.Sub(th.Multi(cos, Z), th.Multi(sin, X)); //Z = cos * Z - sin * Z;
+        }
+        private void RotateAboutZ(T angle, bool clockwise = false)
+        {
+            if (clockwise) angle = th.Negative(angle);
+            T cos = th.Cos(angle), sin = th.Sin(angle);
+            X = th.Sub(th.Multi(cos, X), th.Multi(sin, Y)); //X = cos * X - sin * Y;
+            Y = th.Sum(th.Multi(sin, X), th.Multi(cos, Y)); //Y = sin * X + cos * Y;
+        }
+
+        public static Vector3D<T> operator *(Vector3D<T> v1, Vector3D<T> v2) { return v1.Cross(v2); }
+
+        /*public abstract T Dot(Vector3D<T> v);
         public abstract Vector3D<T> Norm();
         public abstract Vector3D<T> Cross(Vector3D<T> p);
         public abstract Vector3D<T> RotateX(T angle);
@@ -94,6 +173,6 @@ namespace MRL.SSL.Common.Math
         public override int GetHashCode()
         {
             return base.GetHashCode();
-        }
+        }*/
     }
 }

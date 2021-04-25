@@ -54,6 +54,12 @@ namespace MRL.SSL.Common.Math
             return new Vector2D<T>(values);
         }
 
+        public Vector3D<T> ToVector3D()
+        {
+            if (this is Vector3D<T> v) return v;
+            return new Vector3D<T>(values);
+        }
+
         /// <summary>
         /// Fill vector by given value
         /// </summary>
@@ -151,6 +157,7 @@ namespace MRL.SSL.Common.Math
         }
 
         /// <summary>
+        /// Distance of this matrix from another
         /// its limited to this matrix dimention and higher dimentions ignored
         /// </summary>
         public T Distance(Vector<T> v) => th.Sqrt(SquareDistance(v));
@@ -300,9 +307,17 @@ namespace MRL.SSL.Common.Math
         public Vector<T> Reverse()
         {
             Vector<T> r = Clone();
-            for (int i = 0; i < Length; i++)
-                r.values[i] = th.Negative(values[i]);
+            r.ReverseSelf();
             return r;
+        }
+
+        /// <summary>
+        /// this vector become (-x0, -x1, ...)
+        /// </summary>
+        public void ReverseSelf()
+        {
+            for (int i = 0; i < Length; i++)
+                values[i] = th.Negative(values[i]);
         }
 
         /// <summary>

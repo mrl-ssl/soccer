@@ -1,5 +1,3 @@
-using System;
-using MRL.SSL.Common.Math.Helpers;
 using ProtoBuf;
 
 namespace MRL.SSL.Common.Math
@@ -7,7 +5,11 @@ namespace MRL.SSL.Common.Math
     [ProtoContract]
     public class VectorF2D : Vector2D<float>
     {
-        public VectorF2D() : base() { }
+        public VectorF2D() { }
+
+        public VectorF2D(float x, float y) : base(x, y) { }
+
+        /*public VectorF2D() : base() { }
         public VectorF2D(float _x, float _y) : base(_x, _y) { }
 
         public static VectorF2D Zero
@@ -446,6 +448,6 @@ namespace MRL.SSL.Common.Math
         public override string ToString()
         {
             return base.ToString();
-        }
+        }*/
     }
 }

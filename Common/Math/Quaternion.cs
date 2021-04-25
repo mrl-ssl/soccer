@@ -193,7 +193,7 @@ namespace MRL.SSL.Common.Math
                 angle *= 0.5F;
                 float sinAngle = MathF.Sin(angle);
                 VectorF3D vn = v;
-                vn.Normalize();
+                vn.NormSelf();
                 x = (vn.X * sinAngle);
                 y = (vn.Y * sinAngle);
                 z = (vn.Z * sinAngle);
@@ -315,7 +315,7 @@ namespace MRL.SSL.Common.Math
             Vector3D<float> cross = from * to;
             float dot = from.Dot(to);
             dot = MathF.Sqrt(2F * (dot + 1F));
-            cross /= dot;
+            cross = (cross / dot).ToVector3D();
             return new Quaternion(cross.X, cross.Y, cross.Z, -dot / 2F);
         }
     }

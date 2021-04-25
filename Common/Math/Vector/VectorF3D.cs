@@ -1,5 +1,3 @@
-using System;
-using MRL.SSL.Common.Math.Helpers;
 using ProtoBuf;
 
 namespace MRL.SSL.Common.Math
@@ -8,6 +6,10 @@ namespace MRL.SSL.Common.Math
     public class VectorF3D : Vector3D<float>
     {
         public VectorF3D() { }
+
+        public VectorF3D(float x, float y, float z) : base(x, y, z) { }
+
+        /*public VectorF3D() { }
         public VectorF3D(float X, float Y, float Z) : base(X, Y, Z) { x = X; y = Y; z = Z; }
         public static VectorF3D Zero
         {
@@ -357,6 +359,7 @@ namespace MRL.SSL.Common.Math
             if (obj != null && (obj is VectorF3D v))
                 return MathF.Abs(x - v.x) < MathHelper.EpsilonF && MathF.Abs(y - v.y) < MathHelper.EpsilonF && MathF.Abs(z - v.z) < MathHelper.EpsilonF;
             return false;
-        }
+        }*/
+
     }
 }

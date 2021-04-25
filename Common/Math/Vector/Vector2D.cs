@@ -1,12 +1,18 @@
 using System;
+using ProtoBuf;
 
 namespace MRL.SSL.Common.Math
 {
+    [ProtoContract]
+    [ProtoInclude(1, typeof(VectorF2D))]
     public class Vector2D<T> : Vector<T>
     {
+        [ProtoMember(1)]
         public T X { get => values[0]; set => values[0] = value; }
+        [ProtoMember(2)]
         public T Y { get => values[1]; set => values[1] = value; }
 
+        public Vector2D() : base(2) { }
         public Vector2D(T x, T y) : base(x, y) { }
         /// <param name="data">src array</param>
         /// <param name="deepCopy">if true create new array and copy values from src</param>
@@ -44,6 +50,13 @@ namespace MRL.SSL.Common.Math
         public T AngleModInDegrees(T angle) => th.Radian2Degree(AngleModInRadians(angle));
         public T AngleInRadians() => th.Atan2(Y, X);
         public T AngleInDegrees() => th.Radian2Degree(AngleInRadians());
+        public T AngleBetweenInRadians(Vector2D<T> v)
+        {
+            T s = Size(), sv = v.Size();
+            if (th.EqualZero(s) || th.EqualZero(sv)) throw new DivideByZeroException("One or both vector is not vector! its point");
+            return th.ACos(th.Divide(Dot(v), th.Multi(s, sv)));
+        }
+        public T AngleBetweenInDegrees(Vector2D<T> v) => th.Radian2Degree(AngleBetweenInRadians(v));
         public T Cosine(Vector2D<T> v)
         {
             T l = this.Dot(v);
@@ -150,24 +163,52 @@ namespace MRL.SSL.Common.Math
             return FromAngle(a.AngleInRadians(), t.Size()).Sum(this).ToVector2D();
         }
 
-        public Vector2D<T> Interpolate(Vector2D<T> end, T amount)
-        {
-            T tl = th.Sum(th.Multi(X, th.Sub(th.One, amount)), th.Multi(end.X, amount)); //X * (1 - amount) + end.X * amount
-            T tr = th.Sum(th.Multi(Y, th.Sub(th.One, amount)), th.Multi(end.Y, amount)); //X * (1 - amount) + end.X * amount
-            return new Vector2D<T>(tl, tr);
-        }
-
         public Vector3D<T> Cross(Vector2D<T> v)
         {
             return new Vector3D<T>(th.Zero, th.Zero, th.Sub(th.Multi(X, v.Y), th.Multi(Y, v.X)));
         }
 
+        /// <summary>
+        /// gives counterclockwise angle from this-b to c-b in radian
+        /// </summary>
+        /// <returns>gives counterclockwise angle from this-b to c-b in radian</returns>
+        public T VertexAngle(Vector2D<T> b, Vector2D<T> c)
+        {
+            T a1 = (this - b).ToVector2D().AngleInRadians();
+            T a2 = (c - b).ToVector2D().AngleInRadians();
+            return AngleModInRadians(th.Sub(a1, a2));
+        }
+
+        public Vector2D<T> PrependecularPoint(Vector2D<T> start, Vector2D<T> from)
+        {
+            Vector2D<T> startFromVec = (from - start).ToVector2D();
+            Vector2D<T> fromStartVec = (start - from).ToVector2D();
+            T teta = AngleBetweenInRadians(startFromVec);
+            T s = th.One;
+            if (th.Greater(th.Abs(teta), th.Times(0.5f, th.PI))) // |teta| > Pi/2
+            {
+                s = th.NegativeOne;
+                teta = th.Multi(th.Sub(th.PI, th.Abs(teta)), th.Sign(teta));    // (PI - |teta|) * Sign(teta)
+            }
+            T d = th.Abs(th.Multi(startFromVec.Size(), th.Sin(teta)));
+            T alfa = th.Sub(th.Times(0.5f, th.PI), th.Abs(teta));
+            T temp = th.Multi(s, th.Multi(th.Sign(teta), alfa)); // s * sign(teta) * alfa
+            return (from + FromAngle(th.Sub(fromStartVec.AngleInRadians(), temp), d)).ToVector2D();
+        }
+
+        public bool IsBetween(Vector2D<T> other, Vector2D<T> v)
+        {
+            Vector3D<T> n = other.Cross(this);
+            T innerL = n.Dot(other.Cross(v)), innerR = n.Dot(v.Cross(this));
+            return th.GreaterOrEqualThanZero(innerL) && th.GreaterOrEqualThanZero(innerR);
+        }
+
         public static Vector2D<T> SegmentNearLine(Vector2D<T> a0, Vector2D<T> a1, Vector2D<T> b0, Vector2D<T> b1) { return a0.SegmentNearLine(a1, b0, b1); }
 
         public static T OffsetToLine(Vector2D<T> x0, Vector2D<T> x1, Vector2D<T> p) { return x0.OffsetToLine(x1, p); }
-        
+
         public static T OffsetAlongLine(Vector2D<T> x0, Vector2D<T> x1, Vector2D<T> p) { return x0.OffsetAlongLine(x1, p); }
-        
+
         /// <summary>
         /// Distance of p from line wich defined by two point on it
         /// </summary>
@@ -176,11 +217,23 @@ namespace MRL.SSL.Common.Math
         /// <param name="lp2">second point on the line</param>
         /// <returns>Distance of p from line</returns>
         public static T DistanceFromLine(Vector2D<T> p, Vector2D<T> lp1, Vector2D<T> lp2) { return p.DistanceFromLine(lp1, lp2); }
-        
+
         public static Vector2D<T> Intersection(Vector2D<T> a1, Vector2D<T> a2, Vector2D<T> b1, Vector2D<T> b2) { return a1.Intersection(a2, b1, b2); }
 
         public static Vector2D<T> FromAngle(T angle, T size) => new Vector2D<T>(th.Multi(size, th.Cos(angle)), th.Multi(size, th.Sin(angle)));
-        
+
+        /// <summary>
+        /// gives counterclockwise angle from a-b to c-b in radian
+        /// </summary>
+        /// <returns>counterclockwise angle from a-b to c-b in radian</returns>
+        public static T VertexAngle(Vector2D<T> a, Vector2D<T> b, Vector2D<T> c) { return a.VertexAngle(b, c); }
+
+        public static T AngleBetweenInRadians(Vector2D<T> v1, Vector2D<T> v2) { return v1.AngleBetweenInRadians(v2); }
+
+        public static T AngleBetweenInDegrees(Vector2D<T> v1, Vector2D<T> v2) { return v1.AngleBetweenInDegrees(v2); }
+
+        public static bool IsBetween(Vector2D<T> Right, Vector2D<T> Left, Vector2D<T> v) { return Right.IsBetween(Left, v); }
+
         public static Vector3D<T> operator *(Vector2D<T> v1, Vector2D<T> v2) { return v1.Cross(v2); }
     }
     /*public abstract class Vector2D<T>
