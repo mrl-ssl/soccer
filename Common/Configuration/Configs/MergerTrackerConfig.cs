@@ -14,6 +14,7 @@ namespace MRL.SSL.Common.Configuration
         public float LastBallMaxDistance { get; set; }
         public int FramesToDetectCameras { get; set; }
         public float BallRadi { get; set; }
+        public float SqImmobileThreshold { get; set; }
         public MergerTrackerConfig()
         {
         }

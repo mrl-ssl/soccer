@@ -22,7 +22,6 @@ namespace MRL.SSL.Common.Configuration
             string name = GetType().Name.Substring(0, GetType().Name.LastIndexOf("Config"));
             var t = GetType().GetConstructor(new Type[] { }).Invoke(new object[] { }) as ConfigBase;
             var dom = new ConfigurationBuilder()
-                            // .SetBasePath(baseAddress)
                             .AddJsonFile(address)
                             .Build();
 

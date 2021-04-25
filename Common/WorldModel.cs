@@ -23,7 +23,6 @@ namespace MRL.SSL.Common
             OurRobotsRaw = new Dictionary<int, RawObjectState>();
             OpponentsRaw = new Dictionary<int, RawObjectState>();
             OtherBalls = new Dictionary<int, RawObjectState>();
-
         }
 
     }
