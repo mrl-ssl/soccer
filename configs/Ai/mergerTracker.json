@@ -1,0 +1,12 @@
+{
+  "availableCameras": [0, 1, 2, 3, 4, 5, 6, 7],
+  "maxCameraCount": 8,
+  "teamsCount": 2,
+  "maxRobotId": 16,
+  "affinityPersist": 30,
+  "frameRate": 60,
+  "lastBallMaxDistance": 1000000,
+  "framesToDetectCameras": 100,
+  "ballRadi": 0.0215,
+  "sqImmobileThreshold": 0.034
+}

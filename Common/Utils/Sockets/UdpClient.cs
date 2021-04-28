@@ -293,7 +293,6 @@ namespace MRL.SSL.Common.Utils.Sockets
             Disconnect();
             while (IsConnected)
             {
-                // Console.WriteLine("an");
                 Thread.Yield();
             }
         }

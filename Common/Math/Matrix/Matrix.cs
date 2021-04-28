@@ -58,33 +58,73 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         /// Paste matrix v to right side of this matrix.
         ///</summary>
-        public void Append(Matrix<T> v)
+        public virtual Matrix<T> Append(Matrix<T> v)
         {
-            Matrix<T> t = new Matrix<T>(System.Math.Max(_Rows, v._Rows), _Cols + v._Cols, Operator);
+            Matrix<T> t = new Matrix<T>(System.Math.Max(_Rows, v.Rows), _Cols + v.Cols, Operator);
+
             for (int i = 0; i < t._Rows; i++)
             {
                 for (int j = 0; j < t._Cols; j++)
                 {
-                    if (i >= _Rows)
+                    if (i < _Rows)
                     {
-                        if (j >= _Cols) { t._mat[i * t._Cols + j] = v._mat[i * v._Cols + j - _Cols]; }
-                        else { t._mat[i * t._Cols + j] = Operator.Zero; }
-                    }
-                    else if (i >= v._Rows)
-                    {
-                        if (j >= _Cols) { t._mat[i * t._Cols + j] = Operator.Zero; }
-                        else { t._mat[i * t._Cols + j] = _mat[i * _Cols + j]; }
+                        if (j < _Cols) t._mat[i * t._Cols + j] = _mat[i * _Cols + j];
+                        else if (i < v.Rows) t._mat[i * t._Cols + j] = v.Data[i * v.Cols + j - _Cols];
+                        else t._mat[i * t._Cols + j] = Operator.Zero;
                     }
                     else
                     {
-                        if (j >= _Cols) { t._mat[i * t._Cols + j] = v._mat[i * v._Cols + j - _Cols]; }
-                        else { t._mat[i * t._Cols + j] = _mat[i * _Cols + j]; }
+                        if (j >= _Cols && j < v.Cols + _Cols) t._mat[i * t._Cols + j] = v.Data[i * v.Cols + j - _Cols];
+                        else t._mat[i * t._Cols + j] = Operator.Zero;
                     }
                 }
             }
-            _Cols = t._Cols; _Rows = t._Rows; _mat = t._mat;
+            return t;
+
         }
 
+        ///<summary>
+        /// Paste matrix v to bottom of this matrix.
+        ///</summary>
+        public virtual Matrix<T> Stack(Matrix<T> v)
+        {
+            Matrix<T> t = new Matrix<T>(_Rows + v.Rows, System.Math.Max(_Cols, v.Cols), Operator);
+            for (int i = 0; i < t._Rows; i++)
+            {
+                for (int j = 0; j < t._Cols; j++)
+                {
+                    if (j < _Cols)
+                    {
+                        if (i < _Rows) t._mat[i * t._Cols + j] = _mat[i * _Cols + j];
+                        else if (j < v.Cols) t._mat[i * t._Cols + j] = v.Data[(i - _Rows) * v.Cols + j];
+                        else t._mat[i * t._Cols + j] = Operator.Zero;
+                    }
+                    else
+                    {
+                        if (i >= _Rows && i < v.Rows + _Rows) t._mat[i * t._Cols + j] = v.Data[(i - _Rows) * v.Cols + j];
+                        else t._mat[i * t._Cols + j] = Operator.Zero;
+                    }
+                }
+            }
+            return t;
+        }
+        ///<summary>
+        /// Paste matrix v to right bottom side of this matrix.
+        ///</summary>
+        public virtual Matrix<T> Diagonal(Matrix<T> v)
+        {
+            Matrix<T> t = new Matrix<T>(_Rows + v.Rows, _Cols + v.Cols, Operator);
+            for (int i = 0; i < t._Rows; i++)
+            {
+                for (int j = 0; j < t._Cols; j++)
+                {
+                    if (i < _Rows && j < _Cols) t._mat[i * t._Cols + j] = _mat[i * _Cols + j];
+                    else if (i > _Rows && j >= _Cols) t._mat[i * t._Cols + j] = v.Data[(i - _Rows) * v.Cols + j - _Cols];
+                    else t._mat[i * t._Cols + j] = Operator.Zero;
+                }
+            }
+            return t;
+        }
         ///<summary>
         /// Fill all elements with zero.
         ///</summary>
@@ -148,26 +188,9 @@ namespace MRL.SSL.Common.Math
             ValueChanged = true;
         }
 
-        ///<summary>
-        /// Paste matrix v to right bottom side of this matrix.
-        ///</summary>
-        public void Diagonal(Matrix<T> v)
-        {
-            Matrix<T> t = new Matrix<T>(_Rows + v._Rows, _Cols + v._Cols, Operator);
-            for (int i = 0; i < t._Rows; i++)
-            {
-                for (int j = 0; j < t._Cols; j++)
-                {
-                    if (i < _Rows && j < _Cols) { t._mat[i * t._Cols + j] = _mat[i * _Cols + j]; }
-                    else if (i >= _Rows && j >= _Cols) { t._mat[i * t._Cols + j] = v._mat[(i - _Rows) * v._Cols + j - _Cols]; }
-                    else { t._mat[i * t._Cols + j] = Operator.Zero; }
-                }
-            }
-            _Cols = t._Cols; _Rows = t._Rows; _mat = t._mat;
-        }
 
         /// <returns>
-        /// The copy of this matrix.
+        /// copy  this matrix.
         /// </returns>
         public Matrix<T> Duplicate()
         {
@@ -235,7 +258,7 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         /// Remove ith row and jth col.
         ///</summary>
-        public void Reduce(int irows, int jcols)
+        public virtual void Reduce(int irows, int jcols)
         {
             RemoveCol(jcols); RemoveRow(irows); ValueChanged = true;
         }
@@ -243,7 +266,7 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         /// Remove col from this matrix.
         ///</summary>
-        public void RemoveCol(int col)
+        public virtual void RemoveCol(int col)
         {
             if (col >= _Cols || col < 0) throw new Exception("Wrong col index");
             Matrix<T> t = new Matrix<T>(_Rows, _Cols - 1, Operator);
@@ -261,7 +284,7 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         /// Remove row from this matrix.
         ///</summary>
-        public void RemoveRow(int row)
+        public virtual void RemoveRow(int row)
         {
             if (row >= _Rows || row < 0) throw new Exception("Wrong row index");
             Matrix<T> t = new Matrix<T>(_Rows - 1, _Cols, Operator);
@@ -278,7 +301,7 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         /// Set first col of matrix v to col k of this matrix.
         ///</summary>
-        public void SetCol(Matrix<T> v, int k)
+        public virtual void SetCol(Matrix<T> v, int k)
         {
             if (v._Rows != _Rows) throw new Exception("Rows must be same.");
             for (int i = 0; i < _Rows; i++) _mat[i * _Cols + k] = v._mat[i * v._Cols];
@@ -288,41 +311,11 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         /// Set first row of v to row k of this matrix.
         ///</summary>
-        public void SetRow(Matrix<T> v, int k)
+        public virtual void SetRow(Matrix<T> v, int k)
         {
             if (v._Cols != _Cols) throw new Exception("Cols must be same");
             for (int i = 0; i < _Cols; i++) _mat[k * _Cols + i] = v._mat[i];
             ValueChanged = true;
-        }
-
-        ///<summary>
-        /// Paste matrix v to bottom of this matrix.
-        ///</summary>
-        public void Stack(Matrix<T> v)
-        {
-            Matrix<T> t = new Matrix<T>(_Rows + v._Rows, System.Math.Max(_Cols, v._Cols), Operator);
-            for (int i = 0; i < t._Rows; i++)
-            {
-                for (int j = 0; j < t._Cols; j++)
-                {
-                    if (j >= v._Cols)
-                    {
-                        if (i >= _Rows) { t._mat[i * t._Cols + j] = Operator.Zero; }
-                        else { t._mat[i * t._Cols + j] = _mat[i * _Cols + j]; }
-                    }
-                    else if (j >= _Cols)
-                    {
-                        if (i >= _Rows) { t._mat[i * t._Cols + j] = v._mat[(i - _Rows) * v._Cols + j]; }
-                        else { t._mat[i * t._Cols + j] = Operator.Zero; }
-                    }
-                    else
-                    {
-                        if (i >= _Rows) { t._mat[i * t._Cols + j] = v._mat[(i - _Rows) * v._Cols + j]; }
-                        else { t._mat[i * t._Cols + j] = _mat[i * _Cols + j]; }
-                    }
-                }
-            }
-            _Cols = t._Cols; _Rows = t._Rows; _mat = t._mat;
         }
 
         /// <returns>

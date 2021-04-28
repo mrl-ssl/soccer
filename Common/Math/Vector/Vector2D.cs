@@ -18,6 +18,10 @@ namespace MRL.SSL.Common.Math
         public abstract T Dot(Vector2D<T> v);
         public abstract T AngleModInDegrees(T angle);
         public abstract T AngleModInRadians(T angle);
+        public abstract T AngleBetweenInRadians(Vector2D<T> v);
+        public abstract T AngleBetweenInDegrees(Vector2D<T> v);
+        public abstract T SmallestAngleBetweenInRadians(Vector2D<T> v);
+        public abstract T SmallestAngleBetweenInDegrees(Vector2D<T> v);
         public abstract T AngleInRadians();
         public abstract T AngleInDegrees();
         public abstract T Cosine(Vector2D<T> v);
@@ -31,10 +35,9 @@ namespace MRL.SSL.Common.Math
         public abstract T OffsetToLine(Vector2D<T> x1, Vector2D<T> p);
         public abstract T OffsetAlongLine(Vector2D<T> x1, Vector2D<T> p);
         public abstract Vector2D<T> GetRotate(T angle);
+        public abstract void Rotate(T angle);
         public abstract Vector2D<T> Intersection(Vector2D<T> a2, Vector2D<T> b1, Vector2D<T> b2);
         public abstract Vector2D<T> Interpolate(Vector2D<T> end, T amount);
-        public abstract void Rotate(T angle);
-        public abstract Vector2D<T> Norm();
         public abstract Vector2D<T> GetPerp();
         public abstract Vector2D<T> Abs();
         public abstract Vector2D<T> Max(Vector2D<T> v);
@@ -47,15 +50,18 @@ namespace MRL.SSL.Common.Math
         public abstract Vector2D<T> Reverse();
         public abstract T VertexAngle(Vector2D<T> b, Vector2D<T> c);
         public abstract Vector2D<T> PointOnSegment(Vector2D<T> x1, Vector2D<T> p);
-        public abstract T AngleBetweenInRadians(Vector2D<T> v);
-        public abstract T AngleBetweenInDegrees(Vector2D<T> v);
         public abstract Vector2D<T> PrependecularPoint(Vector2D<T> start, Vector2D<T> from);
         public abstract bool IsBetween(Vector2D<T> other, Vector2D<T> v);
-
+        public abstract void ToAngleSize(float angle, float size);
         public abstract T Length();
         public abstract T SqLength();
-        public abstract void Normalize();
+        public abstract Vector2D<T> GetNormTo(T newLength);
         public abstract void NormTo(T newLength);
+        public abstract void Norm();
+        public abstract Vector2D<T> GetNorm();
+
+        public abstract Vector2D<T> ToAiCoordinate(bool isReverse);
+        public abstract Vector2D<T> ToVisionCoordinate(bool isReverse);
 
         public static T Dot(Vector2D<T> v1, Vector2D<T> v2) { return v1.Dot(v2); }
         public static Vector2D<T> Interpolate(Vector2D<T> start, Vector2D<T> end, T amount) { return start.Interpolate(end, amount); }

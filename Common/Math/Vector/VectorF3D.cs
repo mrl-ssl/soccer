@@ -71,6 +71,10 @@ namespace MRL.SSL.Common.Math
             r = lHead + (lTail - lHead) * t;
             return r.Distance(this);
         }
+        public override float TripleProdcut(Vector2D<float> v, Vector2D<float> y)
+        {
+            return Dot(v.Cross(y));
+        }
 
         public override float Dot(Vector3D<float> v)
         {

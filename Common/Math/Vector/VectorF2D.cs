@@ -24,7 +24,15 @@ namespace MRL.SSL.Common.Math
         {
             return new VectorF2D(x + v.X, y + v.Y);
         }
+        public override float SmallestAngleBetweenInDegrees(Vector2D<float> v)
+        {
+            return SmallestAngleBetweenInRadians(v) * 180F / MathF.PI;
+        }
 
+        public override float SmallestAngleBetweenInRadians(Vector2D<float> v)
+        {
+            return Dot(v) / (Length() * v.Length());
+        }
         public override float AngleBetweenInDegrees(Vector2D<float> v)
         {
             return AngleBetweenInRadians(v) * 180F / MathF.PI;
@@ -32,14 +40,11 @@ namespace MRL.SSL.Common.Math
 
         public override float AngleBetweenInRadians(Vector2D<float> v)
         {
-            float a1 = MathF.Atan2(y, x), a2 = MathF.Atan2(v.Y, v.X);
-            float d = a1 - a2;
-            while (d > MathF.PI)
-                d -= 2F * MathF.PI;
-
-            while (d < -MathF.PI)
-                d += 2F * MathF.PI;
-            return d;
+            var angle = SmallestAngleBetweenInRadians(v);
+            var sgn = new VectorF3D(0, 0, 1).TripleProdcut(this, v);
+            if (sgn > 0)
+                return -angle;
+            return angle;
         }
 
         public override Vector3D<float> Cross(Vector2D<float> p)
@@ -62,22 +67,28 @@ namespace MRL.SSL.Common.Math
         {
             return new VectorF2D(size * MathF.Cos(angle), size * MathF.Sin(angle));
         }
+        public override void ToAngleSize(float angle, float size)
+        {
+            x = size * MathF.Cos(angle);
+            y = size * MathF.Sin(angle);
+        }
+
 
         public override float Length()
         {
             return MathF.Sqrt(x * x + y * y);
         }
 
-        public override Vector2D<float> Norm()
+        public override Vector2D<float> GetNorm()
         {
             VectorF2D r = new VectorF2D();
             float Size = Length();
-            if (Size < MathHelper.EpsilonF) return new VectorF2D(0F, 0F);
+            if (Size < MathHelper.EpsilonF) return r;
             r.x = x / Size; r.y = y / Size;
             return r;
         }
 
-        public override void Normalize()
+        public override void Norm()
         {
             float Size = Length();
             if (Size < MathHelper.EpsilonF) { x = 0F; y = 0F; return; }
@@ -88,14 +99,26 @@ namespace MRL.SSL.Common.Math
         {
             float size = Length();
             if (size < MathHelper.EpsilonF)
-                x = y = 0F;
-            else
             {
-                x *= newLength / size;
-                y *= newLength / size;
+                x = y = 0F;
+                return;
             }
-        }
+            x *= newLength / size;
+            y *= newLength / size;
 
+        }
+        public override Vector2D<float> GetNormTo(float newLength)
+        {
+            VectorF2D r = new VectorF2D();
+            float size = Length();
+            if (size < MathHelper.EpsilonF)
+                return r;
+
+            r.x = x * newLength / size;
+            r.y = y * newLength / size;
+
+            return r;
+        }
         public override Vector2D<float> Scale(float s)
         {
             return new VectorF2D(x * s, y * s);
@@ -123,13 +146,12 @@ namespace MRL.SSL.Common.Math
 
         public override Vector2D<float> GetRotate(float angle)
         {
-            return FromAngleSize(angle, Length());
+            return FromAngleSize(this.AngleInRadians() + angle, Length());
         }
 
         public override void Rotate(float angle)
         {
-            VectorF2D v = FromAngleSize(angle, Length());
-            x = v.x; y = v.y;
+            ToAngleSize(this.AngleInRadians() + angle, Length());
         }
 
         public override Vector2D<float> GetPerp()
@@ -152,7 +174,7 @@ namespace MRL.SSL.Common.Math
             Vector2D<float> n, v;
             // get normal to line
             n = x1 - this;
-            n.Normalize();
+            n.Norm();
             v = p - this;
             return (n.Dot(v));
         }
@@ -215,9 +237,7 @@ namespace MRL.SSL.Common.Math
 
         public override float Cosine(Vector2D<float> v)
         {
-            float l = (this.Dot(v));
-            float t = Length() * v.Length();
-            return l / t;
+            return this.Dot(v) / (Length() * v.Length());
         }
 
         public override float Distance(Vector2D<float> v)
@@ -261,7 +281,7 @@ namespace MRL.SSL.Common.Math
             float dn, t;
 
             v = a1 - this;
-            n = (b1 - b0).Norm();
+            n = (b1 - b0).GetNorm();
             n = n.GetPerp();
 
             dn = Dot(v, n);
@@ -425,11 +445,19 @@ namespace MRL.SSL.Common.Math
             return dp.Length(); // return the closest distance
         }
 
+        public override Vector2D<float> ToAiCoordinate(bool isReverse)
+        {
+            return Scale(isReverse ? -0.001f : 0.001f);
+        }
+
+        public override Vector2D<float> ToVisionCoordinate(bool isReverse)
+        {
+            return Scale(isReverse ? -1000f : 1000f);
+        }
         public override float VertexAngle(Vector2D<float> b, Vector2D<float> c)
         {
             return AngleModInRadians((this - b).AngleInRadians() - (c - b).AngleInRadians());
         }
-
         public override bool Equals(object obj)
         {
             if (obj != null && (obj is VectorF2D v))
@@ -446,5 +474,7 @@ namespace MRL.SSL.Common.Math
         {
             return base.ToString();
         }
+
+
     }
 }

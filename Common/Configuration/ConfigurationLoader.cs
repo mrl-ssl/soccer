@@ -1,10 +1,8 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Xml;
-// using Microsoft.Extensions.Configuration.FileExtensions;
 using System.Reflection;
 using System.IO;
 using System.Linq;
 using System;
+using MRL.SSL.Common.Utils.Extensions;
 
 namespace MRL.SSL.Common.Configuration
 {
@@ -26,17 +24,17 @@ namespace MRL.SSL.Common.Configuration
                 dir = Path.Combine(parent.FullName, "configs");
             }
             var baseAdress = Path.Combine(dir, section);
-            var fileEntries = Directory.GetFiles(baseAdress).ToList().Where(w => w.LastIndexOf(".xml") > 0);
+            var fileEntries = Directory.GetFiles(baseAdress).ToList().Where(w => w.LastIndexOf(".json") > 0);
             var types = Assembly.GetAssembly(typeof(ConfigBase)).GetTypes().ToList().Where(t => t.IsClass && t.IsSubclassOf(typeof(ConfigBase))).ToList();
 
             foreach (var item in fileEntries)
             {
-                string typeName = Path.GetFileNameWithoutExtension(item) + "Config";
+                string typeName = Path.GetFileNameWithoutExtension(item).ToPascalCase() + "Config";
                 var t = types.Where(w => w.Name == typeName).FirstOrDefault();
                 if (t != null)
                 {
                     ConfigBase c = (ConfigBase)Activator.CreateInstance(t);
-                    c.Load(baseAdress);
+                    c.Load(item);
                 }
                 else
                     Console.WriteLine("Cannot find proper type for {0}.xml file", typeName.Substring(0, typeName.LastIndexOf("Config")));

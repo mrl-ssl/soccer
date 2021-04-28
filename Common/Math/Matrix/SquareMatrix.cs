@@ -4,7 +4,7 @@ namespace MRL.SSL.Common.Math
 {
     public class SquareMatrix<T> : Matrix<T>
     {
-        public int Dimention;
+        public int Dimension { get { return _Rows; } }
         private int[] pi;
         private T detOfP;
         private SquareMatrix<T> _L;
@@ -21,45 +21,15 @@ namespace MRL.SSL.Common.Math
         public SquareMatrix<T> U { get { return _U; } }
 
         /// <param name="OperatorType">Structure wich derived from IOperator wich do operator like add,subtract,multiply,... </param>
-        public SquareMatrix(IOperator<T> OperatorType) : base(OperatorType) { Operator = OperatorType; detOfP = Operator.One; }
+        public SquareMatrix(IOperator<T> OperatorType) : base(OperatorType) { detOfP = Operator.One; }
 
         ///<param name="dimention"> Row and column of square matrix.</param>
         /// <param name="OperatorType">Structure wich derived from IOperator wich do operator like add,subtract,multiply,... </param>
         public SquareMatrix(int dimention, IOperator<T> OperatorType) : base(dimention, dimention, OperatorType)
         {
-            Dimention = dimention; Operator = OperatorType; detOfP = Operator.One;
+            detOfP = Operator.One;
         }
 
-        ///<summary>
-        /// Paste matrix v to right side of this matrix and convert it to square matrix.
-        ///</summary>
-        public new void Append(Matrix<T> v)
-        {
-            Matrix<T> t = new Matrix<T>(System.Math.Max(_Rows, v.Rows), _Cols + v.Cols, Operator);
-            for (int i = 0; i < t.Rows; i++)
-            {
-                for (int j = 0; j < t.Cols; j++)
-                {
-                    if (i >= _Rows)
-                    {
-                        if (j >= _Cols) { t.Data[i * t.Cols + j] = v.Data[i * v.Cols + j - _Cols]; }
-                        else { t.Data[i * t.Cols + j] = Operator.Zero; }
-                    }
-                    else if (i >= v.Rows)
-                    {
-                        if (j >= _Cols) { t.Data[i * t.Cols + j] = Operator.Zero; }
-                        else { t.Data[i * t.Cols + j] = _mat[i * _Cols + j]; }
-                    }
-                    else
-                    {
-                        if (j >= _Cols) { t.Data[i * t.Cols + j] = v.Data[i * v.Cols + j - _Cols]; }
-                        else { t.Data[i * t.Cols + j] = _mat[i * _Cols + j]; }
-                    }
-                }
-            }
-            SquareMatrix<T> temp = t.ToSquareMatrix();
-            _Cols = temp._Cols; _Rows = temp._Rows; _mat = temp._mat; Dimention = temp.Dimention; ValueChanged = true;
-        }
 
         ///<summary>
         /// Returns determinant of this matrix.
@@ -71,24 +41,77 @@ namespace MRL.SSL.Common.Math
             for (int i = 0; i < _Rows; i++) det = Operator.Multiply(det, _U._mat[i * _U._Cols + i]);
             return det;
         }
-
         ///<summary>
-        ///Append matrix v to right bottom side of this matrix and convert it to square matrix.
+        /// Paste matrix v to right side of this matrix and convert it to square matrix.
         ///</summary>
-        public new void Diagonal(Matrix<T> v)
+        public override SquareMatrix<T> Append(Matrix<T> v)
         {
-            Matrix<T> t = new Matrix<T>(_Rows + v.Rows, _Cols + v.Cols, Operator);
-            for (int i = 0; i < t.Rows; i++)
+            var dim = System.Math.Max(System.Math.Max(_Rows, v.Rows), _Cols + v.Cols);
+            SquareMatrix<T> t = new SquareMatrix<T>(dim, Operator);
+
+            for (int i = 0; i < dim; i++)
             {
-                for (int j = 0; j < t.Cols; j++)
+                for (int j = 0; j < dim; j++)
                 {
-                    if (i < _Rows && j < _Cols) { t.Data[i * t.Cols + j] = _mat[i * _Cols + j]; }
-                    else if (i >= _Rows && j >= _Cols) { t.Data[i * t.Cols + j] = v.Data[(i - _Rows) * v.Cols + j - _Cols]; }
-                    else { t.Data[i * t.Cols + j] = Operator.Zero; }
+                    if (i < _Rows)
+                    {
+                        if (j < _Cols) t._mat[i * dim + j] = _mat[i * _Cols + j];
+                        else if (i < v.Rows && j < v.Cols + _Cols) t._mat[i * dim + j] = v.Data[i * v.Cols + j - _Cols];
+                        else t._mat[i * dim + j] = Operator.Zero;
+                    }
+                    else
+                    {
+                        if (i < v.Rows && j >= _Cols && j < v.Cols + _Cols) t._mat[i * dim + j] = v.Data[i * v.Cols + j - _Cols];
+                        else t._mat[i * dim + j] = Operator.Zero;
+                    }
                 }
             }
-            SquareMatrix<T> temp = t.ToSquareMatrix();
-            _Cols = temp._Cols; _Rows = temp._Rows; _mat = temp._mat; Dimention = temp.Dimention; ValueChanged = true;
+            return t;
+        }
+        ///<summary>
+        /// Paste matrix v to the bottom side of this matrix.
+        ///</summary>
+        public override SquareMatrix<T> Stack(Matrix<T> v)
+        {
+            var dim = System.Math.Max(_Rows + v.Rows, System.Math.Max(_Cols, v.Cols));
+            SquareMatrix<T> t = new SquareMatrix<T>(dim, Operator);
+            for (int i = 0; i < dim; i++)
+            {
+                for (int j = 0; j < dim; j++)
+                {
+                    if (j < _Cols)
+                    {
+                        if (i < _Rows) t._mat[i * dim + j] = _mat[i * _Cols + j];
+                        else if (j < v.Cols && i < v.Rows + _Rows) t._mat[i * dim + j] = v.Data[(i - _Rows) * v.Cols + j];
+                        else t._mat[i * dim + j] = Operator.Zero;
+                    }
+                    else
+                    {
+                        if (j < v.Cols && i >= _Rows && i < v.Rows + _Rows) t._mat[i * dim + j] = v.Data[(i - _Rows) * v.Cols + j];
+                        else t._mat[i * dim + j] = Operator.Zero;
+                    }
+                }
+            }
+            return t;
+        }
+
+        ///<summary>
+        /// Paste matrix v to right bottom side of this matrix.
+        ///</summary>
+        public override SquareMatrix<T> Diagonal(Matrix<T> v)
+        {
+            var dim = System.Math.Max(_Rows + v.Rows, _Cols + v.Cols);
+            SquareMatrix<T> t = new SquareMatrix<T>(dim, Operator);
+            for (int i = 0; i < dim; i++)
+            {
+                for (int j = 0; j < dim; j++)
+                {
+                    if (i < _Rows && j < _Cols) t._mat[i * dim + j] = _mat[i * _Cols + j];
+                    else if (i > _Rows && i < v.Rows + _Rows && j >= _Cols && j < v.Cols + _Cols) t._mat[i * dim + j] = v.Data[(i - _Rows) * v.Cols + j - _Cols];
+                    else t._mat[i * dim + j] = Operator.Zero;
+                }
+            }
+            return t;
         }
 
         /// <summary>
@@ -98,8 +121,8 @@ namespace MRL.SSL.Common.Math
         {
             if (_L == null || ValueChanged) MakeLU();
 
-            SquareMatrix<T> matrix = new SquareMatrix<T>(Dimention, Operator);
-            for (int i = 0; i < _Rows; i++) matrix._mat[pi[i] * Dimention + i] = Operator.One;
+            SquareMatrix<T> matrix = new SquareMatrix<T>(Dimension, Operator);
+            for (int i = 0; i < _Rows; i++) matrix._mat[pi[i] * Dimension + i] = Operator.One;
             return matrix;
         }
 
@@ -108,14 +131,15 @@ namespace MRL.SSL.Common.Math
         {
             if (_L == null || ValueChanged) MakeLU();
 
-            SquareMatrix<T> inv = new SquareMatrix<T>(Dimention, Operator);
+            SquareMatrix<T> inv = new SquareMatrix<T>(Operator);
 
+            Matrix<T> Ei = new Matrix<T>(_Rows, 1, Operator);
             for (int i = 0; i < _Rows; i++)
             {
-                Matrix<T> Ei = new Matrix<T>(_Rows, 1, Operator);
                 Ei.Data[i * Ei.Cols] = Operator.One;
                 Matrix<T> col = SolveWith(Ei);
                 inv.SetCol(col, i);
+                Ei.Data[i * Ei.Cols] = Operator.Zero;
             }
             return inv;
         }
@@ -127,8 +151,8 @@ namespace MRL.SSL.Common.Math
         {
             if (!ValueChanged && _L != null && _U != null) return;
             MatrixBuilder<T> builder = new MatrixBuilder<T>(Operator);
-            _L = builder.Identity(Dimention);
-            _U = new SquareMatrix<T>(Dimention, Operator);
+            _L = builder.Identity(Dimension);
+            _U = new SquareMatrix<T>(Dimension, Operator);
             for (int i = 0; i < _Rows * _Cols; i++) _U._mat[i] = _mat[i];   //Cloning this matrix to U
 
             pi = new int[_Rows];
@@ -204,20 +228,20 @@ namespace MRL.SSL.Common.Math
                 for (int j = 0; j < _Cols; j++)
                     t2.Data[i1 * t2.Cols + j] = _mat[i * _Cols + j];
             }
-            _Cols = t2.Cols; _Rows = t2.Rows; _mat = t2.Data; Dimention = _Rows; ValueChanged = true;
+            _Cols = t2.Cols; _Rows = t2.Rows; _mat = t2.Data; ValueChanged = true;
         }
 
         ///<summary>
         /// Note: Don't use this for square matrix.
         /// For square matrix use Reduce(int irows, int jcols).
         ///</summary>
-        public new void RemoveCol(int col) => throw new Exception("For SquareMatrix use Reduce function!");
+        public override void RemoveCol(int col) => throw new Exception("For SquareMatrix use Reduce function!");
 
         ///<summary>
         /// Note: Don't use this for square matrix.
         /// For square matrix use Reduce(int irows, int jcols).
         ///</summary>
-        public new void RemoveRow(int row) => throw new Exception("For SquareMatrix use Reduce function!");
+        public override void RemoveRow(int row) => throw new Exception("For SquareMatrix use Reduce function!");
 
         ///<summary>
         /// Function solves Ax = v in confirmity with solution vector "v".
@@ -236,36 +260,6 @@ namespace MRL.SSL.Common.Math
             return x;
         }
 
-        ///<summary>
-        ///Paste matrix v to bottom of this matrix and convert it to square matrix.
-        ///</summary>
-        public new void Stack(Matrix<T> v)
-        {
-            Matrix<T> t = new Matrix<T>(_Rows + v.Rows, System.Math.Max(_Cols, v.Cols), Operator);
-            for (int i = 0; i < t.Rows; i++)
-            {
-                for (int j = 0; j < t.Cols; j++)
-                {
-                    if (j >= v.Cols)
-                    {
-                        if (i >= _Rows) { t.Data[i * t.Cols + j] = Operator.Zero; }
-                        else { t.Data[i * t.Cols + j] = _mat[i * _Cols + j]; }
-                    }
-                    else if (j >= _Cols)
-                    {
-                        if (i >= _Rows) { t.Data[i * t.Cols + j] = v.Data[(i - _Rows) * v.Cols + j]; }
-                        else { t.Data[i * t.Cols + j] = Operator.Zero; }
-                    }
-                    else
-                    {
-                        if (i >= _Rows) { t.Data[i * t.Cols + j] = v.Data[(i - _Rows) * v.Cols + j]; }
-                        else { t.Data[i * t.Cols + j] = _mat[i * _Cols + j]; }
-                    }
-                }
-            }
-            SquareMatrix<T> temp = t.ToSquareMatrix();
-            _Cols = temp._Cols; _Rows = temp._Rows; _mat = temp._mat; Dimention = temp.Dimention; ValueChanged = true;
-        }
 
         ///<summary>
         /// Function solves Ax = b for A as an upper triangular matrix.
@@ -307,10 +301,5 @@ namespace MRL.SSL.Common.Math
             return x;
         }
 
-        /// <summary>
-        /// For square matrix return itself.
-        /// </summary>
-        /// <returns> This.</returns>
-        public new SquareMatrix<T> ToSquareMatrix() => this;
     }
 }

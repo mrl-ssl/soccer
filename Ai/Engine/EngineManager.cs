@@ -1,16 +1,13 @@
 using System;
-using System.Linq;
 using System.Threading;
-using System.Diagnostics;
 using MRL.SSL.Common.Utils.Sockets;
 using MRL.SSL.Common.Configuration;
 using System.IO;
 using System.Net;
 using ProtoBuf;
 using MRL.SSL.Common.SSLWrapperCommunication;
-using MRL.SSL.Common.Math;
-using ProtoBuf.Meta;
-using System.Collections.Generic;
+using MRL.SSL.Ai.MergerTracker;
+using WatsonWebsocket;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -18,11 +15,12 @@ namespace MRL.SSL.Ai.Engine
     {
         Thread _cmcThread;
         UdpClient _visionClient;
+        WatsonWsServer _visualizerServer;
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
+        WorldGenerator worldGenerator;
         public EngineManager()
         {
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
-
         }
         public SSLWrapperPacket RecieveVisionData()
         {
@@ -50,29 +48,44 @@ namespace MRL.SSL.Ai.Engine
         {
             CancellationToken ct = (CancellationToken)obj;
             Console.WriteLine("Engine Mangaer Started!");
-            //   RuntimeTypeModel.Default.Add(typeof(Vec<float>), true).AddSubType(101, typeof(VecF));
+
             while (!ct.IsCancellationRequested)
             {
                 var packet = RecieveVisionData();
                 if (packet != null)
                 {
+                    var model = worldGenerator.GenerateWorldModel(packet, false, false);
+                    if (model != null)
+                    {
+
+                    }
                 }
             }
             Console.WriteLine("Engine Mangaer Stopped!");
         }
-        private static void Vision_OnError(object sender, System.Net.Sockets.SocketError e)
-        {
-            Console.WriteLine($"Echo Vision UDP server caught an error with code {e}");
-        }
         public void Initialize()
         {
             Console.WriteLine("Initializing Stuff...");
+
+            worldGenerator = new();
+
+            if (_visualizerServer != null)
+            {
+                if (_visualizerServer.IsListening)
+                    _visualizerServer.Stop();
+                _visualizerServer.Dispose();
+            }
+            _visualizerServer = new WatsonWsServer(ConnectionConfig.Default.VisualizerName, ConnectionConfig.Default.VisualizerPort, false);
+            _visualizerServer.ClientConnected += Visualizer_OnClientConnected;
+            _visualizerServer.ClientDisconnected += Visualizer_OnClientDisconnected;
+            _visualizerServer.MessageReceived += Visualizer_OnMessageReceived;
+
+
             if (_visionClient != null)
                 _visionClient.Dispose();
+
             _visionClient = new UdpClient(IPAddress.Any, ConnectionConfig.Default.VisionPort);
-
             _visionClient.Error += Vision_OnError;
-
             _visionClient.SetupMulticast(true);
             _visionClient.Connect();
             _visionClient.OptionReceiveTimeout = 2000;
@@ -80,6 +93,16 @@ namespace MRL.SSL.Ai.Engine
         }
         public void Start()
         {
+            try
+            {
+                Console.WriteLine("Starting Websocket...");
+                _visualizerServer.Start();
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine("Failed Starting Websocket: " + e);
+            }
+            Console.WriteLine("Websocket IsListening:" + _visualizerServer.IsListening);
             Console.WriteLine("Starting CMC Thread...");
             _cmcThread.Start(_cmcCancelationSource.Token);
         }
@@ -90,9 +113,37 @@ namespace MRL.SSL.Ai.Engine
             _cmcThread.Join();
             _cmcCancelationSource.Dispose();
 
-
+            Console.WriteLine("Stopping Vision Socket...");
+            _visionClient.DisconnectAndStop();
             _visionClient.Error -= Vision_OnError;
 
+            Console.WriteLine("Stopping Websocket...");
+            if (_visualizerServer.IsListening)
+                _visualizerServer.Stop();
+            _visualizerServer.ClientConnected -= Visualizer_OnClientConnected;
+            _visualizerServer.ClientDisconnected -= Visualizer_OnClientDisconnected;
+            _visualizerServer.MessageReceived -= Visualizer_OnMessageReceived;
+            _visualizerServer.Dispose();
+
         }
+        private static void Vision_OnError(object sender, System.Net.Sockets.SocketError e)
+        {
+            Console.WriteLine($"Echo Vision UDP server caught an error with code {e}");
+        }
+        private static void Visualizer_OnMessageReceived(object sender, MessageReceivedEventArgs e)
+        {
+            Console.WriteLine("Client Connected", e.IpPort);
+        }
+        private static void Visualizer_OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
+        {
+            Console.WriteLine("Client Connected", e.IpPort);
+        }
+        private static void Visualizer_OnClientConnected(object sender, ClientConnectedEventArgs e)
+        {
+
+            Console.WriteLine("Client Disconnected", e.IpPort);
+        }
+
+
     }
 }
