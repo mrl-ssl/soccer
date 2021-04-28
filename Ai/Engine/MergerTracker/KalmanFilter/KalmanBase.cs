@@ -109,44 +109,44 @@ namespace MRL.SSL.Ai.MergerTracker
 
             xs.Clear(); Ps.Clear(); Is.Clear();
             steppedTime = time;
-            SquareMatrixF =
+            // SquareMatrixF =
 
-            MatrixF K = P * (__H.Transpose()) * ((SquareMatrix)(__H * P * __H.Transpose() + tmpCV)).Inverse();
-            MatrixF error = K * (z - h(x));
-            x = x + error;
-            imCheck[0, 0] = x[0, 0];
-            imCheck[1, 0] = x[1, 0];
-            imCheck[2, 0] = x[2, 0];
-            imCheck[3, 0] = x[3, 0];
-            var tmpM = new RectangularMatrix(P.RowCount, P.RowCount);
-            tmpM.Fill((i, j) =>
-            {
-                if (i == j)
-                    return 1;
-                else
-                    return 0;
-            });
-            P = (tmpM - K * __H) * P;
-            xs.Enqueue(x); Ps.Enqueue(P); Is.Enqueue(I);
-            if (prediction_lookahead > 0.0)
-            {
-                if (time - prediction_time >= prediction_lookahead)
-                {
-                    if (prediction_x != null)
-                    {
-                        if (prediction_time > 0.0)
-                        {
-                            error = x - prediction_x;
+            // MatrixF K = P * (__H.Transpose()) * ((SquareMatrix)(__H * P * __H.Transpose() + tmpCV)).Inverse();
+            // MatrixF error = K * (z - h(x));
+            // x = x + error;
+            // imCheck[0, 0] = x[0, 0];
+            // imCheck[1, 0] = x[1, 0];
+            // imCheck[2, 0] = x[2, 0];
+            // imCheck[3, 0] = x[3, 0];
+            // var tmpM = new RectangularMatrix(P.RowCount, P.RowCount);
+            // tmpM.Fill((i, j) =>
+            // {
+            //     if (i == j)
+            //         return 1;
+            //     else
+            //         return 0;
+            // });
+            // P = (tmpM - K * __H) * P;
+            // xs.Enqueue(x); Ps.Enqueue(P); Is.Enqueue(I);
+            // if (prediction_lookahead > 0.0)
+            // {
+            //     if (time - prediction_time >= prediction_lookahead)
+            //     {
+            //         if (prediction_x != null)
+            //         {
+            //             if (prediction_time > 0.0)
+            //             {
+            //                 error = x - prediction_x;
 
-                            for (int i = 0; i < error.RowCount; i++)
-                                errors[i, 0] += Math.Abs(error[i, 0]);
-                            errors_n++;
-                        }
-                    }
-                    prediction_x = predict(prediction_lookahead);
-                    prediction_time = time;
-                }
-            }
+            //                 for (int i = 0; i < error.RowCount; i++)
+            //                     errors[i, 0] += Math.Abs(error[i, 0]);
+            //                 errors_n++;
+            //             }
+            //         }
+            //         prediction_x = predict(prediction_lookahead);
+            //         prediction_time = time;
+            //     }
+            // }
         }
         protected virtual MatrixF Predict(double dt, bool visionProblem, bool checkCollision)
         {

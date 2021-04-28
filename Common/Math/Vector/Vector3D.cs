@@ -24,6 +24,7 @@ namespace MRL.SSL.Common.Math
         protected Vector3D(T X, T Y, T Z) { x = X; y = Y; z = Z; }
 
         public abstract T Dot(Vector3D<T> v);
+        public abstract T TripleProdcut(Vector2D<T> v, Vector2D<T> u);
         public abstract Vector3D<T> Norm();
         public abstract Vector3D<T> Cross(Vector3D<T> p);
         public abstract Vector3D<T> RotateX(T angle);

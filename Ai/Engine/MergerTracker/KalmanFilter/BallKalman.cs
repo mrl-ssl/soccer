@@ -63,9 +63,6 @@ namespace MRL.SSL.Ai.MergerTracker
         {
             throw new System.NotImplementedException();
         }
-        public override void Update(MatrixF z, bool visionProblem, bool checkCollision)
-        {
-            throw new System.NotImplementedException();
-        }
+        
     }
 }
