@@ -53,6 +53,11 @@ namespace MRL.SSL.Common.Configuration
         public float OpponentRadius { get; set; }
         public float BallVelocityVarianceNearRobot { get; set; }
         public float BallVelocityVarianceNoRobot { get; set; }
+        public float OpponentPositionVariance { get; set; }
+        public float OpponentAngleVariance { get; set; }
+        public float OpponentVelocityNextStepCovariance { get; set; }
+        public float OpponentVelocityVariance { get; set; }
+        public float OpponentAngularVelocityVariance { get; set; }
 
         public MergerTrackerConfig()
         {
