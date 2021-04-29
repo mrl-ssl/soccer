@@ -14,7 +14,7 @@ namespace MRL.SSL.Ai.MergerTracker
         public Observation[] Observations { get => observations; set => observations = value; }
         public ObjectMerger()
         {
-            observations = new Observation[MergerTrackerConfig.Default.MaxCameraCount].Populate();
+            observations = new Observation[MergerTrackerConfig.Default.MaxCameraCount].Populate((i) => new Observation((uint)i));
             affinity = -1;
         }
         public int MergeObservations()

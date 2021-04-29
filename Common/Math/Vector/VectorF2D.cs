@@ -20,7 +20,7 @@ namespace MRL.SSL.Common.Math
         [ProtoMember(2)]
         public override float Y { get => y; set => y = value; }
 
-        public override Vector2D<float> Add(Vector2D<float> v)
+        public override VectorF2D Add(Vector2D<float> v)
         {
             return new VectorF2D(x + v.X, y + v.Y);
         }
@@ -47,12 +47,12 @@ namespace MRL.SSL.Common.Math
             return angle;
         }
 
-        public override Vector3D<float> Cross(Vector2D<float> p)
+        public override VectorF3D Cross(Vector2D<float> p)
         {
             return new VectorF3D(0F, 0F, x * p.Y - y * p.X);
         }
 
-        public override Vector2D<float> Divide(float p)
+        public override VectorF2D Divide(float p)
         {
             return new VectorF2D(x / p, y / p);
         }
@@ -79,7 +79,7 @@ namespace MRL.SSL.Common.Math
             return MathF.Sqrt(x * x + y * y);
         }
 
-        public override Vector2D<float> GetNorm()
+        public override VectorF2D GetNorm()
         {
             VectorF2D r = new VectorF2D();
             float Size = Length();
@@ -107,7 +107,7 @@ namespace MRL.SSL.Common.Math
             y *= newLength / size;
 
         }
-        public override Vector2D<float> GetNormTo(float newLength)
+        public override VectorF2D GetNormTo(float newLength)
         {
             VectorF2D r = new VectorF2D();
             float size = Length();
@@ -119,7 +119,7 @@ namespace MRL.SSL.Common.Math
 
             return r;
         }
-        public override Vector2D<float> Scale(float s)
+        public override VectorF2D Scale(float s)
         {
             return new VectorF2D(x * s, y * s);
         }
@@ -129,7 +129,7 @@ namespace MRL.SSL.Common.Math
             return x * x + y * y;
         }
 
-        public override Vector2D<float> Sub(Vector2D<float> v)
+        public override VectorF2D Sub(Vector2D<float> v)
         {
             return new VectorF2D(x - v.X, y - v.Y);
         }
@@ -144,7 +144,7 @@ namespace MRL.SSL.Common.Math
             return AngleInRadians() * 180F / MathF.PI;
         }
 
-        public override Vector2D<float> GetRotate(float angle)
+        public override VectorF2D GetRotate(float angle)
         {
             return FromAngleSize(this.AngleInRadians() + angle, Length());
         }
@@ -154,7 +154,7 @@ namespace MRL.SSL.Common.Math
             ToAngleSize(this.AngleInRadians() + angle, Length());
         }
 
-        public override Vector2D<float> GetPerp()
+        public override VectorF2D GetPerp()
         {
             return new VectorF2D(-y, x);
         }
@@ -179,10 +179,10 @@ namespace MRL.SSL.Common.Math
             return (n.Dot(v));
         }
 
-        public override Vector2D<float> PrependecularPoint(Vector2D<float> start, Vector2D<float> from)
+        public override VectorF2D PrependecularPoint(Vector2D<float> start, Vector2D<float> from)
         {
-            Vector2D<float> startFromVec = from - start;
-            Vector2D<float> fromStartVec = start - from;
+            var startFromVec = from - start;
+            var fromStartVec = start - from;
             float teta = AngleBetweenInRadians(startFromVec);
             float s = 1F;
             if (MathF.Abs(teta) > MathF.PI / 2F)
@@ -192,7 +192,7 @@ namespace MRL.SSL.Common.Math
             }
             float d = MathF.Abs(startFromVec.Length() * MathF.Sin(teta));
             float alfa = MathF.PI / 2F - MathF.Abs(teta);
-            return from + FromAngleSize(fromStartVec.AngleInRadians() - s * MathF.Sign(teta) * alfa, d);
+            return (VectorF2D)(from + FromAngleSize(fromStartVec.AngleInRadians() - s * MathF.Sign(teta) * alfa, d));
         }
 
         public override bool IsBetween(Vector2D<float> other, Vector2D<float> v)
@@ -202,12 +202,12 @@ namespace MRL.SSL.Common.Math
             return innerL >= 0F && innerR >= 0F;
         }
 
-        public override Vector2D<float> Reverse()
+        public override VectorF2D Reverse()
         {
             return new VectorF2D(-x, -y);
         }
 
-        public override Vector2D<float> Abs()
+        public override VectorF2D Abs()
         {
             VectorF2D r = new VectorF2D
             {
@@ -217,7 +217,7 @@ namespace MRL.SSL.Common.Math
             return r;
         }
 
-        public override Vector2D<float> Max(Vector2D<float> v)
+        public override VectorF2D Max(Vector2D<float> v)
         {
             VectorF2D r = new VectorF2D
             {
@@ -227,7 +227,7 @@ namespace MRL.SSL.Common.Math
             return r;
         }
 
-        public override Vector2D<float> Bound(float low, float high)
+        public override VectorF2D Bound(float low, float high)
         {
             VectorF2D r = new VectorF2D(x, y);
             if (x < low) r.x = low; else if (x > high) r.x = high;
@@ -265,17 +265,17 @@ namespace MRL.SSL.Common.Math
             return r.Distance(this);
         }
 
-        public override Vector2D<float> Extend(float x, float y)
+        public override VectorF2D Extend(float x, float y)
         {
             return new VectorF2D(this.x + x, this.y + y);
         }
 
-        public override Vector2D<float> Interpolate(Vector2D<float> end, float amount)
+        public override VectorF2D Interpolate(Vector2D<float> end, float amount)
         {
             return new VectorF2D(x * (1F - amount) + end.X * amount, y * (1F - amount) + end.Y * amount);
         }
 
-        public override Vector2D<float> SegmentNearLine(Vector2D<float> a1, Vector2D<float> b0, Vector2D<float> b1)
+        public override VectorF2D SegmentNearLine(Vector2D<float> a1, Vector2D<float> b0, Vector2D<float> b1)
         {
             Vector2D<float> v, n, p;
             float dn, t;
@@ -292,10 +292,10 @@ namespace MRL.SSL.Common.Math
             if (t > 1) t = 1F;
             p = this + v * t;
 
-            return p;
+            return (VectorF2D)p;
         }
 
-        public override Vector2D<float> Intersection(Vector2D<float> a2, Vector2D<float> b1, Vector2D<float> b2)
+        public override VectorF2D Intersection(Vector2D<float> a2, Vector2D<float> b1, Vector2D<float> b2)
         {
             Vector2D<float> a = a2.Sub(this);
 
@@ -304,7 +304,7 @@ namespace MRL.SSL.Common.Math
             Vector2D<float> br = (b1r.Sub(b2r));
             Vector2D<float> t = new VectorF2D(b2r.X - b2r.Y * (br.X / br.Y), 0F);
 
-            return t.GetRotate(a.AngleInRadians()).Add(this);
+            return (VectorF2D)t.GetRotate(a.AngleInRadians()).Add(this);
         }
 
         public override float AngleModInRadians(float angle)
@@ -325,7 +325,7 @@ namespace MRL.SSL.Common.Math
             return AngleModInRadians(angle) * 180F / MathF.PI;
         }
 
-        public override Vector2D<float> PointOnSegment(Vector2D<float> x1, Vector2D<float> p)
+        public override VectorF2D PointOnSegment(Vector2D<float> x1, Vector2D<float> p)
         {
             Vector2D<float> sx, sp, r;
             float f, l;
@@ -337,11 +337,11 @@ namespace MRL.SSL.Common.Math
             if (f <= 0.0) return this;         // also handles this=x1 case
 
             l = sx.SqLength();
-            if (f >= l) return x1;
+            if (f >= l) return (VectorF2D)x1;
 
             r = this + sx * (f / l);
 
-            return r;
+            return (VectorF2D)r;
         }
 
         public override float ClosestPointTime(Vector2D<float> v1, Vector2D<float> x2, Vector2D<float> v2)
@@ -445,12 +445,12 @@ namespace MRL.SSL.Common.Math
             return dp.Length(); // return the closest distance
         }
 
-        public override Vector2D<float> ToAiCoordinate(bool isReverse)
+        public override VectorF2D ToAiCoordinate(bool isReverse)
         {
             return Scale(isReverse ? -0.001f : 0.001f);
         }
 
-        public override Vector2D<float> ToVisionCoordinate(bool isReverse)
+        public override VectorF2D ToVisionCoordinate(bool isReverse)
         {
             return Scale(isReverse ? -1000f : 1000f);
         }

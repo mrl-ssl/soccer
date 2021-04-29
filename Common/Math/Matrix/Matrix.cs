@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace MRL.SSL.Common.Math
 {
@@ -37,12 +38,20 @@ namespace MRL.SSL.Common.Math
         /// <param name="OperatorType">Structure wich derived from IOperator wich do operator like add,subtract,multiply,... </param>
         public Matrix(int rows, int cols, IOperator<T> OperatorType)
         {
-            _Rows = rows; _Cols = cols; _mat = new T[cols * rows];
+            _Rows = rows; _Cols = cols;
+            _mat = new T[cols * rows];
             Operator = OperatorType;
         }
 
         /// <param name="OperatorType">Structure wich derived from IOperator.</param>
         public Matrix(IOperator<T> OperatorType) { Operator = OperatorType; }
+        /// <param name="OperatorType">Structure wich derived from IOperator.</param>
+        public Matrix(int rows, int cols, T[] m, IOperator<T> OperatorType)
+        {
+            _Rows = rows; _Cols = cols;
+            Operator = OperatorType;
+            _mat = m;
+        }
 
         public T this[int iRow, int iCol]      // Access this matrix as a 2D array
         {
@@ -54,6 +63,9 @@ namespace MRL.SSL.Common.Math
             get { return _mat[index]; }
             set { _mat[index] = value; ValueChanged = true; }
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetElement(int iRow, int iCol) => _mat[iRow * Cols + iCol];
 
         ///<summary>
         /// Paste matrix v to right side of this matrix.
@@ -210,8 +222,15 @@ namespace MRL.SSL.Common.Math
             }
             return false;
         }
-
-
+        public bool IsNanDiagonal()
+        {
+            var dim = System.MathF.Min(_Rows, _Cols);
+            for (int i = 0; i < dim; i++)
+            {
+                if (Operator.IsNan(_mat[i * _Cols + i])) return true;
+            }
+            return false;
+        }
 
         /// <returns>
         /// Col number k as matrix.
@@ -260,7 +279,9 @@ namespace MRL.SSL.Common.Math
         ///</summary>
         public virtual void Reduce(int irows, int jcols)
         {
-            RemoveCol(jcols); RemoveRow(irows); ValueChanged = true;
+            RemoveCol(jcols);
+            RemoveRow(irows);
+            ValueChanged = true;
         }
 
         ///<summary>
@@ -323,7 +344,7 @@ namespace MRL.SSL.Common.Math
         /// </returns>
         public SquareMatrix<T> ToSquareMatrix()
         {
-            if (_Rows == _Cols) return new SquareMatrix<T>(_Rows, Operator);
+            if (_Rows == _Cols) return new SquareMatrix<T>(_Rows, _mat, Operator);
             SquareMatrix<T> m = new SquareMatrix<T>(System.Math.Max(_Rows, _Cols), Operator);
             m.CopyFrom(this);
             return m;
@@ -351,9 +372,8 @@ namespace MRL.SSL.Common.Math
             Matrix<T> t = new Matrix<T>(_Cols, _Rows, Operator);
             for (int i = 0; i < t._Rows; i++)
             {
-                Matrix<T> col = GetCol(i);
                 for (int j = 0; j < t._Cols; j++)
-                    t._mat[i * t._Cols + j] = col._mat[j];
+                    t._mat[i * t._Cols + j] = _mat[j * _Cols + i];
             }
             return t;
         }

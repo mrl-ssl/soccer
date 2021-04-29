@@ -14,5 +14,11 @@ namespace MRL.SSL.Common.Math
             if (x > max || EqualFloat(x, max)) return max;
             return x;
         }
+        public static float AngleMod(float a)
+        {
+            var pi2 = MathF.PI * 2f;
+            a -= pi2 * (int)MathF.Round(a / pi2);
+            return (a);
+        }
     }
 }

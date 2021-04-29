@@ -22,6 +22,7 @@ namespace MRL.SSL.Common.Math
         bool GreaterOrEqual(T a, T b);
         bool Less(T a, T b);
         bool LessOrEqual(T a, T b);
+        bool IsNan(T a);
     }
     public class MatrixOperators
     {
@@ -77,6 +78,9 @@ namespace MRL.SSL.Common.Math
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool LessOrEqual(int a, int b) => a <= b;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsNan(int a) => false;
     }
 
     public class FloatOperator : IOperator<float>
@@ -125,6 +129,9 @@ namespace MRL.SSL.Common.Math
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool LessOrEqual(float a, float b) => a <= b;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsNan(float a) => float.IsNaN(a);
     }
 
     public class DoubleOperator : IOperator<double>
@@ -175,6 +182,9 @@ namespace MRL.SSL.Common.Math
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool LessOrEqual(double a, double b) => a <= b;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsNan(double a) => double.IsNaN(a);
     }
 
 }
