@@ -81,6 +81,7 @@ namespace MRL.SSL.Common
                 _z[2, 0] = MathHelper.AngleMod((obs.Angle - MathF.PI / 2f) - xtheta) + xtheta;
 
                 Update(_z);
+
                 if (GetTimeElapsedError() > 10.0f)
                     ResetError();
             }
