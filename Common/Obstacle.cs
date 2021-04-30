@@ -25,7 +25,7 @@ namespace MRL.SSL.Common
         protected ObstacleBase(SingleObjectState state) { this.state = state; Avoid = false; }
         // protected ObstacleBase() { this.state = new SingleObjectState(); }
 
-        public abstract bool Meet(SingleObjectState From, SingleObjectState To, float obstacleRadi, float margin = 0f);
+        public abstract bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f);
         public abstract bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f);
     }
 
@@ -37,9 +37,9 @@ namespace MRL.SSL.Common
 
         public CircleObstacle(SingleObjectState state, float radius) : base(state) { this.radius = radius; }
 
-        public override bool Meet(SingleObjectState From, SingleObjectState To, float obstacleRadi, float margin = 0f)
+        public override bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f)
         {
-            Vector2D<float> p = VectorF2D.PointOnSegment(From.Location, To.Location, state.Location);
+            Vector2D<float> p = VectorF2D.PointOnSegment(from.Location, to.Location, state.Location);
             float d = p.Distance(state.Location);
             return d <= radius + obstacleRadi + margin;
         }
@@ -63,11 +63,9 @@ namespace MRL.SSL.Common
             this.heigth = heigth;
         }
 
-        public override bool Meet(SingleObjectState From, SingleObjectState To, float obstacleRadi, float margin = 0f)
+        public override bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f)
         {
-            Vector2D<float> N = From.Location;
-            Vector2D<float> T = To.Location;
-            Vector2D<float>[] c = new VectorF2D[4];
+            VectorF2D[] c = new VectorF2D[4];
 
             c[0] = new VectorF2D(state.Location.X - width, state.Location.Y - heigth);
             c[1] = new VectorF2D(state.Location.X + width, state.Location.Y - heigth);
@@ -77,10 +75,10 @@ namespace MRL.SSL.Common
             // check box against oriented sweep
             for (int i = 0; i < 4; i++)
             {
-                d = VectorF2D.DistanceSegToSeg(N, T, c[i], c[(i + 1) % 4]);
+                d = VectorF2D.DistanceSegToSeg(from.Location, to.Location, c[i], c[(i + 1) % 4]);
                 if (d < obstacleRadi + margin) return true;
             }
-            return Meet(From, obstacleRadi, margin) || Meet(To, obstacleRadi, margin);
+            return Meet(from, obstacleRadi, margin) || Meet(to, obstacleRadi, margin);
         }
 
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
