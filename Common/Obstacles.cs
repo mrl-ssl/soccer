@@ -31,7 +31,7 @@ namespace MRL.SSL.Common
         }
 
         /// <summary>
-        /// Check there is specific obstacle type in given state and returns that
+        /// Check there is specific obstacle type in given state and returns that.
         /// if there is not returns null
         /// </summary>
         /// <param name="s">target state</param>
@@ -46,7 +46,7 @@ namespace MRL.SSL.Common
         }
 
         /// <summary>
-        /// Check there is obstacle from state a to state b and returns that.
+        /// Check there is obstacle from state a to b and returns that.
         /// if there is not returns null
         /// </summary>
         public ObstacleBase Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, Dictionary<ObstacleType, float> margins = null)
@@ -73,7 +73,7 @@ namespace MRL.SSL.Common
 
         /// <summary>
         /// Avoid all obstacles from given type
-        /// (Call this before calling Meet to apply changes)
+        /// (Call this before calling "Meet" to apply changes)
         /// </summary>
         /// <param name="type">type of obstacles you want to avoid from</param>
         /// <param name="avoid">set false to not avoid</param>
@@ -85,7 +85,7 @@ namespace MRL.SSL.Common
 
         /// <summary>
         /// Avoid from some robots
-        /// (Call this before calling Meet to apply changes)
+        /// (Call this before calling "Meet" to apply changes)
         /// </summary>
         /// <param name="robotsId">ids of robots you want to avoid from</param>
         /// <param name="ours">true if given ids are our robots ids</param>
@@ -105,12 +105,9 @@ namespace MRL.SSL.Common
         public void RemoveSpecificRobots(bool ours, List<int> ids)
         {
             ObstacleType type = ours ? ObstacleType.OurRobot : ObstacleType.OppRobot;
-            List<int> indexes = new List<int>(ids.Count);
-            for (int i = 0; i < obstacles[type].Count; i++)
+            for (int i = obstacles[type].Count - 1; i >= 0; i--)
                 if (obstacles[type][i] is RobotObstacle robotObs && ids.Contains(robotObs.Id))
-                    indexes.Add(i);
-            foreach (var index in indexes)
-                obstacles[type].RemoveAt(index);
+                    obstacles[type].RemoveAt(i);
         }
     }
 }
