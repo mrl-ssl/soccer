@@ -30,7 +30,5 @@ namespace MRL.SSL.Ai
                 }
             }
         }
-
-
     }
 }
