@@ -115,7 +115,7 @@ namespace MRL.SSL.Common
                 var r = model.Opponents[key];
                 if (r.vision != null)
                 {
-                    robots[0, id2index[0, key]].VisionProblem = false;
+                    robots[1, id2index[1, key]].VisionProblem = false;
                     robots[1, id2index[1, key]].Observe(r.vision);
                 }
             }
@@ -142,17 +142,17 @@ namespace MRL.SSL.Common
                 r.ViewState = viewState;
                 model.OurRobots.Add(key, state);
             }
-            foreach (var key in obsModel.Opponents.Keys)
-            {
-                var r = obsModel.Opponents[key];
-                var actionDelay = MergerTrackerConfig.Default.ActionDelay + r.NotSeen * MergerTrackerConfig.Default.FramePeriod;
-                var viewDelay = (r.NotSeen + 1) * MergerTrackerConfig.Default.FramePeriod;
+            // foreach (var key in obsModel.Opponents.Keys)
+            // {
+            //     var r = obsModel.Opponents[key];
+            //     var actionDelay = MergerTrackerConfig.Default.ActionDelay + r.NotSeen * MergerTrackerConfig.Default.FramePeriod;
+            //     var viewDelay = (r.NotSeen + 1) * MergerTrackerConfig.Default.FramePeriod;
 
-                var state = GetRobotState(1, id2index[1, key], actionDelay);
-                var viewState = GetRobotState(1, id2index[1, key], viewDelay);
-                r.ViewState = viewState;
-                model.Opponents.Add(key, state);
-            }
+            //     var state = GetRobotState(1, id2index[1, key], actionDelay);
+            //     var viewState = GetRobotState(1, id2index[1, key], viewDelay);
+            //     r.ViewState = viewState;
+            //     model.Opponents.Add(key, state);
+            // }
 
             if (model.BallState == null)
                 model.BallState = new SingleObjectState(VectorF2D.Zero, VectorF2D.Zero);

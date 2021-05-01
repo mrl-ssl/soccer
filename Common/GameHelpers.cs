@@ -11,7 +11,7 @@ namespace MRL.SSL.Common
 
             if (location.X < config.OppGoalCenter.X - margin || location.X > config.OurGoalCenter.X + margin)
                 return false;
-            if (location.Y < config.OurRightCorner.Y - margin || location.Y > config.OurLeftCorner.Y + margin)
+            if (location.Y > config.OurRightCorner.Y - margin || location.Y < config.OurLeftCorner.Y + margin)
                 return false;
             return true;
         }

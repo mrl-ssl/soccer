@@ -25,14 +25,14 @@ namespace MRL.SSL.Ai.MergerTracker
             {
 
                 affinity = -1;
-                double minDist = double.MaxValue;
+                float minDist = float.MaxValue;
                 for (int o = 0; o < config.MaxCameraCount; o++)
                 {
                     if (observations[o].IsValid)
                     {
                         if (lastAffinity >= 0)
                         {
-                            double d = observations[lastAffinity].Location.Distance(observations[o].Location);
+                            float d = observations[lastAffinity].Location.Distance(observations[o].Location);
                             if (d < minDist)
                             {
                                 minDist = d;
@@ -65,20 +65,16 @@ namespace MRL.SSL.Ai.MergerTracker
                 affinity = ballAffinity;
             else if (affinity < 0 || !observations[affinity].IsValid)
             {
-                if (affinity >= 0)
-                {
-
-                }
 
                 affinity = -1;
-                double minDist = double.MaxValue;
+                float minDist = float.MaxValue;
                 for (int o = 0; o < config.MaxCameraCount; o++)
                 {
                     if (observations[o].IsValid)
                     {
                         if (lastAffinity >= 0)
                         {
-                            double d = observations[lastAffinity].Location.Distance(observations[o].Location);
+                            float d = observations[lastAffinity].Location.Distance(observations[o].Location);
                             if (d < minDist)
                             {
                                 minDist = d;

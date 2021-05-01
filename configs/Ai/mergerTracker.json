@@ -6,7 +6,7 @@
   "opponentRadius": 0.09,
   "ourRobotHeight": 0.2,
   "opponentHeight": 0.2,
-  "maxTeamRobots": 8,
+  "maxTeamRobots": 11,
   "maxRobotId": 16,
   "affinityPersist": 30,
   "frameRate": 60,

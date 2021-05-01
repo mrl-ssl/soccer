@@ -19,12 +19,12 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public uint CameraId { get; set; }
 
         [ProtoMember(5)]
-        public List<SSLDetectionBall> Balls { get; set; }
+        public List<SSLDetectionBall> Balls { get; set; } = new List<SSLDetectionBall>();
 
         [ProtoMember(6)]
-        public List<SSLDetectionRobot> YellowRobots { get; set; }
+        public List<SSLDetectionRobot> YellowRobots { get; set; } = new List<SSLDetectionRobot>();
 
         [ProtoMember(7)]
-        public List<SSLDetectionRobot> BlueRobots { get; set; }
+        public List<SSLDetectionRobot> BlueRobots { get; set; } = new List<SSLDetectionRobot>();
     }
 }

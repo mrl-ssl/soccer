@@ -35,7 +35,6 @@ namespace MRL.SSL.Common
                 _p[3, 3] = 0f; // 0m/s
                 _p[4, 4] = 0f; // 0m/s
                 _p[5, 5] = 0f;
-                _p[6, 6] = 0f;
 
                 _x[0, 0] = obs.Location.X;
                 _x[1, 0] = obs.Location.Y;
@@ -154,9 +153,6 @@ namespace MRL.SSL.Common
         public override VectorF2D RawVelocity(double time)
         {
             var x = Predict(time);
-
-            if (x[6, 0] > MergerTrackerConfig.Default.RobotStuckThreshold)
-                return VectorF2D.Zero;
 
             return new VectorF2D(x[3, 0], x[4, 0]);
         }

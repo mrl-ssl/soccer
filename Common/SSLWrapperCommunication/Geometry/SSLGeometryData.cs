@@ -10,6 +10,6 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public SSLGeometryFieldSize Field { get; set; }
 
         [ProtoMember(2)]
-        public List<SSLGeometryCameraCalibration> Calibrations { get; set; }
+        public List<SSLGeometryCameraCalibration> Calibrations { get; set; } = new List<SSLGeometryCameraCalibration>();
     }
 }

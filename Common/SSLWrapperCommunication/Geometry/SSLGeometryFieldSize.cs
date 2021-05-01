@@ -22,10 +22,10 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public int BoundaryWidth { get; set; }
 
         [ProtoMember(6)]
-        public List<SSLFieldLineSegment> FieldLines { get; set; }
+        public List<SSLFieldLineSegment> FieldLines { get; set; } = new List<SSLFieldLineSegment>();
 
         [ProtoMember(7)]
-        public List<SSLFieldCircularArc> FieldArcs { get; set; }
+        public List<SSLFieldCircularArc> FieldArcs { get; set; } = new List<SSLFieldCircularArc>();
 
         [ProtoMember(8)]
         public int PenaltyAreaDepth { get; set; }

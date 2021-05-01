@@ -22,6 +22,7 @@ namespace MRL.SSL.Ai.Engine
         public RobotCommands Commands { get; set; }
         public EngineManager()
         {
+            Commands = new RobotCommands();
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
         }
         public SSLWrapperPacket RecieveVisionData()

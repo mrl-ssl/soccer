@@ -18,17 +18,17 @@ namespace MRL.SSL.Ai.MergerTracker
         byte[] lastAvailableCameras;
         ObjectMerger[,] robots;
         ObjectMerger ball;
-        private Dictionary<uint, List<SSLDetectionBall>> balls = new Dictionary<uint, List<SSLDetectionBall>>();
+        private IDictionary<uint, List<SSLDetectionBall>> balls;
         private double lastCaptureTime;
-        Dictionary<uint, SSLWrapperPacket> sslPackets = new();
 
         public Merger()
         {
             camerasSeen = new bool[MergerTrackerConfig.Default.MaxCameraCount];
             numCameras = 0;
             numCamerasSeen = 0;
-            frames = 0;
+            frames = 0; 
             ball = new ObjectMerger();
+            balls = new Dictionary<uint, List<SSLDetectionBall>>();
             robots = new ObjectMerger[MergerTrackerConfig.Default.TeamsCount, MergerTrackerConfig.Default.MaxRobotId].Populate();
         }
         private bool ValidateCameraSeen(SSLWrapperPacket packet)
@@ -37,8 +37,8 @@ namespace MRL.SSL.Ai.MergerTracker
             var availableCameras = MergerTrackerConfig.Default.AvailableCameras;
 
             //if configurations changed reset available camera detection params
-            if (!lastAvailableCameras.All(a => availableCameras.Contains(a))
-                || !availableCameras.All(a => lastAvailableCameras.Contains(a)))
+            if (lastAvailableCameras != null && (!lastAvailableCameras.All(a => availableCameras.Contains(a))
+                || !availableCameras.All(a => lastAvailableCameras.Contains(a))))
             {
                 numCameras = 0;
                 frames = 0;
@@ -104,7 +104,7 @@ namespace MRL.SSL.Ai.MergerTracker
             for (int i = 0; i < d.YellowRobots.Count; i++)
             {
                 var r = d.YellowRobots[i];
-                var obs = robots[0, r.Id.HasValue ? r.Id.Value : i].Observations[camera];
+                var obs = robots[1, r.Id.HasValue ? r.Id.Value : i].Observations[camera];
                 obs.IsValid = true;
                 obs.Time = time;
                 obs.Confidence = r.Confidence;
