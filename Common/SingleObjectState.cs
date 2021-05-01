@@ -7,8 +7,8 @@ namespace MRL.SSL.Common
         private SingleObjectState parent;
         private SingleObjectState child;
 
-        private VectorF2D location;
-        private VectorF2D speed;
+        private Vector2D<float> location;
+        private Vector2D<float> speed;
         private float angle;
         private float angularSpeed;
         private float stuck;
@@ -17,8 +17,8 @@ namespace MRL.SSL.Common
 
         public SingleObjectState Parent { get => parent; set => parent = value; }
         public SingleObjectState Child { get => child; set => child = value; }
-        public VectorF2D Location { get => location; set => location = value; }
-        public VectorF2D Speed { get => speed; set => speed = value; }
+        public Vector2D<float> Location { get => location; set => location = value; }
+        public Vector2D<float> Speed { get => speed; set => speed = value; }
         public float Angle { get => angle; set => angle = value; }
         public float AngularSpeed { get => angularSpeed; set => angularSpeed = value; }
         public int? Battery { get => battery; set => battery = value; }
@@ -40,27 +40,27 @@ namespace MRL.SSL.Common
             location = new VectorF2D(x, y);
             angle = theta;
         }
-        public SingleObjectState(VectorF2D loc)
+        public SingleObjectState(Vector2D<float> loc)
         {
             location = loc;
         }
-        public SingleObjectState(VectorF2D loc, VectorF2D sp)
+        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp)
         {
             location = loc;
             speed = sp;
         }
-        public SingleObjectState(VectorF2D loc, VectorF2D sp, float stuck)
+        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp, float stuck)
         {
             location = loc;
             speed = sp;
             this.stuck = stuck;
         }
-        public SingleObjectState(VectorF2D loc, float theta)
+        public SingleObjectState(Vector2D<float> loc, float theta)
         {
             location = loc;
             angle = theta;
         }
-        public SingleObjectState(VectorF2D loc, VectorF2D sp, float theta, float w)
+        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp, float theta, float w)
         {
             location = loc;
             speed = sp;
@@ -68,7 +68,7 @@ namespace MRL.SSL.Common
             angularSpeed = w;
         }
 
-        public SingleObjectState(VectorF2D loc, VectorF2D sp, float theta, float w, float stuck)
+        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp, float theta, float w, float stuck)
         {
             location = loc;
             speed = sp;

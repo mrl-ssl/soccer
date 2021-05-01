@@ -41,6 +41,7 @@ namespace MRL.SSL.Common.Configuration
     {
         Connection = 0,
         MergerTracker = 1,
-        Field = 2
+        Field = 2,
+        Robot = 3
     }
 }

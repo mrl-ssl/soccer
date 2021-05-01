@@ -31,7 +31,12 @@ namespace MRL.SSL.Common.Math
 
         public override float SmallestAngleBetweenInRadians(Vector2D<float> v)
         {
-            return Dot(v) / (Length() * v.Length());
+            var l1 = Length();
+            var l2 = v.Length();
+            if(l1 <MathHelper.EpsilonF) return v.AngleInRadians();
+            else if (l2 < MathHelper.EpsilonF) return AngleInRadians();
+            
+            return System.MathF.Acos(MathHelper.BoundF(Cosine(v),-1, 1));
         }
         public override float AngleBetweenInDegrees(Vector2D<float> v)
         {
@@ -146,12 +151,18 @@ namespace MRL.SSL.Common.Math
 
         public override VectorF2D GetRotate(float angle)
         {
-            return FromAngleSize(this.AngleInRadians() + angle, Length());
+            var r = new VectorF2D(x, y);
+            r.Rotate(angle);
+            return r;
         }
 
         public override void Rotate(float angle)
         {
-            ToAngleSize(this.AngleInRadians() + angle, Length());
+            float cos = System.MathF.Cos(angle), sin = System.MathF.Sin(angle);
+            var px = x * cos - y * sin;
+            var py = x * sin + y * cos;
+            x = px;
+            y = py;
         }
 
         public override VectorF2D GetPerp()
