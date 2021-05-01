@@ -195,14 +195,14 @@ namespace MRL.SSL.Ai.MergerTracker
                 }
             }
         }
-        private WorldModel MakeWorld(bool isYellow)
+        private ObservationModel MakeModel(bool isYellow)
         {
-            WorldModel world = new();
-            world.TimeOfCapture = lastCaptureTime;
+            ObservationModel model = new();
+
             if (ball.MergeObservations() >= 0)
             {
                 var obs = ball.Observations[ball.Affinity];
-                world.BallRaw = new RawObjectState(obs.Location.X, obs.Location.Y, obs.Angle, obs.Confidence, obs.Time, ball.Affinity);
+                model.Ball = new BallObservationMeta(obs);
             }
 
             for (int team = 0; team < MergerTrackerConfig.Default.TeamsCount; team++)
@@ -213,14 +213,13 @@ namespace MRL.SSL.Ai.MergerTracker
                     if (robot.MergeObservations(ball.Affinity) >= 0)
                     {
                         var obs = robot.Observations[robot.Affinity];
-                        var state = new RawObjectState(obs.Location.X, obs.Location.Y, obs.Angle, obs.Confidence, obs.Time, robot.Affinity);
                         if ((team == 0 && !isYellow) || (team == 1 && isYellow))
                         {
-                            world.OurRobotsRaw[id] = state;
+                            model.OurRobots[id] = new RobotObservationMeta(obs);
                         }
                         else
                         {
-                            world.OpponentsRaw[id] = state;
+                            model.Opponents[id] = new RobotObservationMeta(obs);
                         }
                     }
                 }
@@ -230,11 +229,10 @@ namespace MRL.SSL.Ai.MergerTracker
             {
                 foreach (var b in balls[item])
                 {
-                    world.OtherBalls.Add(c++, new RawObjectState(b.X, b.Y, 0, 1, 0, (int)item));
+                    model.OtherBalls.Add(c++, new Observation(new VectorF2D(b.X, b.Y), 0, b.Confidence, 0, item));
                 }
             }
-            return world;
-
+            return model;
         }
         private void ForgetObservations()
         {
@@ -274,7 +272,7 @@ namespace MRL.SSL.Ai.MergerTracker
             }
         }
 
-        public WorldModel Merge(SSLWrapperPacket packet, bool isReverse, bool isYellow, VectorF2D selectedBall, ref bool selectedBallChanged)
+        public ObservationModel Merge(SSLWrapperPacket packet, bool isReverse, bool isYellow, VectorF2D selectedBall, ref bool selectedBallChanged)
         {
             if (packet == null || packet.Detection == null)
                 return null;
@@ -294,7 +292,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 selectedBallChanged = false;
             }
 
-            var world = MakeWorld(isYellow);
+            var model = MakeModel(isYellow);
             ForgetObservations();
 
             //reset seen camera detection for next frame
@@ -304,7 +302,7 @@ namespace MRL.SSL.Ai.MergerTracker
             }
             numCamerasSeen = 0;
 
-            return world;
+            return model;
         }
     }
 }

@@ -8,6 +8,7 @@ using ProtoBuf;
 using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Ai.MergerTracker;
 using WatsonWebsocket;
+using MRL.SSL.Common;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -18,6 +19,7 @@ namespace MRL.SSL.Ai.Engine
         WatsonWsServer _visualizerServer;
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
         WorldGenerator worldGenerator;
+        public RobotCommands Commands { get; set; }
         public EngineManager()
         {
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
@@ -54,7 +56,8 @@ namespace MRL.SSL.Ai.Engine
                 var packet = RecieveVisionData();
                 if (packet != null)
                 {
-                    var model = worldGenerator.GenerateWorldModel(packet, false, false);
+                    var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
+
                     if (model != null)
                     {
 

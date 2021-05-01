@@ -56,8 +56,8 @@ namespace MRL.SSL.Common.Math
         public Matrix<T> DenseZero(int iRows, int iCols)
         {
             Matrix<T> matrix = new Matrix<T>(iRows, iCols, Operator);
-            for (int i = 0; i < iRows * iCols; i++)
-                matrix.Data[i] = Operator.Zero;
+            // for (int i = 0; i < iRows * iCols; i++)
+            //     matrix.Data[i] = Operator.Zero;
             return matrix;
         }
         /// <summary>
@@ -97,7 +97,7 @@ namespace MRL.SSL.Common.Math
         public Matrix<T> Identity(int iRows, int iCols)
         {
             Matrix<T> matrix = new Matrix<T>(iRows, iCols, Operator);
-            for (int i = 0; i < System.Math.Max(iRows, iCols); i++)
+            for (int i = 0; i < System.Math.Min(iRows, iCols); i++)
                 matrix.Data[i * matrix.Cols + i] = Operator.One;
             return matrix;
         }
@@ -108,7 +108,7 @@ namespace MRL.SSL.Common.Math
         public Matrix<T> DenceIdentity(int iRows, int iCols, T value)
         {
             Matrix<T> matrix = new Matrix<T>(iRows, iCols, Operator);
-            for (int i = 0; i < System.Math.Max(iRows, iCols); i++)
+            for (int i = 0; i < System.Math.Min(iRows, iCols); i++)
                 matrix.Data[i * matrix.Cols + i] = value;
             return matrix;
         }

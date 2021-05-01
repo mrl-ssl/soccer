@@ -12,7 +12,7 @@ namespace MRL.SSL.Common.Math
         {
             get { return new VectorF3D(0F, 0F, 0F); }
         }
-        public override Vector3D<float> Abs()
+        public override VectorF3D Abs()
         {
             VectorF3D r = new VectorF3D
             {
@@ -23,7 +23,7 @@ namespace MRL.SSL.Common.Math
             return r;
         }
 
-        public override Vector3D<float> Add(Vector3D<float> v)
+        public override VectorF3D Add(Vector3D<float> v)
         {
             VectorF3D r = new VectorF3D
             {
@@ -34,7 +34,7 @@ namespace MRL.SSL.Common.Math
             return r;
         }
 
-        public override Vector3D<float> Bound(float low, float high)
+        public override VectorF3D Bound(float low, float high)
         {
             VectorF3D r = new VectorF3D(x, y, z);
             if (x < low) r.x = low; else if (x > high) r.x = high;
@@ -43,7 +43,7 @@ namespace MRL.SSL.Common.Math
             return r;
         }
 
-        public override Vector3D<float> Cross(Vector3D<float> p)
+        public override VectorF3D Cross(Vector3D<float> p)
         {
             VectorF3D r = new VectorF3D
             {
@@ -87,7 +87,7 @@ namespace MRL.SSL.Common.Math
             return MathF.Sqrt(x * x + y * y + z * z);
         }
 
-        public override Vector3D<float> Max(Vector3D<float> v)
+        public override VectorF3D Max(Vector3D<float> v)
         {
             VectorF3D r = new VectorF3D
             {
@@ -98,25 +98,54 @@ namespace MRL.SSL.Common.Math
             return r;
         }
 
-        public override Vector3D<float> Norm()
+        public override VectorF3D GetNorm()
         {
             float l = Length();
-            VectorF3D p = new VectorF3D
+            if (l < MathHelper.EpsilonF) { return new VectorF3D(); }
+            else
             {
-                x = x / l,
-                y = y / l,
-                z = z / l
-            };
-            return p;
+                return new VectorF3D
+                {
+                    x = x / l,
+                    y = y / l,
+                    z = z / l
+                }; ;
+            }
         }
-
-        public override void Normalize()
+        public override VectorF3D GetNormTo(float newLength)
         {
             float l = Length();
-            x /= l; y /= l; z /= l;
+            if (l < MathHelper.EpsilonF) { return new VectorF3D(); }
+            else
+            {
+                return new VectorF3D
+                {
+                    x = x * newLength / l,
+                    y = y * newLength / l,
+                    z = z * newLength / l
+                }; ;
+            }
+        }
+        public override void Norm()
+        {
+            float l = Length();
+            if (l < MathHelper.EpsilonF) { x = 0F; y = 0F; z = 0F; }
+            else
+                x /= l; y /= l; z /= l;
+        }
+        public override void NormTo(float newLength)
+        {
+            float l = Length();
+            if (l < MathHelper.EpsilonF) { x = 0F; y = 0F; z = 0F; }
+            else
+            {
+                x *= newLength / l;
+                y *= newLength / l;
+                z *= newLength / l;
+            }
         }
 
-        public override Vector3D<float> RotateX(float angle)
+        public override VectorF3D GetRotateX(float angle)
         {
             VectorF3D q = new VectorF3D();
             float s, c;
@@ -127,7 +156,7 @@ namespace MRL.SSL.Common.Math
             return q;
         }
 
-        public override Vector3D<float> RotateY(float angle)
+        public override VectorF3D GetRotateY(float angle)
         {
             VectorF3D q = new VectorF3D();
             float s, c;
@@ -138,7 +167,7 @@ namespace MRL.SSL.Common.Math
             return q;
         }
 
-        public override Vector3D<float> RotateZ(float angle)
+        public override VectorF3D GetRotateZ(float angle)
         {
             VectorF3D q = new VectorF3D();
             float s, c;
@@ -149,7 +178,7 @@ namespace MRL.SSL.Common.Math
             return q;
         }
 
-        public override Vector3D<float> Scale(float s)
+        public override VectorF3D Scale(float s)
         {
             VectorF3D r = new VectorF3D
             {
@@ -174,7 +203,7 @@ namespace MRL.SSL.Common.Math
             return x * x + y * y + z * z;
         }
 
-        public override Vector3D<float> Sub(Vector3D<float> v)
+        public override VectorF3D Sub(Vector3D<float> v)
         {
             VectorF3D r = new VectorF3D
             {
@@ -192,35 +221,25 @@ namespace MRL.SSL.Common.Math
             return new VectorF3D(Size * MathF.Cos(alpha) * MathF.Cos(beta), Size * MathF.Sin(beta), Size * MathF.Sin(alpha) * MathF.Cos(beta));
         }
 
-        public override void NormTo(float newLength)
-        {
-            float l = Length();
-            if (l < MathHelper.EpsilonF) { x = 0F; y = 0F; z = 0F; }
-            else
-            {
-                x *= newLength / l;
-                y *= newLength / l;
-                z *= newLength / l;
-            }
-        }
 
-        public override Vector3D<float> Reverse()
+
+        public override VectorF3D Reverse()
         {
             return new VectorF3D(-x, -y, -z);
         }
 
-        public override Vector3D<float> Divide(float s)
+        public override VectorF3D Divide(float s)
         {
             return new VectorF3D(x / s, y / s, z / s);
         }
 
 
-        public override Vector3D<float> Extend(float X, float Y, float Z)
+        public override VectorF3D Extend(float X, float Y, float Z)
         {
             return new VectorF3D(x + X, y + Y, z + Z);
         }
 
-        public override Vector3D<float> Interpolate(Vector3D<float> end, float amount)
+        public override VectorF3D Interpolate(Vector3D<float> end, float amount)
         {
             return new VectorF3D(x * (1F - amount) + end.X * amount, y * (1F - amount) + end.Y * amount, z * (1F - amount) + end.Z * amount);
         }
@@ -326,7 +345,7 @@ namespace MRL.SSL.Common.Math
             return dp.Length(); // return the closest distance
         }
 
-        public override Vector3D<float> PointOnSegment(Vector3D<float> x1, Vector3D<float> p)
+        public override VectorF3D PointOnSegment(Vector3D<float> x1, Vector3D<float> p)
         {
             Vector3D<float> sx, sp, r;
             float f, l;
@@ -338,11 +357,11 @@ namespace MRL.SSL.Common.Math
             if (f <= 0.0) return this;         // also handles this=x1 case
 
             l = sx.SqLength();
-            if (f >= l) return x1;
+            if (f >= l) return (VectorF3D)x1;
 
             r = this + sx * (f / l);
 
-            return r;
+            return (VectorF3D)r;
         }
 
         public override int GetHashCode()

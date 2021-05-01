@@ -25,11 +25,10 @@ namespace MRL.SSL.Common.Math
 
         public abstract T Dot(Vector3D<T> v);
         public abstract T TripleProdcut(Vector2D<T> v, Vector2D<T> u);
-        public abstract Vector3D<T> Norm();
         public abstract Vector3D<T> Cross(Vector3D<T> p);
-        public abstract Vector3D<T> RotateX(T angle);
-        public abstract Vector3D<T> RotateY(T angle);
-        public abstract Vector3D<T> RotateZ(T angle);
+        public abstract Vector3D<T> GetRotateX(T angle);
+        public abstract Vector3D<T> GetRotateY(T angle);
+        public abstract Vector3D<T> GetRotateZ(T angle);
         public abstract T ClosestPointTime(Vector3D<T> v1, Vector3D<T> x2, Vector3D<T> v2);
         public abstract T DistanceSegToSeg(Vector3D<T> s1b, Vector3D<T> s2a, Vector3D<T> s2b);
         public abstract T Distance(Vector3D<T> v);
@@ -49,9 +48,10 @@ namespace MRL.SSL.Common.Math
 
         public abstract T Length();
         public abstract T SqLength();
-        public abstract void Normalize();
+        public abstract void Norm();
         public abstract void NormTo(T newLength);
-
+        public abstract Vector3D<T> GetNorm();
+        public abstract Vector3D<T> GetNormTo(T newLength);
 
         public static Vector3D<T> Interpolate(Vector3D<T> start, Vector3D<T> end, T amount) { return start.Interpolate(end, amount); }
         public static T Dot(Vector3D<T> v1, Vector3D<T> v2) { return v1.Dot(v2); }

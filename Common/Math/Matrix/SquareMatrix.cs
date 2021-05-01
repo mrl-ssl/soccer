@@ -22,7 +22,7 @@ namespace MRL.SSL.Common.Math
 
         /// <param name="OperatorType">Structure wich derived from IOperator wich do operator like add,subtract,multiply,... </param>
         public SquareMatrix(IOperator<T> OperatorType) : base(OperatorType) { detOfP = Operator.One; }
-
+        public SquareMatrix(int r, T[] m, IOperator<T> OperatorType) : base(r, r, m, OperatorType) { detOfP = Operator.One; }
         ///<param name="dimention"> Row and column of square matrix.</param>
         /// <param name="OperatorType">Structure wich derived from IOperator wich do operator like add,subtract,multiply,... </param>
         public SquareMatrix(int dimention, IOperator<T> OperatorType) : base(dimention, dimention, OperatorType)
@@ -126,8 +126,8 @@ namespace MRL.SSL.Common.Math
             return matrix;
         }
 
-        ///<returns> Invert of this matrix.</returns>
-        public SquareMatrix<T> Invert()
+        ///<returns> Inverse of this matrix.</returns>
+        public SquareMatrix<T> Inverse()
         {
             if (_L == null || ValueChanged) MakeLU();
 
@@ -204,7 +204,7 @@ namespace MRL.SSL.Common.Math
         ///<summary>
         ///Remove ith row and jth col.
         ///</summary>
-        public new void Reduce(int irows, int jcols)
+        public override void Reduce(int irows, int jcols)
         {
             if (jcols >= _Cols || jcols < 0) throw new Exception("Wrong col index");
             if (irows >= _Rows || irows < 0) throw new Exception("Wrong row index");
@@ -228,7 +228,8 @@ namespace MRL.SSL.Common.Math
                 for (int j = 0; j < _Cols; j++)
                     t2.Data[i1 * t2.Cols + j] = _mat[i * _Cols + j];
             }
-            _Cols = t2.Cols; _Rows = t2.Rows; _mat = t2.Data; ValueChanged = true;
+            _Cols = t2.Cols; _Rows = t2.Rows; _mat = t2.Data;
+            ValueChanged = true;
         }
 
         ///<summary>

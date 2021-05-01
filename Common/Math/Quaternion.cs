@@ -192,7 +192,7 @@ namespace MRL.SSL.Common.Math
                 angle *= 0.5F;
                 float sinAngle = MathF.Sin(angle);
                 VectorF3D vn = v;
-                vn.Normalize();
+                vn.Norm();
                 x = (vn.X * sinAngle);
                 y = (vn.Y * sinAngle);
                 z = (vn.Z * sinAngle);
