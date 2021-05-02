@@ -4,8 +4,8 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>MRL.SSL.Ai</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
-    <PublishSingleFile>true</PublishSingleFile>
+    <!-- <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile> -->
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj"/>
