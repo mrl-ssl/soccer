@@ -118,7 +118,6 @@ namespace MRL.SSL.Ai.Engine
         }
         public void Dispose()
         {
-            sw.Stop();
             Console.WriteLine("Stopping CMC Thread...");
             _cmcCancelationSource.Cancel();
             _cmcThread.Join();
