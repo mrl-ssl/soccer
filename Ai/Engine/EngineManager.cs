@@ -20,6 +20,7 @@ namespace MRL.SSL.Ai.Engine
         WatsonWsServer _visualizerServer;
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
         WorldGenerator worldGenerator;
+        string visIpPort;
 
         public RobotCommands Commands { get; set; }
         public EngineManager()
@@ -62,7 +63,8 @@ namespace MRL.SSL.Ai.Engine
                         {
                             using var stream = new MemoryStream();
                             Serializer.Serialize<WorldModel>(stream, model);
-                            // _visualizerServer.SendAsync("", stream.GetBuffer());
+                            if (visIpPort != null)
+                                _visualizerServer.SendAsync(visIpPort, stream.GetBuffer());
                         }
                     }
                 }
@@ -78,6 +80,8 @@ namespace MRL.SSL.Ai.Engine
             Console.WriteLine("Initializing Stuff...");
 
             worldGenerator = new();
+
+            visIpPort = null;
 
             if (_visualizerServer != null)
             {
@@ -135,21 +139,25 @@ namespace MRL.SSL.Ai.Engine
             _visualizerServer.MessageReceived -= Visualizer_OnMessageReceived;
             _visualizerServer.Dispose();
 
+            visIpPort = null;
+
         }
         private static void Vision_OnError(object sender, System.Net.Sockets.SocketError e)
         {
             Console.WriteLine($"Echo Vision UDP server caught an error with code {e}");
         }
-        private static void Visualizer_OnMessageReceived(object sender, MessageReceivedEventArgs e)
+        private void Visualizer_OnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
             Console.WriteLine("Client Connected", e.IpPort);
         }
-        private static void Visualizer_OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
+        private void Visualizer_OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
         {
+            visIpPort = null;
             Console.WriteLine("Client Connected", e.IpPort);
         }
-        private static void Visualizer_OnClientConnected(object sender, ClientConnectedEventArgs e)
+        private void Visualizer_OnClientConnected(object sender, ClientConnectedEventArgs e)
         {
+            visIpPort = e.IpPort;
 
             Console.WriteLine("Client Disconnected", e.IpPort);
         }
