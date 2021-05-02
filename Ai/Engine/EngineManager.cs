@@ -10,6 +10,7 @@ using MRL.SSL.Ai.MergerTracker;
 using WatsonWebsocket;
 using MRL.SSL.Common;
 using System.Diagnostics;
+using System.Net.WebSockets;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -64,7 +65,7 @@ namespace MRL.SSL.Ai.Engine
                             using var stream = new MemoryStream();
                             Serializer.Serialize<WorldModel>(stream, model);
                             if (visIpPort != null)
-                                _visualizerServer.SendAsync(visIpPort, stream.GetBuffer());
+                                _visualizerServer.SendAsync(visIpPort, stream.GetBuffer(), WebSocketMessageType.Binary);
                         }
                     }
                 }
