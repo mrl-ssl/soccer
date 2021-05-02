@@ -58,13 +58,10 @@ namespace MRL.SSL.Ai.Engine
                     var packet = RecieveVisionData();
                     if (packet != null)
                     {
-                        var st = sw.ElapsedMilliseconds;
                         var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
 
                         if (model != null)
                         {
-                            var end = sw.ElapsedMilliseconds;
-                            Console.WriteLine(end - st);
 
                         }
                     }
