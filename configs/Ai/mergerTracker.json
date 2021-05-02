@@ -10,7 +10,7 @@
   "maxRobotId": 16,
   "affinityPersist": 30,
   "frameRate": 60,
-  "actionDelay": 0.333333333,
+  "actionDelay": 0.0333333333,
   "lastBallMaxDistance": 1000000,
   "framesToDetectCameras": 100,
   "ballRadi": 0.0215,

@@ -87,7 +87,7 @@ namespace MRL.SSL.Common
             return _A;
         }
 
-        public override MatrixF f(MatrixF x, ref MatrixF I)
+        public override MatrixF f(in MatrixF x, ref MatrixF I)
         {
             float _vpar = x[3, 0], _vperp = x[4, 0], _vtheta = x[5, 0];
 

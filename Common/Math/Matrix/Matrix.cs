@@ -42,7 +42,17 @@ namespace MRL.SSL.Common.Math
             _mat = new T[cols * rows];
             Operator = OperatorType;
         }
-
+        public Matrix(Matrix<T> source)
+        {
+            if (source == null) throw new NullReferenceException("source matrix is null");
+            _Rows = source._Rows; _Cols = source._Cols;
+            _mat = new T[_Rows * _Cols];
+            Operator = source.Operator;
+            for (int i = 0; i < _Rows * _Cols; i++)
+            {
+                _mat[i] = source._mat[i];
+            }
+        }
         /// <param name="OperatorType">Structure wich derived from IOperator.</param>
         public Matrix(IOperator<T> OperatorType) { Operator = OperatorType; }
         /// <param name="OperatorType">Structure wich derived from IOperator.</param>
@@ -358,7 +368,7 @@ namespace MRL.SSL.Common.Math
             string s = "";
             for (int i = 0; i < _Rows; i++)
             {
-                for (int j = 0; j < _Cols; j++) s += String.Format("{0,5:0.00}", _mat[i * _Cols + j]) + " ";
+                for (int j = 0; j < _Cols; j++) s += String.Format("{0,5:0.0000000}", _mat[i * _Cols + j]) + " ";
                 s += "\r\n";
             }
             return s;

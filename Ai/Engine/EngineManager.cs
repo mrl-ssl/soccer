@@ -9,6 +9,7 @@ using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Ai.MergerTracker;
 using WatsonWebsocket;
 using MRL.SSL.Common;
+using System.Diagnostics;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -19,33 +20,31 @@ namespace MRL.SSL.Ai.Engine
         WatsonWsServer _visualizerServer;
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
         WorldGenerator worldGenerator;
+        Stopwatch sw;
         public RobotCommands Commands { get; set; }
         public EngineManager()
         {
+
             Commands = new RobotCommands();
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
+            sw = new Stopwatch();
+            sw.Start();
         }
         public SSLWrapperPacket RecieveVisionData()
         {
             //
-            try
-            {
-                if (_visionClient == null)
-                    return null;
 
-                long size = _visionClient.Receive();
-                if (size == 0)
-                    return null;
-                using var stream = new MemoryStream(_visionClient.ReceiveBuffer.Data, 0, (int)size);
-
-                SSLWrapperPacket packet = Serializer.Deserialize<SSLWrapperPacket>(stream);
-                return packet;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception thrown on receiving vision data", ex.StackTrace);
+            if (_visionClient == null)
                 return null;
-            }
+
+            long size = _visionClient.Receive();
+            if (size == 0)
+                return null;
+            using var stream = new MemoryStream(_visionClient.ReceiveBuffer.Data, 0, (int)size);
+
+            SSLWrapperPacket packet = Serializer.Deserialize<SSLWrapperPacket>(stream);
+            return packet;
+
         }
         private void EngineManagerRun(object obj)
         {
@@ -54,15 +53,25 @@ namespace MRL.SSL.Ai.Engine
 
             while (!ct.IsCancellationRequested)
             {
-                var packet = RecieveVisionData();
-                if (packet != null)
+                try
                 {
-                    var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
-
-                    if (model != null)
+                    var packet = RecieveVisionData();
+                    if (packet != null)
                     {
+                        var st = sw.ElapsedMilliseconds;
+                        var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
 
+                        if (model != null)
+                        {
+                            var end = sw.ElapsedMilliseconds;
+                            Console.WriteLine(end - st);
+
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception thrown on Engine Manager run", ex.StackTrace);
                 }
             }
             Console.WriteLine("Engine Mangaer Stopped!");
@@ -112,6 +121,7 @@ namespace MRL.SSL.Ai.Engine
         }
         public void Dispose()
         {
+            sw.Stop();
             Console.WriteLine("Stopping CMC Thread...");
             _cmcCancelationSource.Cancel();
             _cmcThread.Join();

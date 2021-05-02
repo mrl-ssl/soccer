@@ -96,7 +96,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 model.Tracker = tracker;
                 model.Commands = commands;
             }
-
+            lastObsModel = obsModel;
             return model;
         }
     }

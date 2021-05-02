@@ -131,7 +131,7 @@ namespace MRL.SSL.Common.Math
         {
             if (_L == null || ValueChanged) MakeLU();
 
-            SquareMatrix<T> inv = new SquareMatrix<T>(Operator);
+            SquareMatrix<T> inv = new SquareMatrix<T>(_Rows, Operator);
 
             Matrix<T> Ei = new Matrix<T>(_Rows, 1, Operator);
             for (int i = 0; i < _Rows; i++)

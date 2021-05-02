@@ -4,7 +4,6 @@ using System.Linq;
 using System;
 using MRL.SSL.Common.Utils.Extensions;
 using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
-using SquareMatrixF = MRL.SSL.Common.Math.SquareMatrix<float>;
 using SMath = System.Math;
 
 namespace MRL.SSL.Common
@@ -71,7 +70,7 @@ namespace MRL.SSL.Common
 
         }
 
-        public abstract MatrixF f(MatrixF x, ref MatrixF I); // noiseless dynamics
+        public abstract MatrixF f(in MatrixF x, ref MatrixF I); // noiseless dynamics
         public abstract MatrixF A(MatrixF x); // Jacobian of f w.r.t. x
         public abstract MatrixF Q(MatrixF x); // Covariance of propagation noise
         public abstract MatrixF R(MatrixF x); // Covariance of observation noise
@@ -100,7 +99,7 @@ namespace MRL.SSL.Common
         }
         protected virtual void Propagate()
         {
-            MatrixF x = xs.Last();
+            MatrixF x = new MatrixF(xs.Last());
             MatrixF P = Ps.Last();
             MatrixF __A = A(x);
             MatrixF I = matrixBuilder.DenseZero(1, 1);
@@ -139,7 +138,7 @@ namespace MRL.SSL.Common
             steppedTime = time;
             // SquareMatrixF =
 
-            MatrixF K = P * (__H.Transpose()) * (__H * P * __H.Transpose() + tmpCV).ToSquareMatrix().Inverse();
+            MatrixF K = P * __H.Transpose() * (__H * P * __H.Transpose() + tmpCV).ToSquareMatrix().Inverse();
             MatrixF error = K * (z - h(x));
             x = x + error;
 

@@ -1,4 +1,5 @@
 using MRL.SSL.Common.Math;
+using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 
 namespace MRL.SSL.Common
 {
@@ -9,6 +10,11 @@ namespace MRL.SSL.Common
         public OccludeType Occluded { get; set; }
         public int OccludingTeam { get; set; }
         public int OccludingId { get; set; }
+        public bool HasCollision { get; set; }
+        public MatrixF Covariances { get; set; }
+        public int CollidedTeam { get; set; }
+        public int CollidedRobot { get; set; }
+
         public BallObservationMeta() : base()
         {
 

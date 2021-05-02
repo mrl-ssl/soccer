@@ -113,7 +113,7 @@ namespace MRL.SSL.Common
             return _A;
         }
 
-        public override MatrixF f(MatrixF x, ref MatrixF I)
+        public override MatrixF f(in MatrixF x, ref MatrixF I)
         {
             var c = GetCommand(steppedTime);
 

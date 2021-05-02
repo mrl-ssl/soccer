@@ -132,7 +132,7 @@ namespace MRL.SSL.Common
             return _A;
         }
 
-        public override MatrixF f(MatrixF x, ref MatrixF I)
+        public override MatrixF f(in MatrixF x, ref MatrixF I)
         {
             float _x = x[0, 0], _y = x[1, 0], _vx = x[2, 0], _vy = x[3, 0];
             float _v = MathF.Sqrt(_vx * _vx + _vy * _vy);

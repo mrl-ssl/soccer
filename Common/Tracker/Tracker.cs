@@ -87,6 +87,31 @@ namespace MRL.SSL.Common
             if (team == 0) stuck = ((OurRobotKalman)robots[team, indx]).Stuck(dt);
             return new SingleObjectState(loc, speed, angle, angularSpeed, 1);
         }
+        private SingleObjectState GetBallState(double dt)
+        {
+            BallObservationMeta m = null;
+            return GetBallState(dt, ref m);
+        }
+        private SingleObjectState GetBallState(double dt, ref BallObservationMeta meta)
+        {
+            var loc = ball.Position(dt);
+            var speed = ball.Velocity(dt);
+            if (meta != null)
+            {
+                int team = -1, robot = -1;
+                var cov = ball.Covariances(dt);
+                var col = ball.Collision(dt, ref team, ref robot);
+                meta.Occluded = ball.Occluded;
+                meta.OccludingTeam = ball.OccludingTeam;
+                meta.OccludingId = index2id[ball.OccludingTeam, ball.OccludingRobot];
+                meta.OccludingOffset = ball.OccludingOffset;
+                meta.Covariances = cov;
+                meta.HasCollision = col;
+                meta.CollidedTeam = team;
+                meta.CollidedRobot = robot;
+            }
+            return new SingleObjectState(loc, speed);
+        }
         public void ObserveModel(ObservationModel model, RobotCommands commands)
         {
             ResetUnSeens(model);
@@ -142,18 +167,28 @@ namespace MRL.SSL.Common
                 r.ViewState = viewState;
                 model.OurRobots.Add(key, state);
             }
-            // foreach (var key in obsModel.Opponents.Keys)
-            // {
-            //     var r = obsModel.Opponents[key];
-            //     var actionDelay = MergerTrackerConfig.Default.ActionDelay + r.NotSeen * MergerTrackerConfig.Default.FramePeriod;
-            //     var viewDelay = (r.NotSeen + 1) * MergerTrackerConfig.Default.FramePeriod;
+            foreach (var key in obsModel.Opponents.Keys)
+            {
+                var r = obsModel.Opponents[key];
+                var actionDelay = MergerTrackerConfig.Default.ActionDelay + r.NotSeen * MergerTrackerConfig.Default.FramePeriod;
+                var viewDelay = (r.NotSeen + 1) * MergerTrackerConfig.Default.FramePeriod;
 
-            //     var state = GetRobotState(1, id2index[1, key], actionDelay);
-            //     var viewState = GetRobotState(1, id2index[1, key], viewDelay);
-            //     r.ViewState = viewState;
-            //     model.Opponents.Add(key, state);
-            // }
+                var state = GetRobotState(1, id2index[1, key], actionDelay);
+                var viewState = GetRobotState(1, id2index[1, key], viewDelay);
+                r.ViewState = viewState;
+                model.Opponents.Add(key, state);
+            }
+            if (obsModel.Ball != null)
+            {
+                var b = obsModel.Ball;
+                var actionDelay = MergerTrackerConfig.Default.ActionDelay + b.NotSeen * MergerTrackerConfig.Default.FramePeriod;
+                var viewDelay = (b.NotSeen + 1) * MergerTrackerConfig.Default.FramePeriod;
 
+                var state = GetBallState(actionDelay, ref b);
+                var viewState = GetBallState(viewDelay);
+                b.ViewState = viewState;
+                model.BallState = state;
+            }
             if (model.BallState == null)
                 model.BallState = new SingleObjectState(VectorF2D.Zero, VectorF2D.Zero);
 
