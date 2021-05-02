@@ -20,15 +20,13 @@ namespace MRL.SSL.Ai.Engine
         WatsonWsServer _visualizerServer;
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
         WorldGenerator worldGenerator;
-        Stopwatch sw;
+
         public RobotCommands Commands { get; set; }
         public EngineManager()
         {
 
             Commands = new RobotCommands();
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
-            sw = new Stopwatch();
-            sw.Start();
         }
         public SSLWrapperPacket RecieveVisionData()
         {
@@ -62,7 +60,9 @@ namespace MRL.SSL.Ai.Engine
 
                         if (model != null)
                         {
-
+                            using var stream = new MemoryStream();
+                            Serializer.Serialize<WorldModel>(stream, model);
+                            // _visualizerServer.SendAsync("", stream.GetBuffer());
                         }
                     }
                 }

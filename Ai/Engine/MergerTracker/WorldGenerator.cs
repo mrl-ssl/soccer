@@ -43,7 +43,7 @@ namespace MRL.SSL.Ai.MergerTracker
                         if (r.NotSeen < MergerTrackerConfig.Default.MaxNotSeenFrames)
                         {
                             r.NotSeen++;
-                            r.vision = null;
+                            r.Vision = null;
                             obsModel.OurRobots.Add(key, r);
                         }
                     }
@@ -56,7 +56,7 @@ namespace MRL.SSL.Ai.MergerTracker
                         if (r.NotSeen < MergerTrackerConfig.Default.MaxNotSeenFrames)
                         {
                             r.NotSeen++;
-                            r.vision = null;
+                            r.Vision = null;
                             obsModel.Opponents.Add(key, r);
                         }
                     }

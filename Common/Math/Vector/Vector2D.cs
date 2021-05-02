@@ -110,7 +110,7 @@ namespace MRL.SSL.Common.Math
         {
             return base.Equals(obj);
         }
-
+        public static implicit operator Vector2D<T>(VectorF2D d) => (Vector2D<T>)d;
         public override int GetHashCode()
         {
             return base.GetHashCode();

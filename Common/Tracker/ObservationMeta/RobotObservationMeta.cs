@@ -1,8 +1,13 @@
 
+using ProtoBuf;
+
 namespace MRL.SSL.Common
 {
+    [ProtoContract]
     public class RobotObservationMeta : ObservationMeta
     {
+
+
 
         public RobotObservationMeta() : base()
         {

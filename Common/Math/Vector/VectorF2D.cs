@@ -33,10 +33,10 @@ namespace MRL.SSL.Common.Math
         {
             var l1 = Length();
             var l2 = v.Length();
-            if(l1 <MathHelper.EpsilonF) return v.AngleInRadians();
+            if (l1 < MathHelper.EpsilonF) return v.AngleInRadians();
             else if (l2 < MathHelper.EpsilonF) return AngleInRadians();
-            
-            return System.MathF.Acos(MathHelper.BoundF(Cosine(v),-1, 1));
+
+            return System.MathF.Acos(MathHelper.BoundF(Cosine(v), -1, 1));
         }
         public override float AngleBetweenInDegrees(Vector2D<float> v)
         {
@@ -475,6 +475,7 @@ namespace MRL.SSL.Common.Math
                 return MathF.Abs(x - v.x) < MathHelper.EpsilonF && MathF.Abs(y - v.y) < MathHelper.EpsilonF;
             return false;
         }
+
 
         public override int GetHashCode()
         {

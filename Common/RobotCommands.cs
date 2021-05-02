@@ -1,13 +1,16 @@
 using System.Collections.Generic;
+using ProtoBuf;
 
 namespace MRL.SSL.Common
 {
+    [ProtoContract]
     public class RobotCommands
     {
-        public IDictionary<int, SingleWirelessCommand> Commands { get; set; }
+        [ProtoMember(1)]
+        public Dictionary<int, SingleWirelessCommand> Commands { get; set; }
         public RobotCommands()
         {
-            Commands = new Dictionary<int,SingleWirelessCommand>();
+            Commands = new Dictionary<int, SingleWirelessCommand>();
         }
     }
 }

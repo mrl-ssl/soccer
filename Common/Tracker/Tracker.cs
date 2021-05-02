@@ -129,28 +129,28 @@ namespace MRL.SSL.Common
             foreach (var key in model.OurRobots.Keys)
             {
                 var r = model.OurRobots[key];
-                if (r.vision != null)
+                if (r.Vision != null)
                 {
                     robots[0, id2index[0, key]].VisionProblem = false;
-                    robots[0, id2index[0, key]].Observe(r.vision);
+                    robots[0, id2index[0, key]].Observe(r.Vision);
                 }
             }
             foreach (var key in model.Opponents.Keys)
             {
                 var r = model.Opponents[key];
-                if (r.vision != null)
+                if (r.Vision != null)
                 {
                     robots[1, id2index[1, key]].VisionProblem = false;
-                    robots[1, id2index[1, key]].Observe(r.vision);
+                    robots[1, id2index[1, key]].Observe(r.Vision);
                 }
             }
             if (model.Ball != null)
             {
                 var b = model.Ball;
-                if (b.vision != null)
+                if (b.Vision != null)
                 {
                     ball.CheckCollision = true;
-                    ball.Observe(b.vision);
+                    ball.Observe(b.Vision);
                 }
             }
         }

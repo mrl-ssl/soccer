@@ -1,7 +1,9 @@
 using MRL.SSL.Common.Math;
+using ProtoBuf;
 
 namespace MRL.SSL.Common
 {
+    [ProtoContract]
     public class SingleObjectState
     {
         private SingleObjectState parent;
@@ -17,12 +19,23 @@ namespace MRL.SSL.Common
 
         public SingleObjectState Parent { get => parent; set => parent = value; }
         public SingleObjectState Child { get => child; set => child = value; }
-        public Vector2D<float> Location { get => location; set => location = value; }
-        public Vector2D<float> Speed { get => speed; set => speed = value; }
+
+        [ProtoMember(1)]
+        public VectorF2D Location { get => (VectorF2D)location; set => location = value; }
+
+        [ProtoMember(2)]
+        public VectorF2D Speed { get => (VectorF2D)speed; set => speed = value; }
+
+        [ProtoMember(3)]
         public float Angle { get => angle; set => angle = value; }
+
+        [ProtoMember(4)]
         public float AngularSpeed { get => angularSpeed; set => angularSpeed = value; }
+
+        [ProtoMember(5)]
         public int? Battery { get => battery; set => battery = value; }
 
+        [ProtoMember(6)]
         public float Stuck { get => stuck; set => stuck = value; }
 
         public SingleObjectState()

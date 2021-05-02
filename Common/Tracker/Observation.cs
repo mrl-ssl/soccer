@@ -1,15 +1,27 @@
 using MRL.SSL.Common.Math;
+using ProtoBuf;
 
 namespace MRL.SSL.Common
 {
+    [ProtoContract]
     public class Observation
     {
         public bool IsValid { get; set; }
         public int LastValid { get; set; }
+
+        [ProtoMember(1)]
         public uint Camera { get; set; }
+
+        [ProtoMember(2)]
         public double Time { get; set; }
+
+        [ProtoMember(3)]
         public float Confidence { get; set; }
+
+        [ProtoMember(4)]
         public VectorF2D Location { get; set; }
+
+        [ProtoMember(5)]
         public float Angle { get; set; }
 
         public Observation()
