@@ -1,8 +1,28 @@
-using MRL.SSL.Common.Math;
+// using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Common.KdTree
 {
-    public class KdNode
+    class KdNode
+    {
+        public int SelfIndex { get; set; }
+        public int ParentIndex { get; set; }
+        public int LeftChildIndex { get; set; }
+        public int RightChildIndex { get; set; }
+        
+        public KdNode(int selfIndex)
+        {
+            SelfIndex = selfIndex;
+            ParentIndex = LeftChildIndex = RightChildIndex = -1;
+        }
+
+        public KdNode(int selfIndex,int parentIndex)
+        {
+            SelfIndex = selfIndex;
+            ParentIndex = parentIndex;
+            LeftChildIndex = RightChildIndex = -1;
+        }
+    }
+    /*public class KdNode
     {
         public static KdNode NullNode { get => new KdNode(); }
 
@@ -34,5 +54,5 @@ namespace MRL.SSL.Common.KdTree
             this.states = state;
             child = new KdNode[2];
         }
-    }
+    }*/
 }
