@@ -21,10 +21,10 @@ namespace MRL.SSL.Common
         public SingleObjectState Child { get => child; set => child = value; }
 
         [ProtoMember(1)]
-        public VectorF2D Location { get => (VectorF2D)location; set => location = value; }
+        public Vector2D<float> Location { get => location; set => location = value; }
 
         [ProtoMember(2)]
-        public VectorF2D Speed { get => (VectorF2D)speed; set => speed = value; }
+        public Vector2D<float> Speed { get => speed; set => speed = value; }
 
         [ProtoMember(3)]
         public float Angle { get => angle; set => angle = value; }
@@ -89,5 +89,7 @@ namespace MRL.SSL.Common
             angularSpeed = w;
             this.stuck = stuck;
         }
+
+        public float DistanceFrom(SingleObjectState state) => location.Distance(state.location);
     }
 }

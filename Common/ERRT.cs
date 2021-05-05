@@ -11,7 +11,7 @@ namespace MRL.SSL.Common
 
         private const int maxNodesCount = 400;
         private const int wayPointsCount = 30;
-        private const float extendMaxStepSize = 0.15f;
+        private const float extendStepSize = 0.15f;
         private const float nearThreshold = 0.14f;
         private const float goalProb = 0.2f;
         private const float wayPointProb = 0.4f;
@@ -19,7 +19,6 @@ namespace MRL.SSL.Common
         private readonly Random random;
         private KdTree.KdTree tree;
         private readonly SingleObjectState[] wayPoints;
-        private readonly SingleObjectState[] lastPath;
 
         public ERRT()
         {
@@ -30,75 +29,88 @@ namespace MRL.SSL.Common
                 wayPoints[i] = GenerateRandomState();
         }
 
-        public SingleObjectState[] PlanPath(SingleObjectState init, SingleObjectState goal, Obstacles obstacles)
+        public List<SingleObjectState> PlanPath(SingleObjectState init, SingleObjectState goal, Obstacles obstacles)
         {
             init.Parent = null;
             tree.Reset(init);
             int iteration = 0;
-            float distance = init.Location.Distance(goal.Location), bestDistance = distance;
+            bool goalIsTarget, isExtended;
+            float distance = init.DistanceFrom(goal), bestDistance = distance;
             SingleObjectState target, nearest, best = init;
             while (iteration < maxNodesCount && bestDistance > nearThreshold)
             {
-                target = ChoosTarget(goal);
-                if (obstacles.Meet(target, robotRadi) != null)
-                    continue;
-                nearest = tree.Nearest(target);
-                Extend(target, nearest);
-                distance = target.Location.Distance(goal.Location);
-                if (distance < bestDistance)
+                target = ChoosTarget(goal, out goalIsTarget);
+                nearest = (goalIsTarget) ? best : tree.Nearest(target);
+                isExtended = Extend(target, nearest, obstacles);
+                if (isExtended)
                 {
-                    best = target;
-                    bestDistance = distance;
+                    distance = target.DistanceFrom(goal);
+                    if (distance < bestDistance)
+                    {
+                        best = target;
+                        bestDistance = distance;
+                    }
                 }
                 iteration++;
             }
-            var path = GeneratePath(best, iteration);
-            FillWayPoints(path);
+            var path = GeneratePath(best);
+            if (bestDistance < nearThreshold) //path found
+                FillWayPoints(path);
             return path;
         }
 
-        private void FillWayPoints(SingleObjectState[] path)
+        private void FillWayPoints(List<SingleObjectState> path)
         {
-            List<int> usedIndexes = new List<int>(wayPointsCount);
-            int t = random.Next(path.Length);
-            for (int i = 0; i < wayPointsCount; i++)
+            List<int> usedIndexes = new List<int>(path.Count);
+            int t = random.Next(path.Count);
+            for (int i = 0; i < path.Count; i++)
             {
-                while (usedIndexes.Contains(t)) t = random.Next(path.Length);
-                wayPoints[i] = path[t];
+                while (usedIndexes.Contains(t)) t = random.Next(wayPointsCount);
+                usedIndexes.Add(t);
+                wayPoints[t] = path[i];
+                wayPoints[t].Parent = null;
             }
         }
 
-        private SingleObjectState[] GeneratePath(SingleObjectState lastNode, int nodesCount)
+        private List<SingleObjectState> GeneratePath(SingleObjectState lastNode)
         {
-            SingleObjectState[] path = new SingleObjectState[nodesCount];
-            SingleObjectState node = lastNode;
-            int i = nodesCount;
-            while (node.Parent != null)
+            List<SingleObjectState> path = new List<SingleObjectState>();
+            while (lastNode.Parent != null)
             {
-                path[i--] = node;
-                node = node.Parent;
+                path.Add(lastNode);
+                lastNode = lastNode.Parent;
             }
+            path.Reverse();
             return path;
         }
 
-        private void Extend(SingleObjectState node, SingleObjectState nearest)
+        private bool Extend(SingleObjectState target, SingleObjectState nearest, Obstacles obstacles)
         {
-            Vector2D<float> node2nearest = nearest.Location - node.Location;
+            Vector2D<float> node2nearest = nearest.Location - target.Location;
             float length = node2nearest.Length();
-            if (length > extendMaxStepSize)
+            if (length > extendStepSize)
             {
-                node2nearest.Scale(extendMaxStepSize / length);
-                node.Location = (VectorF2D)(nearest.Location + node2nearest);
+                node2nearest.Scale(extendStepSize / length);
+                target.Location = nearest.Location + node2nearest;
             }
-            tree.Add(node);
-            node.Parent = nearest;
+            if (obstacles.Meet(target, robotRadi) == null)
+            {
+                target.Parent = nearest;
+                tree.Add(target);
+                return true;
+            }
+            return false;
         }
 
-        private SingleObjectState ChoosTarget(SingleObjectState goal)
+        private SingleObjectState ChoosTarget(SingleObjectState goal, out bool goalIsTarget)
         {
+            goalIsTarget = false;
             float p = (float)random.NextDouble();
             if (p < goalProb)
+            {
+                goalIsTarget = true;
                 return goal;
+            }
             if (p < wayPointProb + goalProb)
                 return wayPoints[random.Next(wayPointsCount)];
             return GenerateRandomState();

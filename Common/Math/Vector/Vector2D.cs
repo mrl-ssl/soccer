@@ -42,7 +42,8 @@ namespace MRL.SSL.Common.Math
         public abstract Vector2D<T> Abs();
         public abstract Vector2D<T> Max(Vector2D<T> v);
         public abstract Vector2D<T> Bound(T low, T high);
-        public abstract Vector2D<T> Scale(T s);
+        public abstract void Scale(T s);
+        public abstract Vector2D<T> GetScaled(T s);
         public abstract Vector3D<T> Cross(Vector2D<T> v);
         public abstract Vector2D<T> Sub(Vector2D<T> v);
         public abstract Vector2D<T> Add(Vector2D<T> v);
@@ -80,8 +81,8 @@ namespace MRL.SSL.Common.Math
         public static T VertexAngle(Vector2D<T> a, Vector2D<T> b, Vector2D<T> c) { return a.VertexAngle(b, c); }     // gives counterclockwise angle from <a-b> to <c-b> in radian
         public static Vector2D<T> PointOnSegment(Vector2D<T> x0, Vector2D<T> x1, Vector2D<T> p) { return x0.PointOnSegment(x1, p); }      // returns nearest point on line segment x0-x1 to point p
         public static bool IsBetween(Vector2D<T> Right, Vector2D<T> Left, Vector2D<T> v) { return Right.IsBetween(Left, v); }
-        public static Vector2D<T> operator *(T p, Vector2D<T> v) { return v.Scale(p); }
-        public static Vector2D<T> operator *(Vector2D<T> v, T p) { return v.Scale(p); }
+        public static Vector2D<T> operator *(T p, Vector2D<T> v) { return v.GetScaled(p); }
+        public static Vector2D<T> operator *(Vector2D<T> v, T p) { return v.GetScaled(p); }
         public static Vector3D<T> operator *(Vector2D<T> v1, Vector2D<T> v2) { return v1.Cross(v2); }
         public static Vector2D<T> operator +(Vector2D<T> v1, Vector2D<T> v2) { return v1.Add(v2); }
         public static Vector2D<T> operator -(Vector2D<T> v1, Vector2D<T> v2) { return v1.Sub(v2); }

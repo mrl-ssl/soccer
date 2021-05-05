@@ -124,7 +124,13 @@ namespace MRL.SSL.Common.Math
 
             return r;
         }
-        public override VectorF2D Scale(float s)
+
+        public override void Scale(float s)
+        {
+            x *= s; y *= s;
+        }
+
+        public override VectorF2D GetScaled(float s)
         {
             return new VectorF2D(x * s, y * s);
         }
@@ -458,12 +464,12 @@ namespace MRL.SSL.Common.Math
 
         public override VectorF2D ToAiCoordinate(bool isReverse)
         {
-            return Scale(isReverse ? -0.001f : 0.001f);
+            return GetScaled(isReverse ? -0.001f : 0.001f);
         }
 
         public override VectorF2D ToVisionCoordinate(bool isReverse)
         {
-            return Scale(isReverse ? -1000f : 1000f);
+            return GetScaled(isReverse ? -1000f : 1000f);
         }
         public override float VertexAngle(Vector2D<float> b, Vector2D<float> c)
         {
