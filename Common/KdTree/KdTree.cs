@@ -4,11 +4,9 @@ namespace MRL.SSL.Common.KdTree
 {
     public class KdTree
     {
-        // private const int InitNodesSize = 100;
-
         private readonly List<KdNode> nodes;
         private readonly List<SingleObjectState> nodeDatas;
-        private KdNode Root { get => nodes[0]; }
+        private KdNode Root => nodes[0];
 
         public KdTree()
         {
@@ -21,14 +19,15 @@ namespace MRL.SSL.Common.KdTree
             nodeDatas = new List<SingleObjectState>(capacity);
         }
 
-        public void Add(SingleObjectState state)
+        public void Reset(SingleObjectState root)
         {
-            if (nodes.Count > 0)
-                Add(state, Root);
-            else
-                AddNodeWithData(state, -1); //create root node
+            Clear();
+            AddNodeWithData(root, -1);
         }
-        public SingleObjectState Nearest(SingleObjectState state) => NearestNode(state, Root, Root, float.MaxValue);
+
+        public void Add(SingleObjectState state) => Add(state, Root);
+
+        public SingleObjectState Nearest(SingleObjectState to) => Nearest(to, Root, Root, float.MaxValue);
 
         private void Add(SingleObjectState state, KdNode current, int depth = 0)
         {
@@ -45,20 +44,24 @@ namespace MRL.SSL.Common.KdTree
                 Add(state, child, depth + 1);
         }
 
-        private SingleObjectState NearestNode(SingleObjectState state, KdNode current, KdNode best, float best_dist, int depth = 0)
+        private SingleObjectState Nearest(SingleObjectState to, KdNode current, KdNode best, float best_dist, int depth = 0)
         {
-            float distance = nodeDatas[current.SelfIndex].Location.Distance(state.Location);
+            float distance = nodeDatas[current.SelfIndex].Location.Distance(to.Location);
             if (distance <= Math.MathHelper.EpsilonF) return nodeDatas[best.SelfIndex];
             if (distance < best_dist) { best_dist = distance; best = current; }
-            bool right = GoRight(current, state, depth);
+            bool right = GoRight(current, to, depth);
             KdNode child = GetChild(current, right);
             if (child == null)
                 return nodeDatas[best.SelfIndex];
-            return NearestNode(state, child, best, best_dist, depth + 1);
+            return Nearest(to, child, best, best_dist, depth + 1);
         }
 
-        private KdNode GetRightChild(KdNode node) => node.RightChildIndex < 0 ? null : nodes[node.RightChildIndex];
-        private KdNode GetLeftChild(KdNode node) => node.LeftChildIndex < 0 ? null : nodes[node.LeftChildIndex];
+        private void Clear()
+        {
+            nodes.Clear();
+            nodeDatas.Clear();
+        }
+
         private KdNode GetChild(KdNode node, bool right) => right ? node.RightChildIndex < 0 ? null : nodes[node.RightChildIndex] : node.LeftChildIndex < 0 ? null : nodes[node.LeftChildIndex];
         private bool GoRight(KdNode node, SingleObjectState state, int depth) =>
             depth % 2 == 0 ? state.Location.X >= nodeDatas[node.SelfIndex].Location.X : state.Location.Y >= nodeDatas[node.SelfIndex].Location.Y;

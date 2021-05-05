@@ -46,6 +46,22 @@ namespace MRL.SSL.Common
         }
 
         /// <summary>
+        /// Check there is obstacle in given state and returns that.
+        /// if there is not returns null
+        /// </summary>
+        /// <param name="s">target state</param>
+        /// <param name="type">type of obstacle you want to check for</param>
+        public ObstacleBase Meet(SingleObjectState s, float obstacleRadi, float margin = 0f)
+        {
+            foreach (var type in obstacles.Keys)
+                foreach (var item in obstacles[type])
+                    if (!item.Avoid)
+                        if (item.Meet(s, obstacleRadi, margin))
+                            return item;
+            return null;
+        }
+
+        /// <summary>
         /// Check there is obstacle from state a to b and returns that.
         /// if there is not returns null
         /// </summary>
