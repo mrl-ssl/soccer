@@ -63,7 +63,11 @@ namespace MRL.SSL.Ai.Engine
                         if (model != null)
                         {
                             using var stream = new MemoryStream();
-                            Serializer.Serialize<WorldModel>(stream, model);
+                            WorldModel2 md = new WorldModel2();
+                            md.FieldIsInverted = true;
+                            md.OurMarkerIsYellow = false;
+                            md.GoalieID = 5;
+                            Serializer.Serialize<WorldModel2>(stream, md);
                             if (visIpPort != null)
                                 _visualizerServer.SendAsync(visIpPort, stream.GetBuffer(), WebSocketMessageType.Binary);
                         }
