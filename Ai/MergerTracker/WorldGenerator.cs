@@ -45,6 +45,7 @@ namespace MRL.SSL.Ai.MergerTracker
                         {
                             r.NotSeen++;
                             r.Vision = null;
+                            r.Time += MergerTrackerConfig.Default.FramePeriod;
                             obsModel.Teammates.Add(key, r);
                         }
                     }
@@ -58,6 +59,7 @@ namespace MRL.SSL.Ai.MergerTracker
                         {
                             r.NotSeen++;
                             r.Vision = null;
+                            r.Time += MergerTrackerConfig.Default.FramePeriod;
                             obsModel.Opponents.Add(key, r);
                         }
                     }
@@ -68,6 +70,8 @@ namespace MRL.SSL.Ai.MergerTracker
                     if (b.NotSeen < MergerTrackerConfig.Default.MaxNotSeenFrames)
                     {
                         b.NotSeen++;
+                        b.Vision = null;
+                        b.Time += MergerTrackerConfig.Default.FramePeriod;
                         obsModel.Ball = b;
                     }
 

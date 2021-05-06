@@ -40,17 +40,17 @@ namespace MRL.SSL.Ai.Utils
         {
             viewState = state;
         }
-        public ObservationMeta(Observation v)
+        public ObservationMeta(Observation v, double time)
         {
             vision = v;
-            if (v != null)
-                time = v.Time;
+            // if (v != null)
+            //     time = v.Time;
         }
-        public ObservationMeta(Observation v, SingleObjectState state)
+        public ObservationMeta(Observation v, double time, SingleObjectState state)
         {
             vision = v;
-            if (v != null)
-                time = v.Time;
+            // if (v != null)
+            //     time = v.Time;
             viewState = state;
         }
     }
@@ -82,11 +82,11 @@ namespace MRL.SSL.Ai.Utils
         public BallObservationMeta(SingleObjectState state) : base(state)
         {
         }
-        public BallObservationMeta(Observation v) : base(v)
+        public BallObservationMeta(Observation v, double time) : base(v, time)
         {
 
         }
-        public BallObservationMeta(Observation v, SingleObjectState state) : base(v, state)
+        public BallObservationMeta(Observation v, double time, SingleObjectState state) : base(v, time, state)
         {
         }
     }
@@ -101,11 +101,11 @@ namespace MRL.SSL.Ai.Utils
         public RobotObservationMeta(SingleObjectState state) : base(state)
         {
         }
-        public RobotObservationMeta(Observation v) : base(v)
+        public RobotObservationMeta(Observation v, double time) : base(v, time)
         {
 
         }
-        public RobotObservationMeta(Observation v, SingleObjectState state) : base(v, state)
+        public RobotObservationMeta(Observation v, double time, SingleObjectState state) : base(v, time, state)
         {
         }
     }

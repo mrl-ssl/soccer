@@ -14,6 +14,7 @@ namespace MRL.SSL.Ai.MergerTracker
     internal class Merger
     {
         bool[] camerasSeen;
+        double[] times;
         int numCameras, numCamerasSeen;
         uint frames;
         byte[] lastAvailableCameras;
@@ -25,6 +26,7 @@ namespace MRL.SSL.Ai.MergerTracker
         public Merger()
         {
             camerasSeen = new bool[MergerTrackerConfig.Default.MaxCameraCount];
+            times = new double[MergerTrackerConfig.Default.MaxCameraCount];
             numCameras = 0;
             numCamerasSeen = 0;
             frames = 0;
@@ -90,14 +92,12 @@ namespace MRL.SSL.Ai.MergerTracker
         private void UpdateObservations(SSLDetectionFrame d, VectorF2D selectedBall, bool isReverse, bool selectedBallChanged)
         {
             var camera = d.CameraId;
-            var time = d.CaptureTime;
-            lastCaptureTime = time;
+            times[camera] = d.CaptureTime;
             for (int i = 0; i < d.BlueRobots.Count; i++)
             {
                 var r = d.BlueRobots[i];
                 var obs = robots[0, r.Id.HasValue ? r.Id.Value : i].Observations[camera];
                 obs.IsValid = true;
-                obs.Time = time;
                 obs.Confidence = r.Confidence;
                 obs.Location = new VectorF2D(r.X, r.Y);
                 obs.Angle = r.Orientation.HasValue ? r.Orientation.Value : 0;
@@ -107,7 +107,6 @@ namespace MRL.SSL.Ai.MergerTracker
                 var r = d.YellowRobots[i];
                 var obs = robots[1, r.Id.HasValue ? r.Id.Value : i].Observations[camera];
                 obs.IsValid = true;
-                obs.Time = time;
                 obs.Confidence = r.Confidence;
                 obs.Location = new VectorF2D(r.X, r.Y);
                 obs.Angle = r.Orientation.HasValue ? r.Orientation.Value : 0;
@@ -157,7 +156,6 @@ namespace MRL.SSL.Ai.MergerTracker
                 {
                     var obs = ball.Observations[camera];
                     obs.IsValid = true;
-                    obs.Time = time;
                     obs.Confidence = closest.Confidence;
                     obs.Location = new VectorF2D(closest.X, closest.Y);
                 }
@@ -203,7 +201,7 @@ namespace MRL.SSL.Ai.MergerTracker
             if (ball.MergeObservations() >= 0)
             {
                 var obs = ball.Observations[ball.Affinity];
-                model.Ball = new BallObservationMeta(obs);
+                model.Ball = new BallObservationMeta(obs, times[ball.Affinity]);
             }
 
             for (int team = 0; team < MergerTrackerConfig.Default.TeamsCount; team++)
@@ -216,11 +214,11 @@ namespace MRL.SSL.Ai.MergerTracker
                         var obs = robot.Observations[robot.Affinity];
                         if ((team == 0 && !isYellow) || (team == 1 && isYellow))
                         {
-                            model.Teammates[id] = new RobotObservationMeta(obs);
+                            model.Teammates[id] = new RobotObservationMeta(obs, times[robot.Affinity]);
                         }
                         else
                         {
-                            model.Opponents[id] = new RobotObservationMeta(obs);
+                            model.Opponents[id] = new RobotObservationMeta(obs, times[robot.Affinity]);
                         }
                     }
                 }
@@ -229,7 +227,7 @@ namespace MRL.SSL.Ai.MergerTracker
             {
                 foreach (var b in balls[item])
                 {
-                    model.OtherBalls.Add(new Observation(new VectorF2D(b.X, b.Y), 0, b.Confidence, 0, item));
+                    model.OtherBalls.Add(new Observation(new VectorF2D(b.X, b.Y), 0, b.Confidence, item));
                 }
             }
             return model;

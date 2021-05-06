@@ -12,8 +12,8 @@ namespace MRL.SSL.Ai.Utils
         [ProtoMember(1)]
         public uint Camera { get; set; }
 
-        // [ProtoMember(2)]
-        public double Time { get; set; }
+        // // [ProtoMember(2)]
+        // public double Time { get; set; }
 
         [ProtoMember(2)]
         public float Confidence { get; set; }
@@ -31,12 +31,12 @@ namespace MRL.SSL.Ai.Utils
         {
             Camera = cam;
         }
-        public Observation(VectorF2D loc, float angle, float conf, double time, uint cam)
+        public Observation(VectorF2D loc, float angle, float conf, uint cam)
         {
             Location = loc;
             Angle = angle;
             Confidence = conf;
-            Time = time;
+            // Time = time;
             Camera = cam;
         }
     }

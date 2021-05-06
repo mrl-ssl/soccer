@@ -18,8 +18,6 @@ namespace MRL.SSL.Ai.Utils
         [ProtoMember(4)]
         public IList<Observation> OtherBalls { get; set; }
 
-        // [ProtoMember(5)]
-        public double TimeOfCapture { get; set; }
         public ObservationModel()
         {
             Teammates = new Dictionary<int, RobotObservationMeta>();

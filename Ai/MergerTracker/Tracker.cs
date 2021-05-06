@@ -133,7 +133,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 if (r.Vision != null)
                 {
                     robots[0, id2index[0, key]].VisionProblem = false;
-                    robots[0, id2index[0, key]].Observe(r.Vision);
+                    robots[0, id2index[0, key]].Observe(r.Vision, r.Time);
                 }
             }
             foreach (var key in model.Opponents.Keys)
@@ -142,7 +142,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 if (r.Vision != null)
                 {
                     robots[1, id2index[1, key]].VisionProblem = false;
-                    robots[1, id2index[1, key]].Observe(r.Vision);
+                    robots[1, id2index[1, key]].Observe(r.Vision, r.Time);
                 }
             }
             if (model.Ball != null)
@@ -151,7 +151,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 if (b.Vision != null)
                 {
                     ball.CheckCollision = true;
-                    ball.Observe(b.Vision);
+                    ball.Observe(b.Vision, b.Time);
                 }
             }
         }

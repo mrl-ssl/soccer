@@ -87,7 +87,7 @@ namespace MRL.SSL.Ai.MergerTracker
         public virtual MatrixF W(MatrixF x) { return _W; } // Jacobian of f w.r.t. noise
         public virtual MatrixF H(MatrixF x) { return _H; } // Jacobian of h w.r.t. x
         public virtual MatrixF V(MatrixF x) { return _V; }// Jacobian of h w.r.t. noise
-        public abstract void Observe(Observation obs);
+        public abstract void Observe(Observation obs, double timestamp);
         protected virtual void Initial(double t, MatrixF x, MatrixF P)
         {
             xs.Clear();

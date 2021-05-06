@@ -53,9 +53,9 @@ namespace MRL.SSL.Ai.MergerTracker
             Is.Enqueue(I);
             steppedTime += stepSize;
         }
-        public override void Observe(Observation obs)
+        public override void Observe(Observation obs, double timestamp)
         {
-            if (SMath.Abs(obs.Time - time) > MergerTrackerConfig.Default.MaxPredictionTime
+            if (SMath.Abs(timestamp - time) > MergerTrackerConfig.Default.MaxPredictionTime
                 || (xs.Count > 0 && float.IsNaN(xs.ElementAt(0)[0, 0])))
                 Reset();
 
@@ -76,22 +76,22 @@ namespace MRL.SSL.Ai.MergerTracker
                 _x[2, 0] = 0f;
                 _x[3, 0] = 0f;
 
-                Initial(obs.Time, _x, _p);
+                Initial(timestamp, _x, _p);
                 Occluded = OccludeType.Visible;
                 _reset = false;
             }
-            else if (obs.Time > time)
+            else if (timestamp > time)
             {
                 if (_reset && Occluded != OccludeType.Occluded) return;
 
                 // Tick to current time.
                 if (Occluded == OccludeType.Occluded)
                 {
-                    TickOcclusion(obs.Time - time);
+                    TickOcclusion(timestamp - time);
                 }
                 else
                 {
-                    Tick(obs.Time - time);
+                    Tick(timestamp - time);
                 }
                 _z[0, 0] = obs.Location.X;
                 _z[1, 0] = obs.Location.Y;
@@ -106,7 +106,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 {
                     Update(_z);
                     Occluded = OccludeType.Visible;
-                    OccludedLastObsTime = obs.Time;
+                    OccludedLastObsTime = timestamp;
                 }
                 else
                 {
@@ -115,7 +115,7 @@ namespace MRL.SSL.Ai.MergerTracker
                         CheckOcclusion();
 
                     if (Occluded == OccludeType.MaybeOccluded &&
-                        obs.Time - OccludedLastObsTime > MergerTrackerConfig.Default.BallOccludeTime)
+                        timestamp - OccludedLastObsTime > MergerTrackerConfig.Default.BallOccludeTime)
                     {
 
                         Occluded = OccludeType.Occluded;

@@ -37,11 +37,11 @@ namespace MRL.SSL.Ai.MergerTracker
             cs.Enqueue(new RCommand(t, new VectorF3D()));
             base.Initial(t, x, p);
         }
-        public override void Observe(Observation obs)
+        public override void Observe(Observation obs, double timestamp)
         {
             var fx = (xs.Count > 0 && xs.First().Rows > 2) ? xs.First() : null;
 
-            if (SMath.Abs(obs.Time - time) > MergerTrackerConfig.Default.MaxPredictionTime
+            if (SMath.Abs(timestamp - time) > MergerTrackerConfig.Default.MaxPredictionTime
                 || (fx != null && (float.IsNaN(fx[0, 0]) || float.IsNaN(fx[1, 0]) || float.IsNaN(fx[2, 0]))))
                 Reset();
 
@@ -64,14 +64,14 @@ namespace MRL.SSL.Ai.MergerTracker
                 _x[1, 0] = obs.Location.Y;
                 _x[2, 0] = obs.Angle - MathF.PI / 2f;
 
-                Initial(obs.Time, _x, _p);
+                Initial(timestamp, _x, _p);
 
                 _reset = false;
             }
-            else if (obs.Time > time)
+            else if (timestamp > time)
             {
 
-                Tick(obs.Time - time);
+                Tick(timestamp - time);
 
                 var xtheta = xs.First()[2, 0];
 
