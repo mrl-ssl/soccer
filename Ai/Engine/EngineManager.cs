@@ -61,18 +61,19 @@ namespace MRL.SSL.Ai.Engine
                     {
                         var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
 
-                        if (model != null)
+                        if (model == null)
+                            continue;
+
+                        if (visIpPort != null)
                         {
-                            if (visIpPort != null)
-                            {
-                                using var stream = new MemoryStream();
+                            using var stream = new MemoryStream();
 
-                                Serializer.Serialize<WorldModel>(stream, model);
+                            Serializer.Serialize<WorldModel>(stream, model);
 
-                                _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
-                            }
-
+                            _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
                         }
+
+
                     }
                 }
                 catch (Exception ex)
