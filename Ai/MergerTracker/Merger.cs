@@ -21,7 +21,6 @@ namespace MRL.SSL.Ai.MergerTracker
         ObjectMerger[,] robots;
         ObjectMerger ball;
         private IDictionary<uint, List<SSLDetectionBall>> balls;
-        private double lastCaptureTime;
 
         public Merger()
         {
