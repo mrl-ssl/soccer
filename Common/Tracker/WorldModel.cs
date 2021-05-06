@@ -14,24 +14,25 @@ namespace MRL.SSL.Common
         public int? GoalieID { get; set; }
 
         [ProtoMember(4)]
-        public Dictionary<int, SingleObjectState> OurRobots { get; set; }
+        public Dictionary<int, SingleObjectState> Teammates { get; set; }
 
         [ProtoMember(5)]
         public Dictionary<int, SingleObjectState> Opponents { get; set; }
 
         [ProtoMember(6)]
-        public SingleObjectState BallState { get; set; }
+        public SingleObjectState Ball { get; set; }
 
         [ProtoMember(7)]
         public ObservationModel Observations { get; set; }
 
-        public Tracker Tracker { get; set; }
 
         [ProtoMember(8)]
         public RobotCommands Commands { get; set; }
+
+        public Tracker Tracker { get; set; }
         public WorldModel()
         {
-            OurRobots = new Dictionary<int, SingleObjectState>();
+            Teammates = new Dictionary<int, SingleObjectState>();
             Opponents = new Dictionary<int, SingleObjectState>();
             Observations = new ObservationModel();
         }

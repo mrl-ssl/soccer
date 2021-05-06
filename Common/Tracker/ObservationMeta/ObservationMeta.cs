@@ -4,6 +4,8 @@ using ProtoBuf;
 namespace MRL.SSL.Common
 {
     [ProtoContract]
+    [ProtoInclude(4, typeof(BallObservationMeta))]
+    [ProtoInclude(5, typeof(RobotObservationMeta))]
     public class ObservationMeta
     {
         protected Observation vision;
@@ -13,13 +15,13 @@ namespace MRL.SSL.Common
         [ProtoMember(1)]
         public Observation Vision { get => vision; set { vision = value; } }
 
-        [ProtoMember(2)]
+        [ProtoMember(2, IsRequired = true)]
         public int NotSeen { get => notSeen; set { notSeen = value; } }
 
         [ProtoMember(3)]
         public SingleObjectState ViewState { get => viewState; set { viewState = value; } }
 
-        [ProtoMember(4)]
+        // [ProtoMember(4)]
         public double Time { get => time; set { time = value; } }
 
         protected double time;

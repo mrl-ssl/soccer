@@ -12,16 +12,16 @@ namespace MRL.SSL.Common
         [ProtoMember(1)]
         public uint Camera { get; set; }
 
-        [ProtoMember(2)]
+        // [ProtoMember(2)]
         public double Time { get; set; }
 
-        [ProtoMember(3)]
+        [ProtoMember(2)]
         public float Confidence { get; set; }
 
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         public VectorF2D Location { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         public float Angle { get; set; }
 
         public Observation()

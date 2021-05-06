@@ -26,7 +26,7 @@ namespace MRL.SSL.Ai.MergerTracker
             camerasSeen = new bool[MergerTrackerConfig.Default.MaxCameraCount];
             numCameras = 0;
             numCamerasSeen = 0;
-            frames = 0; 
+            frames = 0;
             ball = new ObjectMerger();
             balls = new Dictionary<uint, List<SSLDetectionBall>>();
             robots = new ObjectMerger[MergerTrackerConfig.Default.TeamsCount, MergerTrackerConfig.Default.MaxRobotId].Populate();
@@ -224,12 +224,11 @@ namespace MRL.SSL.Ai.MergerTracker
                     }
                 }
             }
-            int c = 0;
             foreach (var item in balls.Keys)
             {
                 foreach (var b in balls[item])
                 {
-                    model.OtherBalls.Add(c++, new Observation(new VectorF2D(b.X, b.Y), 0, b.Confidence, 0, item));
+                    model.OtherBalls.Add(new Observation(new VectorF2D(b.X, b.Y), 0, b.Confidence, 0, item));
                 }
             }
             return model;

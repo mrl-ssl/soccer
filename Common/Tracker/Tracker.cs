@@ -165,7 +165,7 @@ namespace MRL.SSL.Common
                 var state = GetRobotState(0, id2index[0, key], actionDelay);
                 var viewState = GetRobotState(0, id2index[0, key], viewDelay);
                 r.ViewState = viewState;
-                model.OurRobots.Add(key, state);
+                model.Teammates.Add(key, state);
             }
             foreach (var key in obsModel.Opponents.Keys)
             {
@@ -187,10 +187,10 @@ namespace MRL.SSL.Common
                 var state = GetBallState(actionDelay, ref b);
                 var viewState = GetBallState(viewDelay);
                 b.ViewState = viewState;
-                model.BallState = state;
+                model.Ball = state;
             }
-            if (model.BallState == null)
-                model.BallState = new SingleObjectState(VectorF2D.Zero, VectorF2D.Zero);
+            if (model.Ball == null)
+                model.Ball = new SingleObjectState(VectorF2D.Zero, VectorF2D.Zero);
 
             model.Observations = obsModel;
             return model;

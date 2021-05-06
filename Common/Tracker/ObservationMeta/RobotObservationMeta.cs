@@ -7,8 +7,6 @@ namespace MRL.SSL.Common
     public class RobotObservationMeta : ObservationMeta
     {
 
-
-
         public RobotObservationMeta() : base()
         {
 

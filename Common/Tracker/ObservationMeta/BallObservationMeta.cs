@@ -8,17 +8,16 @@ namespace MRL.SSL.Common
     public class BallObservationMeta : ObservationMeta
     {
 
-
         [ProtoMember(1)]
         public VectorF2D OccludingOffset { get; set; }
 
-        [ProtoMember(2)]
+        [ProtoMember(2, IsRequired = true)]
         public OccludeType Occluded { get; set; }
 
-        [ProtoMember(3)]
+        [ProtoMember(3, IsRequired = true)]
         public int OccludingTeam { get; set; }
 
-        [ProtoMember(4)]
+        [ProtoMember(4, IsRequired = true)]
         public int OccludingId { get; set; }
 
         public bool HasCollision { get; set; }

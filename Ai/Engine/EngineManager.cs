@@ -11,6 +11,7 @@ using WatsonWebsocket;
 using MRL.SSL.Common;
 using System.Diagnostics;
 using System.Net.WebSockets;
+using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -50,7 +51,6 @@ namespace MRL.SSL.Ai.Engine
         {
             CancellationToken ct = (CancellationToken)obj;
             Console.WriteLine("Engine Mangaer Started!");
-
             while (!ct.IsCancellationRequested)
             {
                 try
@@ -63,13 +63,10 @@ namespace MRL.SSL.Ai.Engine
                         if (model != null)
                         {
                             using var stream = new MemoryStream();
-                            WorldModel2 md = new WorldModel2();
-                            md.FieldIsInverted = true;
-                            md.OurMarkerIsYellow = false;
-                            md.GoalieID = 5;
-                            Serializer.Serialize<WorldModel2>(stream, md);
+
+                            Serializer.Serialize<WorldModel>(stream, model);
                             if (visIpPort != null)
-                                _visualizerServer.SendAsync(visIpPort, stream.GetBuffer(), WebSocketMessageType.Binary);
+                                _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
                         }
                     }
                 }

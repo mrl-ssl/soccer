@@ -26,17 +26,17 @@ namespace MRL.SSL.Common
         [ProtoMember(2)]
         public VectorF2D Speed { get => (VectorF2D)speed; set => speed = value; }
 
-        [ProtoMember(3)]
+        [ProtoMember(3, IsRequired = true)]
         public float Angle { get => angle; set => angle = value; }
 
-        [ProtoMember(4)]
+        [ProtoMember(4, IsRequired = true)]
         public float AngularSpeed { get => angularSpeed; set => angularSpeed = value; }
 
-        [ProtoMember(5)]
-        public int? Battery { get => battery; set => battery = value; }
+        [ProtoMember(5, IsRequired = true)]
+        public float Stuck { get => stuck; set => stuck = value; }
 
         [ProtoMember(6)]
-        public float Stuck { get => stuck; set => stuck = value; }
+        public int? Battery { get => battery; set => battery = value; }
 
         public SingleObjectState()
         {
