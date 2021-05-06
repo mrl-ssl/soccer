@@ -12,9 +12,6 @@ namespace MRL.SSL.Ai.Utils
         [ProtoMember(1)]
         public uint Camera { get; set; }
 
-        // // [ProtoMember(2)]
-        // public double Time { get; set; }
-
         [ProtoMember(2)]
         public float Confidence { get; set; }
 
