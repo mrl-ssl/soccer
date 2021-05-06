@@ -57,23 +57,20 @@ namespace MRL.SSL.Ai.Engine
                 try
                 {
                     var packet = RecieveVisionData();
-                    if (packet != null)
+                    if (packet == null)
+                        continue;
+
+                    var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
+                    if (model == null)
+                        continue;
+
+                    if (visIpPort != null)
                     {
-                        var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
+                        using var stream = new MemoryStream();
 
-                        if (model == null)
-                            continue;
+                        Serializer.Serialize<WorldModel>(stream, model);
 
-                        if (visIpPort != null)
-                        {
-                            using var stream = new MemoryStream();
-
-                            Serializer.Serialize<WorldModel>(stream, model);
-
-                            _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
-                        }
-
-
+                        _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
                     }
                 }
                 catch (Exception ex)
