@@ -12,6 +12,7 @@ using MRL.SSL.Common;
 using System.Diagnostics;
 using System.Net.WebSockets;
 using MRL.SSL.Common.Math;
+using MRL.SSL.Ai.Utils;
 
 namespace MRL.SSL.Ai.Engine
 {

@@ -5,8 +5,9 @@ using System;
 using MRL.SSL.Common.Utils.Extensions;
 using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 using SMath = System.Math;
+using MRL.SSL.Ai.Utils;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
     public abstract class KalmanBase
     {

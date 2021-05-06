@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using MRL.SSL.Ai.Utils;
 using MRL.SSL.Common;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using MRL.SSL.Common.SSLWrapperCommunication;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
     public class Tracker
     {

@@ -2,7 +2,7 @@
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
     public abstract class RobotKalman : KalmanBase
     {

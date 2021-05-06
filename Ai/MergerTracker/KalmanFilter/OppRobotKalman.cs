@@ -4,8 +4,9 @@ using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 using SMath = System.Math;
 using System.Linq;
 using System;
+using MRL.SSL.Ai.Utils;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
     public class OppRobotKalman : RobotKalman
     {

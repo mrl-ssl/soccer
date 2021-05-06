@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using ProtoBuf;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.Utils
 {
     [ProtoContract]
     public class ObservationModel

@@ -5,12 +5,10 @@ using System;
 using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 using SMath = System.Math;
 using ProtoBuf;
+using MRL.SSL.Ai.Utils;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
-    [ProtoContract]
-    public enum OccludeType { Visible, MaybeOccluded, Occluded };
-
     public class BallKalman : KalmanBase
     {
         // Pointer up to the complete set of trackers... for collisions,

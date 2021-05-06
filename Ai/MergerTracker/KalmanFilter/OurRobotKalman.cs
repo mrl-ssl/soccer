@@ -6,11 +6,10 @@ using MRL.SSL.Common.Math;
 using System;
 using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 using SMath = System.Math;
+using MRL.SSL.Ai.Utils;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
-
-
     public class OurRobotKalman : RobotKalman
     {
         protected struct RCommand

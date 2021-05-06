@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using MRL.SSL.Common;
 using ProtoBuf;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.Utils
 {
     [ProtoContract]
     public class WorldModel
@@ -29,7 +30,7 @@ namespace MRL.SSL.Common
         [ProtoMember(8)]
         public RobotCommands Commands { get; set; }
 
-        public Tracker Tracker { get; set; }
+        public MRL.SSL.Ai.MergerTracker.Tracker Tracker { get; set; }
         public WorldModel()
         {
             Teammates = new Dictionary<int, SingleObjectState>();
