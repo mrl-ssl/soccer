@@ -35,8 +35,6 @@ namespace MRL.SSL.Common
         [ProtoMember(5, IsRequired = true)]
         public float Stuck { get => stuck; set => stuck = value; }
 
-        [ProtoMember(6)]
-        public int? Battery { get => battery; set => battery = value; }
 
         public SingleObjectState()
         {
