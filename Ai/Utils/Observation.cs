@@ -33,7 +33,6 @@ namespace MRL.SSL.Ai.Utils
             Location = loc;
             Angle = angle;
             Confidence = conf;
-            // Time = time;
             Camera = cam;
         }
     }
