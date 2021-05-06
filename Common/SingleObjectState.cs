@@ -15,8 +15,6 @@ namespace MRL.SSL.Common
         private float angularSpeed;
         private float stuck;
 
-        private int? battery;
-
         public SingleObjectState Parent { get => parent; set => parent = value; }
         public SingleObjectState Child { get => child; set => child = value; }
 

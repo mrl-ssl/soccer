@@ -14,10 +14,10 @@ namespace MRL.SSL.Common.Math
             get { return new VectorF2D(0F, 0F); }
         }
 
-        [ProtoMember(1, IsRequired = false)]
+        [ProtoMember(1, IsRequired = true)]
         public override float X { get => x; set => x = value; }
 
-        [ProtoMember(2, IsRequired = false)]
+        [ProtoMember(2, IsRequired = true)]
         public override float Y { get => y; set => y = value; }
 
         public override VectorF2D Add(Vector2D<float> v)

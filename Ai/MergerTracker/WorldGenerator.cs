@@ -93,14 +93,15 @@ namespace MRL.SSL.Ai.MergerTracker
 
             var obsModel = merger.Merge(packet, isReverse, isYellow, selectedBallLoc, ref ballIndexChanged);
 
-            if (obsModel != null)
-            {
-                obsModel = UpdateNotSeens(obsModel);
-                tracker.ObserveModel(obsModel, commands);
-                model = tracker.GetEstimations(obsModel);
-                model.Tracker = tracker;
-                model.Commands = commands;
-            }
+            if (obsModel == null)
+                return null;
+
+            obsModel = UpdateNotSeens(obsModel);
+            tracker.ObserveModel(obsModel, commands);
+            model = tracker.GetEstimations(obsModel);
+            model.Tracker = tracker;
+            model.Commands = commands;
+
             lastObsModel = obsModel;
             return model;
         }

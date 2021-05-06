@@ -7,18 +7,18 @@ namespace MRL.SSL.Ai.Utils
     [ProtoContract]
     public class WorldModel
     {
-        [ProtoMember(1)]
+        [ProtoMember(1, IsRequired = true)]
         public bool OurMarkerIsYellow { get; set; }
-        [ProtoMember(2)]
+        [ProtoMember(2, IsRequired = true)]
         public bool FieldIsInverted { get; set; }
         [ProtoMember(3)]
         public int? GoalieID { get; set; }
 
         [ProtoMember(4)]
-        public Dictionary<int, SingleObjectState> Teammates { get; set; }
+        public IDictionary<int, SingleObjectState> Teammates { get; set; }
 
         [ProtoMember(5)]
-        public Dictionary<int, SingleObjectState> Opponents { get; set; }
+        public IDictionary<int, SingleObjectState> Opponents { get; set; }
 
         [ProtoMember(6)]
         public SingleObjectState Ball { get; set; }

@@ -40,17 +40,17 @@ namespace MRL.SSL.Ai.Utils
         {
             viewState = state;
         }
-        public ObservationMeta(Observation v, double time)
+        public ObservationMeta(Observation v, double _time)
         {
             vision = v;
             // if (v != null)
-            //     time = v.Time;
+            time = _time;
         }
-        public ObservationMeta(Observation v, double time, SingleObjectState state)
+        public ObservationMeta(Observation v, double _time, SingleObjectState state)
         {
             vision = v;
             // if (v != null)
-            //     time = v.Time;
+            time = _time;
             viewState = state;
         }
     }
