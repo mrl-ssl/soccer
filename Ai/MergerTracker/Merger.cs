@@ -216,7 +216,7 @@ namespace MRL.SSL.Ai.MergerTracker
                         var obs = robot.Observations[robot.Affinity];
                         if ((team == 0 && !isYellow) || (team == 1 && isYellow))
                         {
-                            model.OurRobots[id] = new RobotObservationMeta(obs);
+                            model.Teammates[id] = new RobotObservationMeta(obs);
                         }
                         else
                         {

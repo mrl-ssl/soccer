@@ -54,7 +54,7 @@ namespace MRL.SSL.Ai.MergerTracker
             if (model != null)
             {
                 int idx = 0;
-                foreach (var item in model.OurRobots.Keys)
+                foreach (var item in model.Teammates.Keys)
                 {
                     index2id[0, idx] = item;
                     id2index[0, item] = idx;
@@ -122,14 +122,14 @@ namespace MRL.SSL.Ai.MergerTracker
                 int idx = id2index[0, key];
                 if (idx >= 0)
                 {
-                    var r = model.OurRobots[key];
+                    var r = model.Teammates[key];
                     ((OurRobotKalman)robots[0, idx]).PushCommand(new VectorF3D(cmd.Vy * 1000, cmd.Vx * 1000, cmd.W),
                                                                  r.Time + r.NotSeen * MergerTrackerConfig.Default.FramePeriod);
                 }
             }
-            foreach (var key in model.OurRobots.Keys)
+            foreach (var key in model.Teammates.Keys)
             {
-                var r = model.OurRobots[key];
+                var r = model.Teammates[key];
                 if (r.Vision != null)
                 {
                     robots[0, id2index[0, key]].VisionProblem = false;
@@ -158,9 +158,9 @@ namespace MRL.SSL.Ai.MergerTracker
         public WorldModel GetEstimations(ObservationModel obsModel)
         {
             WorldModel model = new();
-            foreach (var key in obsModel.OurRobots.Keys)
+            foreach (var key in obsModel.Teammates.Keys)
             {
-                var r = obsModel.OurRobots[key];
+                var r = obsModel.Teammates[key];
                 var actionDelay = MergerTrackerConfig.Default.ActionDelay + r.NotSeen * MergerTrackerConfig.Default.FramePeriod;
                 var viewDelay = (r.NotSeen + 1) * MergerTrackerConfig.Default.FramePeriod;
                 var state = GetRobotState(0, id2index[0, key], actionDelay);

@@ -7,7 +7,7 @@ namespace MRL.SSL.Ai.Utils
     public class ObservationModel
     {
         [ProtoMember(1)]
-        public IDictionary<int, RobotObservationMeta> OurRobots { get; set; }
+        public IDictionary<int, RobotObservationMeta> Teammates { get; set; }
 
         [ProtoMember(2)]
         public IDictionary<int, RobotObservationMeta> Opponents { get; set; }
@@ -22,7 +22,7 @@ namespace MRL.SSL.Ai.Utils
         public double TimeOfCapture { get; set; }
         public ObservationModel()
         {
-            OurRobots = new Dictionary<int, RobotObservationMeta>();
+            Teammates = new Dictionary<int, RobotObservationMeta>();
             Opponents = new Dictionary<int, RobotObservationMeta>();
             Ball = null;
             OtherBalls = new List<Observation>();

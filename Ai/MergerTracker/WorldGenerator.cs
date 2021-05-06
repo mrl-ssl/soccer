@@ -36,16 +36,16 @@ namespace MRL.SSL.Ai.MergerTracker
         {
             if (lastObsModel != null)
             {
-                foreach (var key in lastObsModel.OurRobots.Keys)
+                foreach (var key in lastObsModel.Teammates.Keys)
                 {
-                    if (!obsModel.OurRobots.ContainsKey(key))
+                    if (!obsModel.Teammates.ContainsKey(key))
                     {
-                        var r = lastObsModel.OurRobots[key];
+                        var r = lastObsModel.Teammates[key];
                         if (r.NotSeen < MergerTrackerConfig.Default.MaxNotSeenFrames)
                         {
                             r.NotSeen++;
                             r.Vision = null;
-                            obsModel.OurRobots.Add(key, r);
+                            obsModel.Teammates.Add(key, r);
                         }
                     }
                 }
