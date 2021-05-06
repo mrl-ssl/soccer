@@ -156,18 +156,18 @@ namespace MRL.SSL.Ai.Engine
         }
         private void Visualizer_OnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            Console.WriteLine("Client Connected" + e.IpPort);
+            Console.WriteLine("Message Received " + e.IpPort);
         }
         private void Visualizer_OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
         {
             visIpPort = null;
-            Console.WriteLine("Client Connected" + e.IpPort);
+            Console.WriteLine("Client Disconnected " + e.IpPort);
         }
         private void Visualizer_OnClientConnected(object sender, ClientConnectedEventArgs e)
         {
             visIpPort = e.IpPort;
 
-            Console.WriteLine("Client Disconnected" + e.IpPort);
+            Console.WriteLine("Client Connected " + e.IpPort);
         }
 
 
