@@ -36,6 +36,7 @@ namespace MRL.SSL.Ai.MergerTracker
         private bool ValidateCameraSeen(SSLWrapperPacket packet)
         {
             var camera = packet.Detection.CameraId;
+
             var availableCameras = MergerTrackerConfig.Default.AvailableCameras;
 
             //if configurations changed reset available camera detection params

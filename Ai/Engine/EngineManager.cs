@@ -24,6 +24,7 @@ namespace MRL.SSL.Ai.Engine
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
         WorldGenerator worldGenerator;
         string visIpPort;
+        bool isJoinedVisionMulticastGroup;
 
         public RobotCommands Commands { get; set; }
         public EngineManager()
@@ -34,8 +35,6 @@ namespace MRL.SSL.Ai.Engine
         }
         public SSLWrapperPacket RecieveVisionData()
         {
-            //
-
             if (_visionClient == null)
                 return null;
 
@@ -56,6 +55,8 @@ namespace MRL.SSL.Ai.Engine
             {
                 try
                 {
+                    if (!isJoinedVisionMulticastGroup)
+                        _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
                     var packet = RecieveVisionData();
                     if (packet == null)
                         continue;
@@ -63,7 +64,6 @@ namespace MRL.SSL.Ai.Engine
                     var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
                     if (model == null)
                         continue;
-
                     if (visIpPort != null)
                     {
                         using var stream = new MemoryStream();
@@ -108,7 +108,10 @@ namespace MRL.SSL.Ai.Engine
             _visionClient.SetupMulticast(true);
             _visionClient.Connect();
             _visionClient.OptionReceiveTimeout = 2000;
-            _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
+            _visionClient.JoinedMulticastGroup += Vision_OnJoinedMulticastGroup;
+            _visionClient.LeftMulticastGroup += Vision_OnLeftMulticastGroup;
+            isJoinedVisionMulticastGroup = false;
+
         }
         public void Start()
         {
@@ -133,8 +136,11 @@ namespace MRL.SSL.Ai.Engine
             _cmcCancelationSource.Dispose();
 
             Console.WriteLine("Stopping Vision Socket...");
+            _visionClient.LeaveMulticastGroup(ConnectionConfig.Default.VisionName);
             _visionClient.DisconnectAndStop();
             _visionClient.Error -= Vision_OnError;
+            _visionClient.JoinedMulticastGroup -= Vision_OnJoinedMulticastGroup;
+            _visionClient.LeftMulticastGroup -= Vision_OnLeftMulticastGroup;
 
             Console.WriteLine("Stopping Websocket...");
             if (_visualizerServer.IsListening)
@@ -145,8 +151,21 @@ namespace MRL.SSL.Ai.Engine
             _visualizerServer.Dispose();
 
             visIpPort = null;
-
+            isJoinedVisionMulticastGroup = false;
         }
+
+        private void Vision_OnJoinedMulticastGroup(object sender, IPAddress e)
+        {
+            isJoinedVisionMulticastGroup = true;
+            Console.WriteLine($"Joined Vision Multicast Group {e}");
+        }
+
+        private void Vision_OnLeftMulticastGroup(object sender, IPAddress e)
+        {
+            isJoinedVisionMulticastGroup = false;
+            Console.WriteLine($"Left Vision Multicast Group {e}");
+        }
+
         private static void Vision_OnError(object sender, System.Net.Sockets.SocketError e)
         {
             Console.WriteLine($"Echo Vision UDP server caught an error with code {e}");

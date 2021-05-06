@@ -14,7 +14,6 @@ namespace MRL.SSL.Common.Configuration
         public static ConfigBase Default { get { return null; } }
         public string Name { get; private set; }
         public virtual ConfigType Id { get; }
-        public bool HasChanged { get; private set; }
 
         public ConfigBase()
         {
@@ -33,7 +32,7 @@ namespace MRL.SSL.Common.Configuration
             dom.Bind(this);
             Action onChange = () =>
             {
-                HasChanged = true;
+                dom.Bind(this);
             };
             ChangeToken.OnChange(() => dom.GetReloadToken(), onChange);
         }
@@ -44,6 +43,7 @@ namespace MRL.SSL.Common.Configuration
 
             Load(baseAddress);
         }
+
     }
     public enum ConfigType
     {
