@@ -53,26 +53,21 @@ namespace MRL.SSL.Common
 
     public class RectObstacle : ObstacleBase
     {
-        protected float width, heigth;
-
+        protected VectorF2D[] c = new VectorF2D[4];
         public override ObstacleType Type => ObstacleType.Rectangle;
 
-        public RectObstacle(SingleObjectState state, float width, float heigth) : base(state)
+        public RectObstacle(VectorF2D c0, VectorF2D c1, VectorF2D c2, VectorF2D c3, VectorF2D speed) : base(new SingleObjectState(c0.Interpolate(c2, 0.5f), speed))
         {
-            this.width = width;
-            this.heigth = heigth;
+            c[0] = c0;
+            c[1] = c1;
+            c[2] = c2;
+            c[3] = c3;
         }
 
         public override bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f)
         {
-            VectorF2D[] c = new VectorF2D[4];
-
-            c[0] = new VectorF2D(state.Location.X - width, state.Location.Y - heigth);
-            c[1] = new VectorF2D(state.Location.X + width, state.Location.Y - heigth);
-            c[2] = new VectorF2D(state.Location.X + width, state.Location.Y + heigth);
-            c[3] = new VectorF2D(state.Location.X - width, state.Location.Y + heigth);
             float d = 0;
-            // check box against oriented sweep
+
             for (int i = 0; i < 4; i++)
             {
                 d = VectorF2D.DistanceSegToSeg(from.Location, to.Location, c[i], c[(i + 1) % 4]);
@@ -83,8 +78,10 @@ namespace MRL.SSL.Common
 
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
         {
-            Vector2D<float> v = S1.Location - state.Location;
-            return System.MathF.Abs(v.X) < width + obstacleRadi + margin && System.MathF.Abs(v.Y) < heigth + obstacleRadi + margin;
+            var v = S1.Location - c[0];
+            var p = c[2] - c[0];
+            return System.MathF.Abs(v.X) < System.MathF.Abs(p.X) + obstacleRadi + margin
+                   && System.MathF.Abs(v.Y) < System.MathF.Abs(p.Y) + obstacleRadi + margin;
         }
     }
 
@@ -114,10 +111,8 @@ namespace MRL.SSL.Common
         public override ObstacleType Type => ObstacleType.OurZone;
 
         public OurZoneObstacle()
-            : base(
-                new SingleObjectState(FieldConfig.Default.OurGoalCenter - new VectorF2D(FieldConfig.Default.DefenceAreaHeight / 2, 0f)),
-                FieldConfig.Default.DefenceAreaWidth,
-                FieldConfig.Default.DefenceAreaHeight)
+            : base(GameParameters.Field.OurPenaltyRearLeft, GameParameters.Field.OurPenaltyRearRight,
+                   GameParameters.Field.OurPenaltyBackRight, GameParameters.Field.OurPenaltyBackLeft, VectorF2D.Zero)
         {
         }
     }
@@ -127,10 +122,8 @@ namespace MRL.SSL.Common
         public override ObstacleType Type => ObstacleType.OppZone;
 
         public OppZoneObstacle()
-            : base(new SingleObjectState(
-                FieldConfig.Default.OppGoalCenter + new VectorF2D(FieldConfig.Default.DefenceAreaHeight / 2, 0f)),
-                FieldConfig.Default.DefenceAreaWidth + RobotConfig.Default.Radius * 2,
-                FieldConfig.Default.DefenceAreaHeight + RobotConfig.Default.Radius * 2)
+            : base(GameParameters.Field.OppPenaltyRearLeft, GameParameters.Field.OppPenaltyRearRight,
+                   GameParameters.Field.OppPenaltyBackRight, GameParameters.Field.OppPenaltyBackLeft, VectorF2D.Zero)
         {
         }
     }

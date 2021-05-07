@@ -144,7 +144,7 @@ namespace MRL.SSL.Ai.MergerTracker
                     float dist = (float)lastBallLoc.Distance(new VectorF2D(b.X, b.Y));
                     if (dist < minDist && dist < maxDist)
                     {
-                        if (GameHelpers.IsInField((VectorF2D)(new VectorF2D(b.X, b.Y).ToAiCoordinate(isReverse)), 0.4f))
+                        if (GameParameters.IsInField(new VectorF2D(b.X, b.Y).ToAiCoordinate(isReverse), true))
                         {
                             closest = b;
                             minDist = dist;
@@ -272,7 +272,7 @@ namespace MRL.SSL.Ai.MergerTracker
 
         public ObservationModel Merge(SSLWrapperPacket packet, bool isReverse, bool isYellow, VectorF2D selectedBall, ref bool selectedBallChanged)
         {
-            if (packet == null || packet.Detection == null)
+            if (packet.Detection == null)
                 return null;
 
             var isValid = ValidateCameraSeen(packet);

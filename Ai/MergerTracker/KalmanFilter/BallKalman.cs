@@ -6,6 +6,7 @@ using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 using SMath = System.Math;
 using ProtoBuf;
 using MRL.SSL.Ai.Utils;
+using MRL.SSL.Common;
 
 namespace MRL.SSL.Ai.MergerTracker
 {
@@ -147,9 +148,9 @@ namespace MRL.SSL.Ai.MergerTracker
 
             if (MergerTrackerConfig.Default.BallWalls)
             {
-                if ((MathF.Abs(_x) > FieldConfig.Default.OurGoalCenter.X + MergerTrackerConfig.Default.WallWidth &&
-                 MathF.Abs(_y) > FieldConfig.Default.GoalWidth / 2f) ||
-                (MathF.Abs(_y) > FieldConfig.Default.OurGoalLeft.X / 2f + MergerTrackerConfig.Default.WallWidth))
+                if ((MathF.Abs(_x) > GameParameters.Field.OurGoalCenter.X + GameParameters.Field.BoundaryWidth &&
+                 MathF.Abs(_y) > GameParameters.Field.GoalWidth / 2f) ||
+                (MathF.Abs(_y) > GameParameters.Field.OurLeftCorner.Y + GameParameters.Field.BoundaryWidth))
                 {
                     _vx = 0f;
                     _vy = 0f;

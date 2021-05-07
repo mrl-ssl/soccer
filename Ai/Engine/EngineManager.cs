@@ -9,9 +9,7 @@ using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Ai.MergerTracker;
 using WatsonWebsocket;
 using MRL.SSL.Common;
-using System.Diagnostics;
 using System.Net.WebSockets;
-using MRL.SSL.Common.Math;
 using MRL.SSL.Ai.Utils;
 
 namespace MRL.SSL.Ai.Engine
@@ -41,11 +39,10 @@ namespace MRL.SSL.Ai.Engine
             long size = _visionClient.Receive();
             if (size == 0)
                 return null;
+
             using var stream = new MemoryStream(_visionClient.ReceiveBuffer.Data, 0, (int)size);
 
-            SSLWrapperPacket packet = Serializer.Deserialize<SSLWrapperPacket>(stream);
-            return packet;
-
+            return Serializer.Deserialize<SSLWrapperPacket>(stream);
         }
         private void EngineManagerRun(object obj)
         {
@@ -61,15 +58,19 @@ namespace MRL.SSL.Ai.Engine
                     if (packet == null)
                         continue;
 
-                    var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
+                    var model = worldGenerator.GenerateWorldModel(packet, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
                     if (model == null)
                         continue;
                     if (visIpPort != null)
                     {
                         using var stream = new MemoryStream();
 
-                        Serializer.Serialize<WorldModel>(stream, model);
-
+                        Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128);
+                        if (GameParameters.IsUpdated)
+                        {
+                            Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128);
+                            GameParameters.IsUpdated = false;
+                        }
                         _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
                     }
                 }

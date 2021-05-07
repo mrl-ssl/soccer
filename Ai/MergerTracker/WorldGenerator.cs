@@ -16,12 +16,13 @@ namespace MRL.SSL.Ai.MergerTracker
         private bool ballIndexChanged;
         private VectorF2D selectedBallLoc;
         private ObservationModel lastObsModel;
+        private bool lastIsReverse;
+        private SSLGeometryFieldSize lastFieldSize;
 
         public WorldGenerator()
         {
             merger = new Merger();
             tracker = new Tracker();
-
         }
         public void setBallIndex(int? ballIndex, VectorF2D pos)
         {
@@ -74,7 +75,6 @@ namespace MRL.SSL.Ai.MergerTracker
                         b.Time += MergerTrackerConfig.Default.FramePeriod;
                         obsModel.Ball = b;
                     }
-
                 }
 
             }
@@ -82,12 +82,23 @@ namespace MRL.SSL.Ai.MergerTracker
         }
         public WorldModel GenerateWorldModel(SSLWrapperPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
         {
-            if (packet != null && packet.Geometry != null)
+            bool updateRequired = false;
+            if (packet.Geometry != null)
             {
-                FieldConfig.Default.UpdateFromGeometry(packet.Geometry);
+                if ((lastFieldSize == null && packet.Geometry.Field != null))
+                {
+                    lastFieldSize = packet.Geometry.Field;
+                    updateRequired = true;
+                }
                 if (packet.Geometry.Calibrations != null)
                     tracker.Cameras = packet.Geometry.Calibrations.ToDictionary(k => k.CameraId, v => v);
             }
+            if (isReverse != lastIsReverse || updateRequired)
+            {
+                if (lastFieldSize != null)
+                    GameParameters.UpdateParamsFromGeometry(lastFieldSize, isReverse);
+            }
+            lastIsReverse = isReverse;
 
             WorldModel model = null;
 
@@ -99,6 +110,7 @@ namespace MRL.SSL.Ai.MergerTracker
             obsModel = UpdateNotSeens(obsModel);
             tracker.ObserveModel(obsModel, commands);
             model = tracker.GetEstimations(obsModel);
+
             model.Tracker = tracker;
             model.Commands = commands;
 
