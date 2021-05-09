@@ -82,7 +82,8 @@ namespace MRL.SSL.Ai.MergerTracker
         }
         public WorldModel GenerateWorldModel(SSLWrapperPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
         {
-            bool updateRequired = false;
+            bool updateRequired = isReverse != lastIsReverse;
+            lastIsReverse = isReverse;
             if (packet.Geometry != null)
             {
                 if ((lastFieldSize == null && packet.Geometry.Field != null))
@@ -93,14 +94,8 @@ namespace MRL.SSL.Ai.MergerTracker
                 if (packet.Geometry.Calibrations != null)
                     tracker.Cameras = packet.Geometry.Calibrations.ToDictionary(k => k.CameraId, v => v);
             }
-            if (isReverse != lastIsReverse || updateRequired)
-            {
-                if (lastFieldSize != null)
-                    GameParameters.UpdateParamsFromGeometry(lastFieldSize, isReverse);
-            }
-            lastIsReverse = isReverse;
-
-            WorldModel model = null;
+            if (updateRequired && lastFieldSize != null)
+                GameParameters.UpdateParamsFromGeometry(lastFieldSize, isReverse);
 
             var obsModel = merger.Merge(packet, isReverse, isYellow, selectedBallLoc, ref ballIndexChanged);
 
@@ -109,7 +104,7 @@ namespace MRL.SSL.Ai.MergerTracker
 
             obsModel = UpdateNotSeens(obsModel);
             tracker.ObserveModel(obsModel, commands);
-            model = tracker.GetEstimations(obsModel);
+            var model = tracker.GetEstimations(obsModel);
 
             model.Tracker = tracker;
             model.Commands = commands;

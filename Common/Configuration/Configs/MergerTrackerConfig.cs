@@ -15,11 +15,10 @@ namespace MRL.SSL.Common.Configuration
         public byte TeamsCount { get; set; }
         public byte AffinityPersist { get; set; }
         public int FrameRate { get; set; }
-        public float FramePeriod { get { return 1.0f / FrameRate; } }
+        public float FramePeriod { get; set; }
         public float LastBallMaxDistance { get; set; }
         public int FramesToDetectCameras { get; set; }
         public float BallRadi { get; set; }
-        public float SqImmobileThreshold { get; set; }
         public bool PrintRobotKalmaError { get; set; }
         public bool PrintBallKalmanError { get; set; }
         public float Latency { get; set; }
