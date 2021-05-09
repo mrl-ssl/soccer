@@ -21,7 +21,7 @@ namespace MRL.SSL.Ai
                 string line = Console.ReadLine();
 
 
-                // Restart the server
+                // Stop the server
                 if (line == "!")
                 {
                     em.Dispose();

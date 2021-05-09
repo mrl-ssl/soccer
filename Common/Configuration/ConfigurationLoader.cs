@@ -33,7 +33,7 @@ namespace MRL.SSL.Common.Configuration
                 var t = types.Where(w => w.Name == typeName).FirstOrDefault();
                 if (t != null)
                 {
-                    ConfigBase c = (ConfigBase)Activator.CreateInstance(t);
+                    ConfigBase c = t.GetConstructor(new Type[] { }).Invoke(new object[] { }) as ConfigBase;
                     c.Load(item);
                 }
                 else

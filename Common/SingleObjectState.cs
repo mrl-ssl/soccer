@@ -15,8 +15,6 @@ namespace MRL.SSL.Common
         private float angularSpeed;
         private float stuck;
 
-        private int? battery;
-
         public SingleObjectState Parent { get => parent; set => parent = value; }
         public SingleObjectState Child { get => child; set => child = value; }
 
@@ -26,17 +24,15 @@ namespace MRL.SSL.Common
         [ProtoMember(2)]
         public VectorF2D Speed { get => (VectorF2D)speed; set => speed = value; }
 
-        [ProtoMember(3)]
+        [ProtoMember(3, IsRequired = true)]
         public float Angle { get => angle; set => angle = value; }
 
-        [ProtoMember(4)]
+        [ProtoMember(4, IsRequired = true)]
         public float AngularSpeed { get => angularSpeed; set => angularSpeed = value; }
 
-        [ProtoMember(5)]
-        public int? Battery { get => battery; set => battery = value; }
-
-        [ProtoMember(6)]
+        [ProtoMember(5, IsRequired = true)]
         public float Stuck { get => stuck; set => stuck = value; }
+
 
         public SingleObjectState()
         {

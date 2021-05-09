@@ -5,12 +5,11 @@ using System;
 using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 using SMath = System.Math;
 using ProtoBuf;
+using MRL.SSL.Ai.Utils;
+using MRL.SSL.Common;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
-    [ProtoContract]
-    public enum OccludeType { Visible, MaybeOccluded, Occluded };
-
     public class BallKalman : KalmanBase
     {
         // Pointer up to the complete set of trackers... for collisions,
@@ -55,9 +54,9 @@ namespace MRL.SSL.Common
             Is.Enqueue(I);
             steppedTime += stepSize;
         }
-        public override void Observe(Observation obs)
+        public override void Observe(Observation obs, double timestamp)
         {
-            if (SMath.Abs(obs.Time - time) > MergerTrackerConfig.Default.MaxPredictionTime
+            if (SMath.Abs(timestamp - time) > MergerTrackerConfig.Default.MaxPredictionTime
                 || (xs.Count > 0 && float.IsNaN(xs.ElementAt(0)[0, 0])))
                 Reset();
 
@@ -78,22 +77,22 @@ namespace MRL.SSL.Common
                 _x[2, 0] = 0f;
                 _x[3, 0] = 0f;
 
-                Initial(obs.Time, _x, _p);
+                Initial(timestamp, _x, _p);
                 Occluded = OccludeType.Visible;
                 _reset = false;
             }
-            else if (obs.Time > time)
+            else if (timestamp > time)
             {
                 if (_reset && Occluded != OccludeType.Occluded) return;
 
                 // Tick to current time.
                 if (Occluded == OccludeType.Occluded)
                 {
-                    TickOcclusion(obs.Time - time);
+                    TickOcclusion(timestamp - time);
                 }
                 else
                 {
-                    Tick(obs.Time - time);
+                    Tick(timestamp - time);
                 }
                 _z[0, 0] = obs.Location.X;
                 _z[1, 0] = obs.Location.Y;
@@ -108,7 +107,7 @@ namespace MRL.SSL.Common
                 {
                     Update(_z);
                     Occluded = OccludeType.Visible;
-                    OccludedLastObsTime = obs.Time;
+                    OccludedLastObsTime = timestamp;
                 }
                 else
                 {
@@ -117,7 +116,7 @@ namespace MRL.SSL.Common
                         CheckOcclusion();
 
                     if (Occluded == OccludeType.MaybeOccluded &&
-                        obs.Time - OccludedLastObsTime > MergerTrackerConfig.Default.BallOccludeTime)
+                        timestamp - OccludedLastObsTime > MergerTrackerConfig.Default.BallOccludeTime)
                     {
 
                         Occluded = OccludeType.Occluded;
@@ -149,9 +148,9 @@ namespace MRL.SSL.Common
 
             if (MergerTrackerConfig.Default.BallWalls)
             {
-                if ((MathF.Abs(_x) > FieldConfig.Default.OurGoalCenter.X + MergerTrackerConfig.Default.WallWidth &&
-                 MathF.Abs(_y) > FieldConfig.Default.GoalWidth / 2f) ||
-                (MathF.Abs(_y) > FieldConfig.Default.OurGoalLeft.X / 2f + MergerTrackerConfig.Default.WallWidth))
+                if ((MathF.Abs(_x) > GameParameters.Field.OurGoalCenter.X + GameParameters.Field.BoundaryWidth &&
+                 MathF.Abs(_y) > GameParameters.Field.GoalWidth / 2f) ||
+                (MathF.Abs(_y) > GameParameters.Field.OurLeftCorner.Y + GameParameters.Field.BoundaryWidth))
                 {
                     _vx = 0f;
                     _vy = 0f;

@@ -9,8 +9,8 @@ using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Ai.MergerTracker;
 using WatsonWebsocket;
 using MRL.SSL.Common;
-using System.Diagnostics;
 using System.Net.WebSockets;
+using MRL.SSL.Ai.Utils;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -22,6 +22,7 @@ namespace MRL.SSL.Ai.Engine
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
         WorldGenerator worldGenerator;
         string visIpPort;
+        bool isJoinedVisionMulticastGroup;
 
         public RobotCommands Commands { get; set; }
         public EngineManager()
@@ -32,46 +33,51 @@ namespace MRL.SSL.Ai.Engine
         }
         public SSLWrapperPacket RecieveVisionData()
         {
-            //
-
             if (_visionClient == null)
                 return null;
 
             long size = _visionClient.Receive();
             if (size == 0)
                 return null;
+
             using var stream = new MemoryStream(_visionClient.ReceiveBuffer.Data, 0, (int)size);
 
-            SSLWrapperPacket packet = Serializer.Deserialize<SSLWrapperPacket>(stream);
-            return packet;
-
+            return Serializer.Deserialize<SSLWrapperPacket>(stream);
         }
         private void EngineManagerRun(object obj)
         {
             CancellationToken ct = (CancellationToken)obj;
             Console.WriteLine("Engine Mangaer Started!");
-
             while (!ct.IsCancellationRequested)
             {
                 try
                 {
+                    if (!isJoinedVisionMulticastGroup)
+                        _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
                     var packet = RecieveVisionData();
-                    if (packet != null)
-                    {
-                        var model = worldGenerator.GenerateWorldModel(packet, Commands, false, false);
+                    if (packet == null)
+                        continue;
 
-                        if (model != null)
+                    var model = worldGenerator.GenerateWorldModel(packet, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
+                    if (model == null)
+                        continue;
+
+                    if (visIpPort != null)
+                    {
+                        using var stream = new MemoryStream();
+
+                        Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
+                        if (GameParameters.IsUpdated)
                         {
-                            using var stream = new MemoryStream();
-                            Serializer.Serialize<WorldModel>(stream, model);
-                            if (visIpPort != null)
-                                _visualizerServer.SendAsync(visIpPort, stream.GetBuffer(), WebSocketMessageType.Binary);
+                            Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
+                            GameParameters.IsUpdated = false;
                         }
+                        _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Exception thrown on Engine Manager run", ex.StackTrace);
+                    Console.WriteLine("Exception thrown on Engine Manager run " + ex.StackTrace);
                 }
             }
             Console.WriteLine("Engine Mangaer Stopped!");
@@ -104,7 +110,10 @@ namespace MRL.SSL.Ai.Engine
             _visionClient.SetupMulticast(true);
             _visionClient.Connect();
             _visionClient.OptionReceiveTimeout = 2000;
-            _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
+            _visionClient.JoinedMulticastGroup += Vision_OnJoinedMulticastGroup;
+            _visionClient.LeftMulticastGroup += Vision_OnLeftMulticastGroup;
+            isJoinedVisionMulticastGroup = false;
+
         }
         public void Start()
         {
@@ -129,8 +138,11 @@ namespace MRL.SSL.Ai.Engine
             _cmcCancelationSource.Dispose();
 
             Console.WriteLine("Stopping Vision Socket...");
+            _visionClient.LeaveMulticastGroup(ConnectionConfig.Default.VisionName);
             _visionClient.DisconnectAndStop();
             _visionClient.Error -= Vision_OnError;
+            _visionClient.JoinedMulticastGroup -= Vision_OnJoinedMulticastGroup;
+            _visionClient.LeftMulticastGroup -= Vision_OnLeftMulticastGroup;
 
             Console.WriteLine("Stopping Websocket...");
             if (_visualizerServer.IsListening)
@@ -141,26 +153,39 @@ namespace MRL.SSL.Ai.Engine
             _visualizerServer.Dispose();
 
             visIpPort = null;
-
+            isJoinedVisionMulticastGroup = false;
         }
+
+        private void Vision_OnJoinedMulticastGroup(object sender, IPAddress e)
+        {
+            isJoinedVisionMulticastGroup = true;
+            Console.WriteLine($"Joined Vision Multicast Group {e}");
+        }
+
+        private void Vision_OnLeftMulticastGroup(object sender, IPAddress e)
+        {
+            isJoinedVisionMulticastGroup = false;
+            Console.WriteLine($"Left Vision Multicast Group {e}");
+        }
+
         private static void Vision_OnError(object sender, System.Net.Sockets.SocketError e)
         {
             Console.WriteLine($"Echo Vision UDP server caught an error with code {e}");
         }
         private void Visualizer_OnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            Console.WriteLine("Client Connected", e.IpPort);
+            Console.WriteLine("Message Received " + e.IpPort);
         }
         private void Visualizer_OnClientDisconnected(object sender, ClientDisconnectedEventArgs e)
         {
             visIpPort = null;
-            Console.WriteLine("Client Connected", e.IpPort);
+            Console.WriteLine("Client Disconnected " + e.IpPort);
         }
         private void Visualizer_OnClientConnected(object sender, ClientConnectedEventArgs e)
         {
             visIpPort = e.IpPort;
 
-            Console.WriteLine("Client Disconnected", e.IpPort);
+            Console.WriteLine("Client Connected " + e.IpPort);
         }
 
 

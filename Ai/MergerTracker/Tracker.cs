@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using MRL.SSL.Ai.Utils;
 using MRL.SSL.Common;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using MRL.SSL.Common.SSLWrapperCommunication;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.MergerTracker
 {
     public class Tracker
     {
@@ -41,7 +42,7 @@ namespace MRL.SSL.Common
         public bool Exists(int team, int idx) => (index2id[team, idx] >= 0);
         public RobotKalman GetRobot(int team, int idx) => robots[team, idx];
         public RobotKalman GetRobotById(int team, int id) => id2index[team, id] > 0 ? robots[team, id2index[team, id]] : null;
-        private void ResetUnSeens(ObservationModel model)
+        private void ResetForgottens(ObservationModel model)
         {
             for (int t = 0; t < MergerTrackerConfig.Default.TeamsCount; t++)
             {
@@ -53,7 +54,7 @@ namespace MRL.SSL.Common
             if (model != null)
             {
                 int idx = 0;
-                foreach (var item in model.OurRobots.Keys)
+                foreach (var item in model.Teammates.Keys)
                 {
                     index2id[0, idx] = item;
                     id2index[0, item] = idx;
@@ -114,25 +115,25 @@ namespace MRL.SSL.Common
         }
         public void ObserveModel(ObservationModel model, RobotCommands commands)
         {
-            ResetUnSeens(model);
+            ResetForgottens(model);
             foreach (var key in commands.Commands.Keys)
             {
                 var cmd = commands.Commands[key];
                 int idx = id2index[0, key];
                 if (idx >= 0)
                 {
-                    var r = model.OurRobots[key];
+                    var r = model.Teammates[key];
                     ((OurRobotKalman)robots[0, idx]).PushCommand(new VectorF3D(cmd.Vy * 1000, cmd.Vx * 1000, cmd.W),
                                                                  r.Time + r.NotSeen * MergerTrackerConfig.Default.FramePeriod);
                 }
             }
-            foreach (var key in model.OurRobots.Keys)
+            foreach (var key in model.Teammates.Keys)
             {
-                var r = model.OurRobots[key];
+                var r = model.Teammates[key];
                 if (r.Vision != null)
                 {
                     robots[0, id2index[0, key]].VisionProblem = false;
-                    robots[0, id2index[0, key]].Observe(r.Vision);
+                    robots[0, id2index[0, key]].Observe(r.Vision, r.Time);
                 }
             }
             foreach (var key in model.Opponents.Keys)
@@ -141,7 +142,7 @@ namespace MRL.SSL.Common
                 if (r.Vision != null)
                 {
                     robots[1, id2index[1, key]].VisionProblem = false;
-                    robots[1, id2index[1, key]].Observe(r.Vision);
+                    robots[1, id2index[1, key]].Observe(r.Vision, r.Time);
                 }
             }
             if (model.Ball != null)
@@ -150,22 +151,22 @@ namespace MRL.SSL.Common
                 if (b.Vision != null)
                 {
                     ball.CheckCollision = true;
-                    ball.Observe(b.Vision);
+                    ball.Observe(b.Vision, b.Time);
                 }
             }
         }
         public WorldModel GetEstimations(ObservationModel obsModel)
         {
             WorldModel model = new();
-            foreach (var key in obsModel.OurRobots.Keys)
+            foreach (var key in obsModel.Teammates.Keys)
             {
-                var r = obsModel.OurRobots[key];
+                var r = obsModel.Teammates[key];
                 var actionDelay = MergerTrackerConfig.Default.ActionDelay + r.NotSeen * MergerTrackerConfig.Default.FramePeriod;
                 var viewDelay = (r.NotSeen + 1) * MergerTrackerConfig.Default.FramePeriod;
                 var state = GetRobotState(0, id2index[0, key], actionDelay);
                 var viewState = GetRobotState(0, id2index[0, key], viewDelay);
                 r.ViewState = viewState;
-                model.OurRobots.Add(key, state);
+                model.Teammates.Add(key, state);
             }
             foreach (var key in obsModel.Opponents.Keys)
             {
@@ -187,10 +188,10 @@ namespace MRL.SSL.Common
                 var state = GetBallState(actionDelay, ref b);
                 var viewState = GetBallState(viewDelay);
                 b.ViewState = viewState;
-                model.BallState = state;
+                model.Ball = state;
             }
-            if (model.BallState == null)
-                model.BallState = new SingleObjectState(VectorF2D.Zero, VectorF2D.Zero);
+            if (model.Ball == null)
+                model.Ball = new SingleObjectState(VectorF2D.Zero, VectorF2D.Zero);
 
             model.Observations = obsModel;
             return model;

@@ -1,7 +1,7 @@
 using MRL.SSL.Common.Math;
 using ProtoBuf;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Ai.Utils
 {
     [ProtoContract]
     public class Observation
@@ -13,15 +13,12 @@ namespace MRL.SSL.Common
         public uint Camera { get; set; }
 
         [ProtoMember(2)]
-        public double Time { get; set; }
-
-        [ProtoMember(3)]
         public float Confidence { get; set; }
 
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         public VectorF2D Location { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         public float Angle { get; set; }
 
         public Observation()
@@ -31,12 +28,11 @@ namespace MRL.SSL.Common
         {
             Camera = cam;
         }
-        public Observation(VectorF2D loc, float angle, float conf, double time, uint cam)
+        public Observation(VectorF2D loc, float angle, float conf, uint cam)
         {
             Location = loc;
             Angle = angle;
             Confidence = conf;
-            Time = time;
             Camera = cam;
         }
     }

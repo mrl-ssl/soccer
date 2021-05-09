@@ -1,4 +1,5 @@
 
+using MRL.SSL.Ai.Utils;
 using MRL.SSL.Common;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
@@ -15,12 +16,13 @@ namespace MRL.SSL.Ai.MergerTracker
         private bool ballIndexChanged;
         private VectorF2D selectedBallLoc;
         private ObservationModel lastObsModel;
+        private bool lastIsReverse;
+        private SSLGeometryFieldSize lastFieldSize;
 
         public WorldGenerator()
         {
             merger = new Merger();
             tracker = new Tracker();
-
         }
         public void setBallIndex(int? ballIndex, VectorF2D pos)
         {
@@ -31,20 +33,21 @@ namespace MRL.SSL.Ai.MergerTracker
                 selectedBallLoc = pos;
             }
         }
-        private ObservationModel UpdateNotSeens(ObservationModel obsModel)
+        private ObservationModel UpdateNotSeensHistory(ObservationModel obsModel)
         {
             if (lastObsModel != null)
             {
-                foreach (var key in lastObsModel.OurRobots.Keys)
+                foreach (var key in lastObsModel.Teammates.Keys)
                 {
-                    if (!obsModel.OurRobots.ContainsKey(key))
+                    if (!obsModel.Teammates.ContainsKey(key))
                     {
-                        var r = lastObsModel.OurRobots[key];
+                        var r = lastObsModel.Teammates[key];
                         if (r.NotSeen < MergerTrackerConfig.Default.MaxNotSeenFrames)
                         {
                             r.NotSeen++;
                             r.Vision = null;
-                            obsModel.OurRobots.Add(key, r);
+                            r.Time += MergerTrackerConfig.Default.FramePeriod;
+                            obsModel.Teammates.Add(key, r);
                         }
                     }
                 }
@@ -57,6 +60,7 @@ namespace MRL.SSL.Ai.MergerTracker
                         {
                             r.NotSeen++;
                             r.Vision = null;
+                            r.Time += MergerTrackerConfig.Default.FramePeriod;
                             obsModel.Opponents.Add(key, r);
                         }
                     }
@@ -67,37 +71,51 @@ namespace MRL.SSL.Ai.MergerTracker
                     if (b.NotSeen < MergerTrackerConfig.Default.MaxNotSeenFrames)
                     {
                         b.NotSeen++;
+                        b.Vision = null;
+                        b.Time += MergerTrackerConfig.Default.FramePeriod;
                         obsModel.Ball = b;
                     }
-
                 }
 
             }
             return obsModel;
         }
-        public WorldModel GenerateWorldModel(SSLWrapperPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
+        private void UpdateGeometry(SSLWrapperPacket packet, bool isReverse)
         {
-            if (packet != null && packet.Geometry != null)
+            bool updateRequired = isReverse != lastIsReverse;
+            lastIsReverse = isReverse;
+            if (packet.Geometry != null)
             {
-                FieldConfig.Default.UpdateFromGeometry(packet.Geometry);
+                if ((lastFieldSize == null && packet.Geometry.Field != null))
+                {
+                    lastFieldSize = packet.Geometry.Field;
+                    updateRequired = true;
+                }
                 if (packet.Geometry.Calibrations != null)
                     tracker.Cameras = packet.Geometry.Calibrations.ToDictionary(k => k.CameraId, v => v);
             }
-
-            WorldModel model = null;
+            if (updateRequired && lastFieldSize != null)
+                GameParameters.UpdateParamsFromGeometry(lastFieldSize, isReverse);
+        }
+        public WorldModel GenerateWorldModel(SSLWrapperPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
+        {
+            UpdateGeometry(packet, isReverse);
 
             var obsModel = merger.Merge(packet, isReverse, isYellow, selectedBallLoc, ref ballIndexChanged);
 
-            if (obsModel != null)
-            {
-                obsModel = UpdateNotSeens(obsModel);
-                tracker.ObserveModel(obsModel, commands);
-                model = tracker.GetEstimations(obsModel);
-                model.Tracker = tracker;
-                model.Commands = commands;
-            }
+            if (obsModel == null)
+                return null;
+
+            obsModel = UpdateNotSeensHistory(obsModel);
+            tracker.ObserveModel(obsModel, commands);
+            var model = tracker.GetEstimations(obsModel);
+
+            model.Tracker = tracker;
+            model.Commands = commands;
+
             lastObsModel = obsModel;
             return model;
         }
+
     }
 }

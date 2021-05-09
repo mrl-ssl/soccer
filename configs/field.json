@@ -1,0 +1,61 @@
+{
+  "thickness": 0.0,
+  "centerCircleRadius": 0.6,
+  "goalWidth": 1.2,
+  "goalDepth": 0.18,
+  "penaltyAreaDepth": 1.2,
+  "penaltyAreaWidth": 2.4,
+  "boundaryWidth": 0.4,
+  "ourLeftCorner": {
+    "x": 6,
+    "y": -4.5
+  },
+  "ourRightCorner": {
+    "x": 6,
+    "y": 4.5
+  },
+  "oppLeftCorner": {
+    "x": -6,
+    "y": 4.5
+  },
+  "oppRightCorner": {
+    "x": -6,
+    "y": -4.5
+  },
+  "ourGoalCenter": {
+    "x": 6,
+    "y": 0
+  },
+  "ourGoalLeft": {
+    "x": 6,
+    "y": -0.6
+  },
+  "ourGoalRight": {
+    "x": 6,
+    "y": 0.6
+  },
+  "ourGoalDepthRight": { "x": 6.18, "y": 0.6 },
+  "ourGoalDepthLeft": { "x": 6.18, "y": -0.6 },
+  "ourPenaltyBackRight": { "x": 6, "y": 1.2 },
+  "ourPenaltyBackLeft": { "x": 6, "y": -1.2 },
+  "ourPenaltyRearRight": { "x": 4.8, "y": 1.2 },
+  "ourPenaltyRearLeft": { "x": 4.8, "y": -1.2 },
+  "oppGoalCenter": {
+    "x": -6,
+    "y": 0
+  },
+  "oppGoalLeft": {
+    "x": -6,
+    "y": 0.6
+  },
+  "oppGoalRight": {
+    "x": -6,
+    "y": -0.6
+  },
+  "oppGoalDepthRight": { "x": -6.18, "y": -0.6 },
+  "oppGoalDepthLeft": { "x": -6.18, "y": 0.6 },
+  "oppPenaltyBackRight": { "x": -6, "y": -1.2 },
+  "oppPenaltyBackLeft": { "x": -6, "y": 1.2 },
+  "oppPenaltyRearRight": { "x": -4.8, "y": -1.2 },
+  "oppPenaltyRearLeft": { "x": -4.8, "y": 1.2 }
+}

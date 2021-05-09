@@ -329,12 +329,19 @@ namespace MRL.SSL.Common.Utils.Sockets
         /// <param name="address">IP address</param>
         public virtual void JoinMulticastGroup(IPAddress address)
         {
-            if (Endpoint.AddressFamily == AddressFamily.InterNetworkV6)
-                Socket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, new IPv6MulticastOption(address));
-            else
-                Socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(address));
-            // Call the client joined multicast group notification
-            OnJoinedMulticastGroup(address);
+            try
+            {
+                if (Endpoint.AddressFamily == AddressFamily.InterNetworkV6)
+                    Socket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, new IPv6MulticastOption(address));
+                else
+                    Socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(address));
+                // Call the client joined multicast group notification
+                OnJoinedMulticastGroup(address);
+            }
+            catch (SocketException ex)
+            {
+                SendError(ex.SocketErrorCode);
+            }
         }
         /// <summary>
         /// Join multicast group with a given IP address (synchronous)
@@ -348,13 +355,20 @@ namespace MRL.SSL.Common.Utils.Sockets
         /// <param name="address">IP address</param>
         public virtual void LeaveMulticastGroup(IPAddress address)
         {
-            if (Endpoint.AddressFamily == AddressFamily.InterNetworkV6)
-                Socket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.DropMembership, new IPv6MulticastOption(address));
-            else
-                Socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.DropMembership, new MulticastOption(address));
+            try
+            {
+                if (Endpoint.AddressFamily == AddressFamily.InterNetworkV6)
+                    Socket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.DropMembership, new IPv6MulticastOption(address));
+                else
+                    Socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.DropMembership, new MulticastOption(address));
 
-            // Call the client left multicast group notification
-            OnLeftMulticastGroup(address);
+                // Call the client left multicast group notification
+                OnLeftMulticastGroup(address);
+            }
+            catch (SocketException ex)
+            {
+                SendError(ex.SocketErrorCode);
+            }
         }
         /// <summary>
         /// Leave multicast group with a given IP address (synchronous)

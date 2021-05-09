@@ -1,32 +1,23 @@
 using System.Collections.Generic;
+using MRL.SSL.Common.Configuration;
 
 namespace MRL.SSL.Common
 {
     public class Obstacles
     {
-        //These constance not important and just good for better performance
-        private const int circleObstaclesInitSize = 100;
-        private const int rectObstaclesInitSize = 100;
-        private const int ourRobotObstaclesInitSize = 8;
-        private const int oppRobotObstaclesInitSize = 8;
-        private const int ballObstaclesInitSize = 1;
-        private const int ourZoneObstaclesInitSize = 1;
-        private const int oppZoneObstaclesInitSize = 1;
-        //////////////////////////////////////////////////////////////////////
-
         Dictionary<ObstacleType, List<ObstacleBase>> obstacles;
 
         public Obstacles()
         {
             obstacles = new Dictionary<ObstacleType, List<ObstacleBase>>
             {
-                { ObstacleType.Ball, new List<ObstacleBase>(ballObstaclesInitSize) },
-                { ObstacleType.Circle, new List<ObstacleBase>(circleObstaclesInitSize) },
-                { ObstacleType.OppRobot, new List<ObstacleBase>(oppRobotObstaclesInitSize) },
-                { ObstacleType.OppZone, new List<ObstacleBase>(oppZoneObstaclesInitSize) },
-                { ObstacleType.OurRobot, new List<ObstacleBase>(ourRobotObstaclesInitSize) },
-                { ObstacleType.OurZone, new List<ObstacleBase>(ourZoneObstaclesInitSize) },
-                { ObstacleType.Rectangle, new List<ObstacleBase>(rectObstaclesInitSize) }
+                { ObstacleType.Ball, new List<ObstacleBase>(2) },
+                { ObstacleType.OppRobot, new List<ObstacleBase>(MergerTrackerConfig.Default.MaxTeamRobots) },
+                { ObstacleType.OurRobot, new List<ObstacleBase>(MergerTrackerConfig.Default.MaxTeamRobots) },
+                { ObstacleType.OppZone, new List<ObstacleBase>(1) },
+                { ObstacleType.OurZone, new List<ObstacleBase>(1) },
+                { ObstacleType.Circle, new List<ObstacleBase>() },
+                { ObstacleType.Rectangle, new List<ObstacleBase>() }
             };
         }
 
@@ -39,9 +30,8 @@ namespace MRL.SSL.Common
         public ObstacleBase Meet(SingleObjectState s, ObstacleType type, float obstacleRadi, float margin = 0f)
         {
             foreach (var item in obstacles[type])
-                if (!item.Avoid)
-                    if (item.Meet(s, obstacleRadi, margin))
-                        return item;
+                if (item.Avoid && item.Meet(s, obstacleRadi, margin))
+                    return item;
             return null;
         }
 
@@ -55,9 +45,8 @@ namespace MRL.SSL.Common
             {
                 float margin = (margins != null && margins.ContainsKey(type)) ? margins[type] : 0f;
                 foreach (var item in obstacles[type])
-                    if (!item.Avoid)
-                        if (item.Meet(from, to, obstacleRadi, margin))
-                            return item;
+                    if (item.Avoid && item.Meet(from, to, obstacleRadi, margin))
+                        return item;
             }
             return null;
         }
@@ -67,8 +56,8 @@ namespace MRL.SSL.Common
         /// </summary>
         public void Clear()
         {
-            foreach (var item in obstacles.Values)
-                item.Clear();
+            foreach (var item in obstacles.Keys)
+                obstacles[item].Clear();
         }
 
         /// <summary>
@@ -102,12 +91,6 @@ namespace MRL.SSL.Common
 
         public void RemoveObstacles(ObstacleType type) => obstacles[type].Clear();
 
-        public void RemoveSpecificRobots(bool ours, List<int> ids)
-        {
-            ObstacleType type = ours ? ObstacleType.OurRobot : ObstacleType.OppRobot;
-            for (int i = obstacles[type].Count - 1; i >= 0; i--)
-                if (obstacles[type][i] is RobotObstacle robotObs && ids.Contains(robotObs.Id))
-                    obstacles[type].RemoveAt(i);
-        }
+
     }
 }
