@@ -33,7 +33,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 selectedBallLoc = pos;
             }
         }
-        private ObservationModel UpdateNotSeens(ObservationModel obsModel)
+        private ObservationModel UpdateNotSeensHistory(ObservationModel obsModel)
         {
             if (lastObsModel != null)
             {
@@ -106,7 +106,7 @@ namespace MRL.SSL.Ai.MergerTracker
             if (obsModel == null)
                 return null;
 
-            obsModel = UpdateNotSeens(obsModel);
+            obsModel = UpdateNotSeensHistory(obsModel);
             tracker.ObserveModel(obsModel, commands);
             var model = tracker.GetEstimations(obsModel);
 

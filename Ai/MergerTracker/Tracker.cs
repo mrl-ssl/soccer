@@ -42,7 +42,7 @@ namespace MRL.SSL.Ai.MergerTracker
         public bool Exists(int team, int idx) => (index2id[team, idx] >= 0);
         public RobotKalman GetRobot(int team, int idx) => robots[team, idx];
         public RobotKalman GetRobotById(int team, int id) => id2index[team, id] > 0 ? robots[team, id2index[team, id]] : null;
-        private void ResetUnSeens(ObservationModel model)
+        private void ResetForgottens(ObservationModel model)
         {
             for (int t = 0; t < MergerTrackerConfig.Default.TeamsCount; t++)
             {
@@ -115,7 +115,7 @@ namespace MRL.SSL.Ai.MergerTracker
         }
         public void ObserveModel(ObservationModel model, RobotCommands commands)
         {
-            ResetUnSeens(model);
+            ResetForgottens(model);
             foreach (var key in commands.Commands.Keys)
             {
                 var cmd = commands.Commands[key];
