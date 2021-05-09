@@ -65,10 +65,10 @@ namespace MRL.SSL.Ai.Engine
                     {
                         using var stream = new MemoryStream();
 
-                        Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128);
+                        Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
                         if (GameParameters.IsUpdated)
                         {
-                            Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128);
+                            Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
                             GameParameters.IsUpdated = false;
                         }
                         _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
