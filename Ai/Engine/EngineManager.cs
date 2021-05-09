@@ -61,6 +61,7 @@ namespace MRL.SSL.Ai.Engine
                     var model = worldGenerator.GenerateWorldModel(packet, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
                     if (model == null)
                         continue;
+
                     if (visIpPort != null)
                     {
                         using var stream = new MemoryStream();

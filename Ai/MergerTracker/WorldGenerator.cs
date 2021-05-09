@@ -80,7 +80,7 @@ namespace MRL.SSL.Ai.MergerTracker
             }
             return obsModel;
         }
-        public WorldModel GenerateWorldModel(SSLWrapperPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
+        private void UpdateGeometry(SSLWrapperPacket packet, bool isReverse)
         {
             bool updateRequired = isReverse != lastIsReverse;
             lastIsReverse = isReverse;
@@ -96,6 +96,10 @@ namespace MRL.SSL.Ai.MergerTracker
             }
             if (updateRequired && lastFieldSize != null)
                 GameParameters.UpdateParamsFromGeometry(lastFieldSize, isReverse);
+        }
+        public WorldModel GenerateWorldModel(SSLWrapperPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
+        {
+            UpdateGeometry(packet, isReverse);
 
             var obsModel = merger.Merge(packet, isReverse, isYellow, selectedBallLoc, ref ballIndexChanged);
 
@@ -112,5 +116,6 @@ namespace MRL.SSL.Ai.MergerTracker
             lastObsModel = obsModel;
             return model;
         }
+
     }
 }
