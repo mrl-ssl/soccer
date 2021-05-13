@@ -45,9 +45,9 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
             public SSLRefereeGameEvent.Team Team { get; set; }
 
             [global::ProtoBuf.ProtoMember(2)]
-            public uint botId
+            public uint? botId
             {
-                get => __pbn__botId.GetValueOrDefault();
+                get => __pbn__botId;
                 set => __pbn__botId = value;
             }
             public bool ShouldSerializebotId() => __pbn__botId != null;
@@ -144,7 +144,7 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         private int? __pbn__StageTimeLeft;
 
         [global::ProtoBuf.ProtoMember(4, IsRequired = true)]
-        public Command command { get; set; }
+        public CommandType Command { get; set; }
 
         [global::ProtoBuf.ProtoMember(5, Name = @"command_counter", IsRequired = true)]
         public uint CommandCounter { get; set; }
@@ -162,9 +162,9 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public Point DesignatedPosition { get; set; }
 
         [global::ProtoBuf.ProtoMember(10)]
-        public bool blueTeamOnPositiveHalf
+        public bool? blueTeamOnPositiveHalf
         {
-            get => __pbn__blueTeamOnPositiveHalf.GetValueOrDefault();
+            get => __pbn__blueTeamOnPositiveHalf;
             set => __pbn__blueTeamOnPositiveHalf = value;
         }
         public bool ShouldSerializeblueTeamOnPositiveHalf() => __pbn__blueTeamOnPositiveHalf != null;
@@ -256,7 +256,7 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         }
 
         [global::ProtoBuf.ProtoContract()]
-        public enum Command
+        public enum CommandType
         {
             [global::ProtoBuf.ProtoEnum(Name = @"HALT")]
             Halt = 0,
