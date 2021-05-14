@@ -130,13 +130,13 @@ namespace MRL.SSL.Ai.Engine
                     if (!isJoinedVisionMulticastGroup)
                         _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
 
-                    var packet = RecieveVisionData();
                     var referee = FetchRefereeCommand();
 
-                    if (packet == null)
+                    var vision = RecieveVisionData();
+                    if (vision == null)
                         continue;
 
-                    var model = worldGenerator.GenerateWorldModel(packet, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
+                    var model = worldGenerator.GenerateWorldModel(vision, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
                     if (model == null)
                         continue;
 
