@@ -1,5 +1,6 @@
 ﻿using System;
 using MRL.SSL.Ai.Engine;
+using MRL.SSL.Common;
 using MRL.SSL.Common.Configuration;
 
 namespace MRL.SSL.Ai
@@ -37,7 +38,7 @@ namespace MRL.SSL.Ai
                 }
                 else if (line.Length == 1)
                 {
-                    rm.ApplyPacketFromCommand(line[0]);
+                    em.EnqueueRefereePacket(new RefereeCommand(line[0]));
                 }
             }
         }

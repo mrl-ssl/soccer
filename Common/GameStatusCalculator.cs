@@ -28,8 +28,68 @@ namespace MRL.SSL.Common
     }
     public class GameStatusCalculator
     {
-        public static GameStatus CalculateGameStatus(GameStatus LastGameStatus, CommandType command, bool OurTeamIsYellow)
+        public static bool CharToRefereeCommand(char c, out CommandType command)
         {
+            command = CommandType.Halt;
+            switch (c)
+            {
+                case 'F':
+                    command = CommandType.DirectFreeBlue;
+                    break;
+                case 'f':
+                    command = CommandType.DirectFreeYellow;
+                    break;
+                case 'S':
+                    command = CommandType.Stop;
+                    break;
+                case 's':
+                    command = CommandType.ForceStart;
+                    break;
+                case 'I':
+                    command = CommandType.IndirectFreeBlue;
+                    break;
+                case 'i':
+                    command = CommandType.IndirectFreeYellow;
+                    break;
+                case 'K':
+                    command = CommandType.PrepareKickoffBlue;
+                    break;
+                case 'k':
+                    command = CommandType.PrepareKickoffYellow;
+                    break;
+                case 'P':
+                    command = CommandType.PreparePenaltyBlue;
+                    break;
+                case 'p':
+                    command = CommandType.PreparePenaltyYellow;
+                    break;
+                case 'T':
+                    command = CommandType.TimeoutBlue;
+                    break;
+                case 't':
+                    command = CommandType.TimeoutYellow;
+                    break;
+                case 'c':
+                case 'H':
+                    command = CommandType.Halt;
+                    break;
+                case ' ':
+                    command = CommandType.NormalStart;
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
+        public static GameStatus CalculateGameStatus(GameStatus LastGameStatus, RefereeCommand referee, bool OurTeamIsYellow)
+        {
+            var command = CommandType.Halt;
+            if (referee.RefereePacket != null)
+                command = referee.RefereePacket.Command;
+            else if (!CharToRefereeCommand(referee.Command, out command))
+                return LastGameStatus;
+
             switch (command)
             {
                 case CommandType.Halt:

@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using MRL.SSL.Common.SSLWrapperCommunication;
 using ProtoBuf;
+using MRL.SSL.Common;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -65,7 +66,7 @@ namespace MRL.SSL.Ai.Engine
                     if (packet == null || lastCounter == packet.CommandCounter)
                         continue;
                     lastCounter = packet.CommandCounter;
-                    EngineManager.Manager.EnqueueRefereePacket(packet);
+                    EngineManager.Manager.EnqueueRefereePacket(new RefereeCommand(packet));
                 }
                 catch (Exception ex)
                 {
@@ -74,61 +75,6 @@ namespace MRL.SSL.Ai.Engine
             }
             Console.WriteLine("Referee Mangaer Stopped!");
         }
-        public void ApplyPacketFromCommand(char c)
-        {
-            SSLRefereePacket p = new SSLRefereePacket();
-            switch (c)
-            {
-                case 'F':
-                    p.Command = SSLRefereePacket.CommandType.DirectFreeBlue;
-                    break;
-                case 'f':
-                    p.Command = SSLRefereePacket.CommandType.DirectFreeYellow;
-                    break;
-                case 'S':
-                    p.Command = SSLRefereePacket.CommandType.Stop;
-                    break;
-                case 's':
-                    p.Command = SSLRefereePacket.CommandType.ForceStart;
-                    break;
-                case 'I':
-                    p.Command = SSLRefereePacket.CommandType.IndirectFreeBlue;
-                    break;
-                case 'i':
-                    p.Command = SSLRefereePacket.CommandType.IndirectFreeYellow;
-                    break;
-                case 'K':
-                    p.Command = SSLRefereePacket.CommandType.PrepareKickoffBlue;
-                    break;
-                case 'k':
-                    p.Command = SSLRefereePacket.CommandType.PrepareKickoffYellow;
-                    break;
-                case 'P':
-                    p.Command = SSLRefereePacket.CommandType.PreparePenaltyBlue;
-                    break;
-                case 'p':
-                    p.Command = SSLRefereePacket.CommandType.PreparePenaltyYellow;
-                    break;
-                case 'T':
-                    p.Command = SSLRefereePacket.CommandType.TimeoutBlue;
-                    break;
-                case 't':
-                    p.Command = SSLRefereePacket.CommandType.TimeoutYellow;
-                    break;
-                case 'c':
-                case 'H':
-                    p.Command = SSLRefereePacket.CommandType.Halt;
-                    break;
-                case ' ':
-                    p.Command = SSLRefereePacket.CommandType.NormalStart;
-                    break;
-                default:
-                    p = null;
-                    break;
-            }
-            if (p != null) EngineManager.Manager.EnqueueRefereePacket(p);
-        }
-
         private SSLRefereePacket RecieveRefereeData()
         {
             if (_refereeClient == null)

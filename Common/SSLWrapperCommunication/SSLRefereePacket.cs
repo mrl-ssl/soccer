@@ -8,6 +8,7 @@
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using MRL.SSL.Common.Math;
@@ -95,7 +96,7 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         private int? __pbn__CurrentActionTimeRemaining;
 
         [ProtoContract()]
-        public partial class TeamInfo : IExtensible
+        public partial class TeamInfo : IExtensible, ICloneable
         {
             private IExtension __pbn__extensionData;
             IExtension IExtensible.GetExtensionObject(bool createIfMissing)
@@ -183,10 +184,15 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
             }
             public bool ShouldSerializeBallPlacementFailuresReached() => __pbn__BallPlacementFailuresReached != null;
             public void ResetBallPlacementFailuresReached() => __pbn__BallPlacementFailuresReached = null;
+
+            public object Clone()
+            {
+                return this.MemberwiseClone();
+            }
+
             private bool? __pbn__BallPlacementFailuresReached;
 
         }
-
 
 
         [ProtoContract()]

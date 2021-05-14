@@ -12,10 +12,11 @@ using MRL.SSL.Common;
 using System.Net.WebSockets;
 using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
+using MRL.SSL.Common.Utils.Extensions;
 
 namespace MRL.SSL.Ai.Engine
 {
-    public class EngineManager : IDisposable
+    public sealed class EngineManager : IDisposable
     {
         /// <summary>
         /// an instance of this class 
@@ -32,7 +33,7 @@ namespace MRL.SSL.Ai.Engine
         /// <summary>
         /// 
         /// </summary>
-        Queue<SSLRefereePacket> refereeCommands;
+        Queue<RefereeCommand> refereeCommands;
         Thread _cmcThread;
         UdpClient _visionClient;
         WatsonWsServer _visualizerServer;
@@ -40,22 +41,28 @@ namespace MRL.SSL.Ai.Engine
         WorldGenerator worldGenerator;
         string visIpPort;
         bool isJoinedVisionMulticastGroup;
-        GameStrategyEngine gameEngine;
+        private GameStrategyEngine gameEngine;
+        public GameStrategyEngine GameEngine
+        {
+            get { return gameEngine; }
+            private set { gameEngine = value; }
+        }
+
 
         public RobotCommands Commands { get; set; }
         public EngineManager()
         {
             Commands = new RobotCommands();
-            refereeCommands = new Queue<SSLRefereePacket>();
+            refereeCommands = new Queue<RefereeCommand>();
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
             _manager = this;
             gameEngine = new GameStrategyEngine(0);
         }
 
-        public void EnqueueRefereePacket(SSLRefereePacket packet)
+        public void EnqueueRefereePacket(RefereeCommand command)
         {
             _refereeCommandsLock.EnterWriteLock();
-            refereeCommands.Enqueue(packet);
+            refereeCommands.Enqueue(command);
             _refereeCommandsLock.ExitWriteLock();
         }
         private SSLVisionPacket RecieveVisionData()
@@ -88,35 +95,31 @@ namespace MRL.SSL.Ai.Engine
             _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
         }
 
-        private SSLRefereePacket FetchRefereeCommand()
+        private RefereeCommand UpdateGameStatus()
         {
 
-            SSLRefereePacket referee = null;
+            RefereeCommand command = null;
             GameStatus status = gameEngine.Status;
 
             _refereeCommandsLock.EnterUpgradeableReadLock();
             while (refereeCommands.Count > 0)
             {
                 _refereeCommandsLock.EnterWriteLock();
-                referee = refereeCommands.Dequeue();
-                status = GameStatusCalculator.CalculateGameStatus(gameEngine.Status, referee.Command,
-                                                                             GameConfig.Default.OurMarkerIsYellow);
+                command = refereeCommands.Dequeue();
+                status = GameStatusCalculator.CalculateGameStatus(gameEngine.Status, command,
+                                                                  GameConfig.Default.OurMarkerIsYellow);
                 _refereeCommandsLock.ExitWriteLock();
             }
             _refereeCommandsLock.ExitUpgradeableReadLock();
 
             gameEngine.Status = status;
 
-            if (referee != null && ConnectionConfig.Default.IgnoreRefbox)
+            if (command != null)
             {
-                gameEngine.RefereePacket = referee;
-            }
-            else if (ConnectionConfig.Default.IgnoreRefbox)
-            {
-                gameEngine.RefereePacket = null;
+                gameEngine.RefereeCommand = command;
             }
 
-            return referee;
+            return command;
         }
 
         private void EngineManagerRun(object obj)
@@ -130,9 +133,9 @@ namespace MRL.SSL.Ai.Engine
                     if (!isJoinedVisionMulticastGroup)
                         _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
 
-                    var referee = FetchRefereeCommand();
-
+                    var referee = UpdateGameStatus();
                     var vision = RecieveVisionData();
+
                     if (vision == null)
                         continue;
 
@@ -141,14 +144,19 @@ namespace MRL.SSL.Ai.Engine
                         continue;
 
                     model.Status = gameEngine.Status;
-                    if (gameEngine.RefereePacket != null)
+
+                    if (gameEngine.RefereeCommand != null)
                     {
-                        model.GoalieID = GameConfig.Default.OurMarkerIsYellow ? gameEngine.RefereePacket.Yellow.Goalkeeper : gameEngine.RefereePacket.Blue.Goalkeeper;
-                        model.OppGoalieID = GameConfig.Default.OurMarkerIsYellow ? gameEngine.RefereePacket.Blue.Goalkeeper : gameEngine.RefereePacket.Yellow.Goalkeeper;
+                        if (gameEngine.RefereeCommand.RefereePacket != null)
+                        {
+                            var p = gameEngine.RefereeCommand.RefereePacket;
+                            model.GoalieID = GameConfig.Default.OurMarkerIsYellow ? p.Yellow.Goalkeeper : p.Blue.Goalkeeper;
+                            model.OppGoalieID = GameConfig.Default.OurMarkerIsYellow ? p.Blue.Goalkeeper : p.Yellow.Goalkeeper;
+                        }
                     }
 
                     if (visIpPort != null)
-                        SendVisualizerData(referee, model);
+                        SendVisualizerData(referee?.RefereePacket, model);
                 }
                 catch (Exception ex)
                 {
@@ -191,6 +199,7 @@ namespace MRL.SSL.Ai.Engine
             isJoinedVisionMulticastGroup = false;
 
         }
+
         public void Start()
         {
             try
