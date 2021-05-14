@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using MRL.SSL.Ai.Utils;
+using MRL.SSL.Common;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -10,8 +11,9 @@ namespace MRL.SSL.Ai.Engine
         private PlayBase[] implementedPlays;
         private Dictionary<Type, RoleBase> implementedRoles;
         PlayBase lastRunningPlay;
-        public int EngineId { get; private set; }
         Random rnd;
+        public GameStatus Status { get; set; }
+        public int EngineId { get; private set; }
         public GameStrategyEngine(int id)
         {
             EngineId = id;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MRL.SSL.Ai.Utils;
+using MRL.SSL.Common;
 
 namespace MRL.SSL.Ai.Engine
 {

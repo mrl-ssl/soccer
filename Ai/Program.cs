@@ -13,8 +13,13 @@ namespace MRL.SSL.Ai
             ConfigurationLoader.Load("Ai");
 
             var em = new EngineManager();
+            var rm = new RefereeManager();
+
             em.Initialize();
             em.Start();
+
+            rm.InitialConnections();
+            rm.Start();
 
             for (; ; )
             {
@@ -24,9 +29,15 @@ namespace MRL.SSL.Ai
                 // Stop the server
                 if (line == "!")
                 {
+                    rm.Dispose();
                     em.Dispose();
+
                     Console.WriteLine("Done!");
                     break;
+                }
+                else if (line.Length == 1)
+                {
+                    rm.ApplyPacketFromCommand(line[0]);
                 }
             }
         }

@@ -11,11 +11,28 @@ using WatsonWebsocket;
 using MRL.SSL.Common;
 using System.Net.WebSockets;
 using MRL.SSL.Ai.Utils;
+using System.Collections.Generic;
 
 namespace MRL.SSL.Ai.Engine
 {
     public class EngineManager : IDisposable
     {
+        /// <summary>
+        /// an instance of this class 
+        /// </summary>
+        static EngineManager _manager;
+        internal static EngineManager Manager
+        {
+            get { return EngineManager._manager; }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        ReaderWriterLockSlim _refereeCommandsLock = new ReaderWriterLockSlim();
+        /// <summary>
+        /// 
+        /// </summary>
+        Queue<SSLRefereePacket> refereeCommands;
         Thread _cmcThread;
         UdpClient _visionClient;
         WatsonWsServer _visualizerServer;
@@ -23,27 +40,79 @@ namespace MRL.SSL.Ai.Engine
         WorldGenerator worldGenerator;
         string visIpPort;
         bool isJoinedVisionMulticastGroup;
+        GameStrategyEngine gameEngine;
 
         public RobotCommands Commands { get; set; }
         public EngineManager()
         {
-
             Commands = new RobotCommands();
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
+            _manager = this;
+            gameEngine = new GameStrategyEngine(0);
         }
-        public SSLWrapperPacket RecieveVisionData()
+
+        public void EnqueueRefereePacket(SSLRefereePacket packet)
+        {
+            _refereeCommandsLock.EnterWriteLock();
+            refereeCommands.Enqueue(packet);
+            _refereeCommandsLock.ExitWriteLock();
+        }
+        private SSLVisionPacket RecieveVisionData()
         {
             if (_visionClient == null)
                 return null;
 
-            long size = _visionClient.Receive();
+            var size = _visionClient.Receive();
             if (size == 0)
                 return null;
 
             using var stream = new MemoryStream(_visionClient.ReceiveBuffer.Data, 0, (int)size);
 
-            return Serializer.Deserialize<SSLWrapperPacket>(stream);
+            return Serializer.Deserialize<SSLVisionPacket>(stream);
         }
+
+        private void SendVisualizerData(SSLRefereePacket referee, WorldModel model)
+        {
+            using var stream = new MemoryStream();
+
+            Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
+            if (GameParameters.IsUpdated)
+            {
+                Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
+                GameParameters.IsUpdated = false;
+            }
+            if (referee != null)
+                Serializer.SerializeWithLengthPrefix<SSLRefereePacket>(stream, referee, PrefixStyle.Base128, 3);
+
+            _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
+        }
+
+        private SSLRefereePacket FetchRefereeCommand()
+        {
+
+            SSLRefereePacket referee = null;
+            GameStatus status = gameEngine.Status;
+
+            _refereeCommandsLock.EnterUpgradeableReadLock();
+            while (refereeCommands.Count > 0)
+            {
+                _refereeCommandsLock.EnterWriteLock();
+                referee = refereeCommands.Dequeue();
+                status = GameStatusCalculator.CalculateGameStatus(gameEngine.Status, referee.Command,
+                                                                             GameConfig.Default.OurMarkerIsYellow);
+                _refereeCommandsLock.ExitWriteLock();
+            }
+            _refereeCommandsLock.ExitUpgradeableReadLock();
+
+
+            if (referee != null)
+            {
+                gameEngine.RefereePacket = referee;
+                gameEngine.Status = status;
+            }
+            return referee;
+        }
+
         private void EngineManagerRun(object obj)
         {
             CancellationToken ct = (CancellationToken)obj;
@@ -54,7 +123,10 @@ namespace MRL.SSL.Ai.Engine
                 {
                     if (!isJoinedVisionMulticastGroup)
                         _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
+
                     var packet = RecieveVisionData();
+                    var referee = FetchRefereeCommand();
+
                     if (packet == null)
                         continue;
 
@@ -62,18 +134,10 @@ namespace MRL.SSL.Ai.Engine
                     if (model == null)
                         continue;
 
-                    if (visIpPort != null)
-                    {
-                        using var stream = new MemoryStream();
+                    model.Status = gameEngine.Status;
 
-                        Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
-                        if (GameParameters.IsUpdated)
-                        {
-                            Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
-                            GameParameters.IsUpdated = false;
-                        }
-                        _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
-                    }
+                    if (visIpPort != null)
+                        SendVisualizerData(referee, model);
                 }
                 catch (Exception ex)
                 {
@@ -82,6 +146,7 @@ namespace MRL.SSL.Ai.Engine
             }
             Console.WriteLine("Engine Mangaer Stopped!");
         }
+
         public void Initialize()
         {
             Console.WriteLine("Initializing Stuff...");
@@ -126,7 +191,7 @@ namespace MRL.SSL.Ai.Engine
             {
                 Console.WriteLine("Failed Starting Websocket: " + e);
             }
-            Console.WriteLine("Websocket IsListening:" + _visualizerServer.IsListening);
+            Console.WriteLine("Websocket Is Listening:" + _visualizerServer.IsListening);
             Console.WriteLine("Starting CMC Thread...");
             _cmcThread.Start(_cmcCancelationSource.Token);
         }

@@ -8,19 +8,22 @@
 #region Designer generated code
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 
+using System.Collections.Generic;
+using ProtoBuf;
+
 namespace MRL.SSL.Common.SSLWrapperCommunication
 {
-    [global::ProtoBuf.ProtoContract(Name = @"SSL_DetectionBall")]
-    public partial class SSLDetectionBall : global::ProtoBuf.IExtensible
+    [ProtoContract(Name = @"SSL_DetectionBall")]
+    public partial class SSLDetectionBall : IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private IExtension __pbn__extensionData;
+        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
+            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"confidence", IsRequired = true)]
+        [ProtoMember(1, Name = @"confidence", IsRequired = true)]
         public float Confidence { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"area")]
+        [ProtoMember(2, Name = @"area")]
         public uint Area
         {
             get => __pbn__Area.GetValueOrDefault();
@@ -30,13 +33,13 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public void ResetArea() => __pbn__Area = null;
         private uint? __pbn__Area;
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"x", IsRequired = true)]
+        [ProtoMember(3, Name = @"x", IsRequired = true)]
         public float X { get; set; }
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"y", IsRequired = true)]
+        [ProtoMember(4, Name = @"y", IsRequired = true)]
         public float Y { get; set; }
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"z")]
+        [ProtoMember(5, Name = @"z")]
         public float Z
         {
             get => __pbn__Z.GetValueOrDefault();
@@ -46,25 +49,25 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public void ResetZ() => __pbn__Z = null;
         private float? __pbn__Z;
 
-        [global::ProtoBuf.ProtoMember(6, Name = @"pixel_x", IsRequired = true)]
+        [ProtoMember(6, Name = @"pixel_x", IsRequired = true)]
         public float PixelX { get; set; }
 
-        [global::ProtoBuf.ProtoMember(7, Name = @"pixel_y", IsRequired = true)]
+        [ProtoMember(7, Name = @"pixel_y", IsRequired = true)]
         public float PixelY { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract(Name = @"SSL_DetectionRobot")]
-    public partial class SSLDetectionRobot : global::ProtoBuf.IExtensible
+    [ProtoContract(Name = @"SSL_DetectionRobot")]
+    public partial class SSLDetectionRobot : IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private IExtension __pbn__extensionData;
+        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
+            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"confidence", IsRequired = true)]
+        [ProtoMember(1, Name = @"confidence", IsRequired = true)]
         public float Confidence { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"robot_id")]
+        [ProtoMember(2, Name = @"robot_id")]
         public uint? Id
         {
             get => __pbn__RobotId;
@@ -74,13 +77,13 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public void ResetRobotId() => __pbn__RobotId = null;
         private uint? __pbn__RobotId;
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"x", IsRequired = true)]
+        [ProtoMember(3, Name = @"x", IsRequired = true)]
         public float X { get; set; }
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"y", IsRequired = true)]
+        [ProtoMember(4, Name = @"y", IsRequired = true)]
         public float Y { get; set; }
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"orientation")]
+        [ProtoMember(5, Name = @"orientation")]
         public float? Orientation
         {
             get => __pbn__Orientation;
@@ -90,13 +93,13 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public void ResetOrientation() => __pbn__Orientation = null;
         private float? __pbn__Orientation;
 
-        [global::ProtoBuf.ProtoMember(6, Name = @"pixel_x", IsRequired = true)]
+        [ProtoMember(6, Name = @"pixel_x", IsRequired = true)]
         public float PixelX { get; set; }
 
-        [global::ProtoBuf.ProtoMember(7, Name = @"pixel_y", IsRequired = true)]
+        [ProtoMember(7, Name = @"pixel_y", IsRequired = true)]
         public float PixelY { get; set; }
 
-        [global::ProtoBuf.ProtoMember(8, Name = @"height")]
+        [ProtoMember(8, Name = @"height")]
         public float Height
         {
             get => __pbn__Height.GetValueOrDefault();
@@ -108,33 +111,33 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
 
     }
 
-    [global::ProtoBuf.ProtoContract(Name = @"SSL_DetectionFrame")]
-    public partial class SSLDetectionFrame : global::ProtoBuf.IExtensible
+    [ProtoContract(Name = @"SSL_DetectionFrame")]
+    public partial class SSLDetectionFrame : IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private IExtension __pbn__extensionData;
+        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
+            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"frame_number", IsRequired = true)]
+        [ProtoMember(1, Name = @"frame_number", IsRequired = true)]
         public uint FrameNumber { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"t_capture", IsRequired = true)]
+        [ProtoMember(2, Name = @"t_capture", IsRequired = true)]
         public double CaptureTime { get; set; }
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"t_sent", IsRequired = true)]
+        [ProtoMember(3, Name = @"t_sent", IsRequired = true)]
         public double SentTime { get; set; }
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"camera_id", IsRequired = true)]
+        [ProtoMember(4, Name = @"camera_id", IsRequired = true)]
         public uint CameraId { get; set; }
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"balls")]
-        public global::System.Collections.Generic.List<SSLDetectionBall> Balls { get; } = new global::System.Collections.Generic.List<SSLDetectionBall>();
+        [ProtoMember(5, Name = @"balls")]
+        public List<SSLDetectionBall> Balls { get; } = new List<SSLDetectionBall>();
 
-        [global::ProtoBuf.ProtoMember(6, Name = @"robots_yellow")]
-        public global::System.Collections.Generic.List<SSLDetectionRobot> YellowRobots { get; } = new global::System.Collections.Generic.List<SSLDetectionRobot>();
+        [ProtoMember(6, Name = @"robots_yellow")]
+        public List<SSLDetectionRobot> YellowRobots { get; } = new List<SSLDetectionRobot>();
 
-        [global::ProtoBuf.ProtoMember(7, Name = @"robots_blue")]
-        public global::System.Collections.Generic.List<SSLDetectionRobot> BlueRobots { get; } = new global::System.Collections.Generic.List<SSLDetectionRobot>();
+        [ProtoMember(7, Name = @"robots_blue")]
+        public List<SSLDetectionRobot> BlueRobots { get; } = new List<SSLDetectionRobot>();
 
     }
 }

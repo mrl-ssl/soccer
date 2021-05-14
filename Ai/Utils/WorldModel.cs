@@ -30,7 +30,12 @@ namespace MRL.SSL.Ai.Utils
         [ProtoMember(8)]
         public RobotCommands Commands { get; set; }
 
+        [ProtoMember(9, IsRequired = true)]
+        public GameStatus Status { get; set; }
+
         public MRL.SSL.Ai.MergerTracker.Tracker Tracker { get; set; }
+
+
         public WorldModel()
         {
             Teammates = new Dictionary<int, SingleObjectState>();
