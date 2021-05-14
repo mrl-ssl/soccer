@@ -46,6 +46,7 @@ namespace MRL.SSL.Ai.Engine
         public EngineManager()
         {
             Commands = new RobotCommands();
+            refereeCommands = new Queue<SSLRefereePacket>();
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
             _manager = this;
             gameEngine = new GameStrategyEngine(0);
@@ -104,12 +105,17 @@ namespace MRL.SSL.Ai.Engine
             }
             _refereeCommandsLock.ExitUpgradeableReadLock();
 
+            gameEngine.Status = status;
 
-            if (referee != null)
+            if (referee != null && ConnectionConfig.Default.IgnoreRefbox)
             {
                 gameEngine.RefereePacket = referee;
-                gameEngine.Status = status;
             }
+            else if (ConnectionConfig.Default.IgnoreRefbox)
+            {
+                gameEngine.RefereePacket = null;
+            }
+
             return referee;
         }
 
@@ -135,6 +141,11 @@ namespace MRL.SSL.Ai.Engine
                         continue;
 
                     model.Status = gameEngine.Status;
+                    if (gameEngine.RefereePacket != null)
+                    {
+                        model.GoalieID = GameConfig.Default.OurMarkerIsYellow ? gameEngine.RefereePacket.Yellow.Goalkeeper : gameEngine.RefereePacket.Blue.Goalkeeper;
+                        model.OppGoalieID = GameConfig.Default.OurMarkerIsYellow ? gameEngine.RefereePacket.Blue.Goalkeeper : gameEngine.RefereePacket.Yellow.Goalkeeper;
+                    }
 
                     if (visIpPort != null)
                         SendVisualizerData(referee, model);

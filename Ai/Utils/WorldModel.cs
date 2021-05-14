@@ -12,7 +12,7 @@ namespace MRL.SSL.Ai.Utils
         [ProtoMember(2, IsRequired = true)]
         public bool FieldIsInverted { get; set; }
         [ProtoMember(3)]
-        public int? GoalieID { get; set; }
+        public uint? GoalieID { get; set; }
 
         [ProtoMember(4)]
         public IDictionary<int, SingleObjectState> Teammates { get; set; }
@@ -32,6 +32,8 @@ namespace MRL.SSL.Ai.Utils
 
         [ProtoMember(9, IsRequired = true)]
         public GameStatus Status { get; set; }
+        [ProtoMember(10)]
+        public uint? OppGoalieID { get; set; }
 
         public MRL.SSL.Ai.MergerTracker.Tracker Tracker { get; set; }
 

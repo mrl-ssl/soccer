@@ -16,17 +16,6 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         [ProtoEnum(Name = @"BLUE")]
         Blue = 2,
     }
-
-    [ProtoContract()]
-    public enum Division
-    {
-        [ProtoEnum(Name = @"DIV_UNKNOWN")]
-        DivUnknown = 0,
-        [ProtoEnum(Name = @"DIV_A")]
-        DivA = 1,
-        [ProtoEnum(Name = @"DIV_B")]
-        DivB = 2,
-    }
 }
 #pragma warning restore CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 #endregion

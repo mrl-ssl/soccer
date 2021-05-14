@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using MRL.SSL.Ai.Utils;
 using MRL.SSL.Common;
+using MRL.SSL.Common.SSLWrapperCommunication;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -14,6 +15,8 @@ namespace MRL.SSL.Ai.Engine
         Random rnd;
         public GameStatus Status { get; set; }
         public int EngineId { get; private set; }
+        public SSLRefereePacket RefereePacket { get; internal set; }
+
         public GameStrategyEngine(int id)
         {
             EngineId = id;
@@ -28,7 +31,6 @@ namespace MRL.SSL.Ai.Engine
                     pb.Add(t.GetConstructor(new Type[] { }).Invoke(new object[] { }) as PlayBase);
                 else if (t.IsClass && t.IsSubclassOf(typeof(RoleBase)))
                     implementedRoles.Add(t, t.GetConstructor(BindingFlags.Instance | BindingFlags.Default | BindingFlags.Public, null, Type.EmptyTypes, null).Invoke(new object[] { }) as RoleBase);
-
             }
             implementedPlays = pb.ToArray();
             rnd = new Random();
