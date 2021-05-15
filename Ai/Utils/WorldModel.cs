@@ -30,9 +30,9 @@ namespace MRL.SSL.Ai.Utils
         [ProtoMember(8)]
         public RobotCommands Commands { get; set; }
 
-        [ProtoMember(9, IsRequired = true)]
+        // [ProtoMember(9, IsRequired = true)]
         public GameStatus Status { get; set; }
-        [ProtoMember(10)]
+        // [ProtoMember(10)]
         public uint? OppGoalieID { get; set; }
 
         public MRL.SSL.Ai.MergerTracker.Tracker Tracker { get; set; }

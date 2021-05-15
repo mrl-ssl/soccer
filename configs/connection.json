@@ -5,7 +5,7 @@
   "VisualizerPort": "10017",
   "VisionName": "224.5.23.2",
   "VisionPort": "10006",
-  "refPort": "10003",
-  "refName": "224.5.23.1",
+  "refPort": "10009",
+  "refName": "224.5.23.3",
   "ignoreRefbox": false
 }
