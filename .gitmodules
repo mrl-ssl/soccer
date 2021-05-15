@@ -1,3 +1,0 @@
-[submodule "visualizer"]
-	path = visualizer
-	url = git@github.com:mrl-ssl/visualizer.git
