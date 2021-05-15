@@ -1,8 +1,10 @@
 
+using ProtoBuf;
 using static MRL.SSL.Common.SSLWrapperCommunication.SSLRefereePacket;
 
 namespace MRL.SSL.Common
 {
+    [ProtoContract]
     public enum GameStatus
     {
         Halt = 0,
