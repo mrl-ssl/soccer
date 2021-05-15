@@ -86,10 +86,11 @@ namespace MRL.SSL.Ai.MergerTracker
             lastIsReverse = isReverse;
             if (packet.Geometry != null)
             {
-                if ((lastFieldSize == null && packet.Geometry.Field != null))
+                if (((lastFieldSize == null || GameParameters.ReUpdate) && packet.Geometry.Field != null))
                 {
                     lastFieldSize = packet.Geometry.Field;
                     updateRequired = true;
+                    GameParameters.ReUpdate = false;
                 }
                 if (packet.Geometry.Calibs != null)
                     tracker.Cameras = packet.Geometry.Calibs.ToDictionary(k => k.CameraId, v => v);

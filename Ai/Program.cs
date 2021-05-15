@@ -14,13 +14,13 @@ namespace MRL.SSL.Ai
             ConfigurationLoader.Load("Ai");
 
             var em = new EngineManager();
-            // var rm = new RefereeManager();
+            var rm = new RefereeManager();
 
             em.Initialize();
             em.Start();
 
-            // rm.InitialConnections();
-            // rm.Start();
+            rm.InitialConnections();
+            rm.Start();
 
             for (; ; )
             {
@@ -30,7 +30,7 @@ namespace MRL.SSL.Ai
                 // Stop the server
                 if (line == "!")
                 {
-                    // rm.Dispose();
+                    rm.Dispose();
                     em.Dispose();
 
                     Console.WriteLine("Done!");

@@ -9,6 +9,7 @@ namespace MRL.SSL.Common
     {
         public static FieldConfig Field { get; set; } = FieldConfig.Default;
         public static bool IsUpdated { get; set; }
+        public static bool ReUpdate { get; set; }
 
         public static void UpdateParamsFromGeometry(SSLGeometryFieldSize f, bool isReverse)
         {

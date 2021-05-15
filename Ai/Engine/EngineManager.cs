@@ -12,7 +12,7 @@ using MRL.SSL.Common;
 using System.Net.WebSockets;
 using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
-using MRL.SSL.Common.Utils.Extensions;
+using System.Diagnostics;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -50,6 +50,8 @@ namespace MRL.SSL.Ai.Engine
 
 
         public RobotCommands Commands { get; set; }
+
+        Stopwatch sw = new();
         public EngineManager()
         {
             Commands = new RobotCommands();
@@ -57,6 +59,7 @@ namespace MRL.SSL.Ai.Engine
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
             _manager = this;
             gameEngine = new GameStrategyEngine(0);
+
         }
 
         public void EnqueueRefereePacket(RefereeCommand command)
@@ -81,18 +84,22 @@ namespace MRL.SSL.Ai.Engine
 
         private void SendVisualizerData(SSLRefereePacket referee, WorldModel model)
         {
-            using var stream = new MemoryStream();
-
-            Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
-            if (GameParameters.IsUpdated)
+            if (visIpPort != null)
             {
-                Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
-                GameParameters.IsUpdated = false;
-            }
-            if (referee != null)
-                Serializer.SerializeWithLengthPrefix<SSLRefereePacket>(stream, referee, PrefixStyle.Base128, 3);
+                using var stream = new MemoryStream();
 
-            _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
+                Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
+                if (GameParameters.IsUpdated)
+                {
+                    Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
+                    GameParameters.IsUpdated = false;
+                }
+                if (referee != null)
+                    Serializer.SerializeWithLengthPrefix<SSLRefereePacket>(stream, referee, PrefixStyle.Base128, 3);
+
+                _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
+            }
+            else if(!GameParameters.IsUpdated) GameParameters.ReUpdate = true;
         }
 
         private RefereeCommand UpdateGameStatus()
@@ -138,7 +145,7 @@ namespace MRL.SSL.Ai.Engine
 
                     if (vision == null)
                         continue;
-
+                    // var start = sw.ElapsedMilliseconds;
                     var model = worldGenerator.GenerateWorldModel(vision, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
                     if (model == null)
                         continue;
@@ -155,8 +162,9 @@ namespace MRL.SSL.Ai.Engine
                         }
                     }
 
-                    if (visIpPort != null)
-                        SendVisualizerData(referee?.RefereePacket, model);
+                 
+                    SendVisualizerData(referee?.RefereePacket, model);
+                    
                 }
                 catch (Exception ex)
                 {
@@ -202,6 +210,7 @@ namespace MRL.SSL.Ai.Engine
 
         public void Start()
         {
+            // sw.Start();
             try
             {
                 Console.WriteLine("Starting Websocket...");
@@ -239,6 +248,7 @@ namespace MRL.SSL.Ai.Engine
 
             visIpPort = null;
             isJoinedVisionMulticastGroup = false;
+            // sw.Stop();
         }
 
         private void Vision_OnJoinedMulticastGroup(object sender, IPAddress e)
