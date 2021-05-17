@@ -110,7 +110,8 @@ namespace MRL.SSL.Ai.Engine
                     GameParameters.IsUpdated = false;
                 }
                 if (refs != null && refs.Count > 0)
-                    Serializer.SerializeWithLengthPrefix<IList<RefereeCommand>>(stream, refs, PrefixStyle.Base128, 3);
+                    foreach (var item in refs)
+                        Serializer.SerializeWithLengthPrefix<RefereeCommand>(stream, item, PrefixStyle.Base128, 3);
 
                 _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
             }
