@@ -33,7 +33,7 @@ namespace MRL.SSL.Ai.MergerTracker
             balls = new Dictionary<uint, List<SSLDetectionBall>>();
             robots = new ObjectMerger[MergerTrackerConfig.Default.TeamsCount, MergerTrackerConfig.Default.MaxRobotId].Populate();
         }
-        private bool ValidateCameraSeen(SSLWrapperPacket packet)
+        private bool ValidateCameraSeen(SSLVisionPacket packet)
         {
             var camera = packet.Detection.CameraId;
 
@@ -270,7 +270,7 @@ namespace MRL.SSL.Ai.MergerTracker
             }
         }
 
-        public ObservationModel Merge(SSLWrapperPacket packet, bool isReverse, bool isYellow, VectorF2D selectedBall, ref bool selectedBallChanged)
+        public ObservationModel Merge(SSLVisionPacket packet, bool isReverse, bool isYellow, VectorF2D selectedBall, ref bool selectedBallChanged)
         {
             if (packet.Detection == null)
                 return null;

@@ -11,11 +11,29 @@ using WatsonWebsocket;
 using MRL.SSL.Common;
 using System.Net.WebSockets;
 using MRL.SSL.Ai.Utils;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MRL.SSL.Ai.Engine
 {
-    public class EngineManager : IDisposable
+    public sealed class EngineManager : IDisposable
     {
+        /// <summary>
+        /// an instance of this class 
+        /// </summary>
+        static EngineManager _manager;
+        internal static EngineManager Manager
+        {
+            get { return EngineManager._manager; }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        ReaderWriterLockSlim _refereeCommandsLock = new ReaderWriterLockSlim();
+        /// <summary>
+        /// 
+        /// </summary>
+        Queue<RefereeCommand> refereeCommands;
         Thread _cmcThread;
         UdpClient _visionClient;
         WatsonWsServer _visualizerServer;
@@ -23,27 +41,110 @@ namespace MRL.SSL.Ai.Engine
         WorldGenerator worldGenerator;
         string visIpPort;
         bool isJoinedVisionMulticastGroup;
+        private GameStrategyEngine gameEngine;
+        public GameStrategyEngine GameEngine
+        {
+            get { return gameEngine; }
+            private set { gameEngine = value; }
+        }
+
 
         public RobotCommands Commands { get; set; }
+
+        Stopwatch sw = new();
         public EngineManager()
         {
-
             Commands = new RobotCommands();
+            refereeCommands = new Queue<RefereeCommand>();
             _cmcThread = new Thread(new ParameterizedThreadStart(EngineManagerRun));
+            _manager = this;
+            gameEngine = new GameStrategyEngine(0);
+
         }
-        public SSLWrapperPacket RecieveVisionData()
+
+        public void EnqueueRefereePacket(RefereeCommand command)
+        {
+            _refereeCommandsLock.EnterWriteLock();
+            refereeCommands.Enqueue(command);
+            _refereeCommandsLock.ExitWriteLock();
+        }
+        public void EnqueueRefereePacket(char c, RefereeSourceType src)
+        {
+            SSLRefereePacket.CommandType command;
+            if (GameStatusCalculator.CharToRefereeCommand(c, out command))
+            {
+                var r = new SSLRefereePacket();
+                r.Command = command;
+                r.Yellow = new SSLRefereePacket.TeamInfo();
+                r.Blue = new SSLRefereePacket.TeamInfo();
+
+                _refereeCommandsLock.EnterWriteLock();
+                refereeCommands.Enqueue(new RefereeCommand(r, src));
+                _refereeCommandsLock.ExitWriteLock();
+            }
+        }
+        private SSLVisionPacket RecieveVisionData()
         {
             if (_visionClient == null)
                 return null;
 
-            long size = _visionClient.Receive();
+            var size = _visionClient.Receive();
             if (size == 0)
                 return null;
 
             using var stream = new MemoryStream(_visionClient.ReceiveBuffer.Data, 0, (int)size);
 
-            return Serializer.Deserialize<SSLWrapperPacket>(stream);
+            return Serializer.Deserialize<SSLVisionPacket>(stream);
         }
+
+        private void SendVisualizerData(IList<RefereeCommand> refs, WorldModel model)
+        {
+            if (visIpPort != null)
+            {
+                using var stream = new MemoryStream();
+
+                Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
+                if (GameParameters.IsUpdated)
+                {
+                    Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
+                    GameParameters.IsUpdated = false;
+                }
+                if (refs != null && refs.Count > 0)
+                    Serializer.SerializeWithLengthPrefix<IList<RefereeCommand>>(stream, refs, PrefixStyle.Base128, 3);
+
+                _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
+            }
+            else if (!GameParameters.IsUpdated) GameParameters.ReUpdate = true;
+        }
+
+        private IList<RefereeCommand> UpdateGameStatus()
+        {
+            var res = new List<RefereeCommand>();
+            RefereeCommand command = null;
+            GameStatus status = gameEngine.Status;
+
+            _refereeCommandsLock.EnterUpgradeableReadLock();
+            while (refereeCommands.Count > 0)
+            {
+                _refereeCommandsLock.EnterWriteLock();
+                command = refereeCommands.Dequeue();
+                status = GameStatusCalculator.CalculateGameStatus(gameEngine.Status, command,
+                                                                  GameConfig.Default.OurMarkerIsYellow);
+                res.Add(command);
+                _refereeCommandsLock.ExitWriteLock();
+            }
+            _refereeCommandsLock.ExitUpgradeableReadLock();
+
+            gameEngine.Status = status;
+
+            if (command != null)
+            {
+                gameEngine.RefereeCommand = command;
+            }
+
+            return res;
+        }
+
         private void EngineManagerRun(object obj)
         {
             CancellationToken ct = (CancellationToken)obj;
@@ -54,26 +155,32 @@ namespace MRL.SSL.Ai.Engine
                 {
                     if (!isJoinedVisionMulticastGroup)
                         _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
-                    var packet = RecieveVisionData();
-                    if (packet == null)
-                        continue;
 
-                    var model = worldGenerator.GenerateWorldModel(packet, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
+                    var vision = RecieveVisionData();
+                    if (vision == null)
+                        continue;
+                    // var start = sw.ElapsedMilliseconds;
+                    var model = worldGenerator.GenerateWorldModel(vision, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
                     if (model == null)
                         continue;
 
-                    if (visIpPort != null)
-                    {
-                        using var stream = new MemoryStream();
+                    var refs = UpdateGameStatus();
 
-                        Serializer.SerializeWithLengthPrefix<WorldModel>(stream, model, PrefixStyle.Base128, 1);
-                        if (GameParameters.IsUpdated)
+                    model.Status = gameEngine.Status;
+
+                    if (gameEngine.RefereeCommand != null)
+                    {
+                        if (gameEngine.RefereeCommand.RefereePacket != null)
                         {
-                            Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
-                            GameParameters.IsUpdated = false;
+                            var p = gameEngine.RefereeCommand.RefereePacket;
+                            model.GoalieID = GameConfig.Default.OurMarkerIsYellow ? p.Yellow.Goalkeeper : p.Blue.Goalkeeper;
+                            model.OppGoalieID = GameConfig.Default.OurMarkerIsYellow ? p.Blue.Goalkeeper : p.Yellow.Goalkeeper;
                         }
-                        _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
                     }
+
+
+                    SendVisualizerData(refs, model);
+
                 }
                 catch (Exception ex)
                 {
@@ -82,6 +189,7 @@ namespace MRL.SSL.Ai.Engine
             }
             Console.WriteLine("Engine Mangaer Stopped!");
         }
+
         public void Initialize()
         {
             Console.WriteLine("Initializing Stuff...");
@@ -115,8 +223,10 @@ namespace MRL.SSL.Ai.Engine
             isJoinedVisionMulticastGroup = false;
 
         }
+
         public void Start()
         {
+            // sw.Start();
             try
             {
                 Console.WriteLine("Starting Websocket...");
@@ -126,7 +236,7 @@ namespace MRL.SSL.Ai.Engine
             {
                 Console.WriteLine("Failed Starting Websocket: " + e);
             }
-            Console.WriteLine("Websocket IsListening:" + _visualizerServer.IsListening);
+            Console.WriteLine("Websocket Is Listening:" + _visualizerServer.IsListening);
             Console.WriteLine("Starting CMC Thread...");
             _cmcThread.Start(_cmcCancelationSource.Token);
         }
@@ -154,6 +264,7 @@ namespace MRL.SSL.Ai.Engine
 
             visIpPort = null;
             isJoinedVisionMulticastGroup = false;
+            // sw.Stop();
         }
 
         private void Vision_OnJoinedMulticastGroup(object sender, IPAddress e)

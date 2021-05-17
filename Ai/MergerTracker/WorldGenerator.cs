@@ -80,24 +80,25 @@ namespace MRL.SSL.Ai.MergerTracker
             }
             return obsModel;
         }
-        private void UpdateGeometry(SSLWrapperPacket packet, bool isReverse)
+        private void UpdateGeometry(SSLVisionPacket packet, bool isReverse)
         {
             bool updateRequired = isReverse != lastIsReverse;
             lastIsReverse = isReverse;
             if (packet.Geometry != null)
             {
-                if ((lastFieldSize == null && packet.Geometry.Field != null))
+                if (((lastFieldSize == null || GameParameters.ReUpdate) && packet.Geometry.Field != null))
                 {
                     lastFieldSize = packet.Geometry.Field;
                     updateRequired = true;
+                    GameParameters.ReUpdate = false;
                 }
-                if (packet.Geometry.Calibrations != null)
-                    tracker.Cameras = packet.Geometry.Calibrations.ToDictionary(k => k.CameraId, v => v);
+                if (packet.Geometry.Calibs != null)
+                    tracker.Cameras = packet.Geometry.Calibs.ToDictionary(k => k.CameraId, v => v);
             }
             if (updateRequired && lastFieldSize != null)
                 GameParameters.UpdateParamsFromGeometry(lastFieldSize, isReverse);
         }
-        public WorldModel GenerateWorldModel(SSLWrapperPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
+        public WorldModel GenerateWorldModel(SSLVisionPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
         {
             UpdateGeometry(packet, isReverse);
 

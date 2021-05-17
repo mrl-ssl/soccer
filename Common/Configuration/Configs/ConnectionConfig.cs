@@ -11,6 +11,9 @@ namespace MRL.SSL.Common.Configuration
         public int VisionPort { get; set; }
         public string VisualizerName { get; set; }
         public int VisualizerPort { get; set; }
+        public string RefName { get; set; }
+        public int RefPort { get; set; }
+        public bool IgnoreRefbox { get; set; }
 
         public ConnectionConfig()
         {

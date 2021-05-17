@@ -149,6 +149,7 @@ namespace MRL.SSL.Common.Utils.Sockets
             get => Socket.ReceiveTimeout;
             set => Socket.ReceiveTimeout = value;
         }
+
         /// <summary>
         /// Option: send timeout in milliseconds
         /// </summary>
@@ -263,13 +264,15 @@ namespace MRL.SSL.Common.Utils.Sockets
 
             try
             {
-                // Close the client socket
+                // Close the client socket 
                 Socket.Close();
-
                 // Dispose the client socket
                 Socket.Dispose();
             }
-            catch (ObjectDisposedException) { }
+            catch (ObjectDisposedException e)
+            {
+                Console.WriteLine(e);
+            }
 
             // Update the connected flag
             IsConnected = false;
@@ -600,7 +603,10 @@ namespace MRL.SSL.Common.Utils.Sockets
 
                 return received;
             }
-            catch (ObjectDisposedException) { return 0; }
+            catch (ObjectDisposedException)
+            {
+                return 0;
+            }
             catch (SocketException ex)
             {
                 SendError(ex.SocketErrorCode);
