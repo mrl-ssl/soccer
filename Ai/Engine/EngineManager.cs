@@ -68,6 +68,21 @@ namespace MRL.SSL.Ai.Engine
             refereeCommands.Enqueue(command);
             _refereeCommandsLock.ExitWriteLock();
         }
+        public void EnqueueRefereePacket(char c, RefereeSourceType src)
+        {
+            SSLRefereePacket.CommandType command;
+            if (GameStatusCalculator.CharToRefereeCommand(c, out command))
+            {
+                var r = new SSLRefereePacket();
+                r.Command = command;
+                r.Yellow = new SSLRefereePacket.TeamInfo();
+                r.Blue = new SSLRefereePacket.TeamInfo();
+
+                _refereeCommandsLock.EnterWriteLock();
+                refereeCommands.Enqueue(new RefereeCommand(r, src));
+                _refereeCommandsLock.ExitWriteLock();
+            }
+        }
         private SSLVisionPacket RecieveVisionData()
         {
             if (_visionClient == null)
@@ -82,7 +97,7 @@ namespace MRL.SSL.Ai.Engine
             return Serializer.Deserialize<SSLVisionPacket>(stream);
         }
 
-        private void SendVisualizerData(SSLRefereePacket referee, WorldModel model)
+        private void SendVisualizerData(IList<RefereeCommand> refs, WorldModel model)
         {
             if (visIpPort != null)
             {
@@ -94,17 +109,17 @@ namespace MRL.SSL.Ai.Engine
                     Serializer.SerializeWithLengthPrefix<FieldConfig>(stream, GameParameters.Field, PrefixStyle.Base128, 2);
                     GameParameters.IsUpdated = false;
                 }
-                if (referee != null)
-                    Serializer.SerializeWithLengthPrefix<SSLRefereePacket>(stream, referee, PrefixStyle.Base128, 3);
+                if (refs != null && refs.Count > 0)
+                    Serializer.SerializeWithLengthPrefix<IList<RefereeCommand>>(stream, refs, PrefixStyle.Base128, 3);
 
                 _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
             }
-            else if(!GameParameters.IsUpdated) GameParameters.ReUpdate = true;
+            else if (!GameParameters.IsUpdated) GameParameters.ReUpdate = true;
         }
 
-        private RefereeCommand UpdateGameStatus()
+        private IList<RefereeCommand> UpdateGameStatus()
         {
-
+            var res = new List<RefereeCommand>();
             RefereeCommand command = null;
             GameStatus status = gameEngine.Status;
 
@@ -115,6 +130,7 @@ namespace MRL.SSL.Ai.Engine
                 command = refereeCommands.Dequeue();
                 status = GameStatusCalculator.CalculateGameStatus(gameEngine.Status, command,
                                                                   GameConfig.Default.OurMarkerIsYellow);
+                res.Add(command);
                 _refereeCommandsLock.ExitWriteLock();
             }
             _refereeCommandsLock.ExitUpgradeableReadLock();
@@ -126,7 +142,7 @@ namespace MRL.SSL.Ai.Engine
                 gameEngine.RefereeCommand = command;
             }
 
-            return command;
+            return res;
         }
 
         private void EngineManagerRun(object obj)
@@ -140,15 +156,15 @@ namespace MRL.SSL.Ai.Engine
                     if (!isJoinedVisionMulticastGroup)
                         _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
 
-                    var referee = UpdateGameStatus();
                     var vision = RecieveVisionData();
-
                     if (vision == null)
                         continue;
                     // var start = sw.ElapsedMilliseconds;
                     var model = worldGenerator.GenerateWorldModel(vision, Commands, GameConfig.Default.OurMarkerIsYellow, GameConfig.Default.IsFieldInverted);
                     if (model == null)
                         continue;
+
+                    var refs = UpdateGameStatus();
 
                     model.Status = gameEngine.Status;
 
@@ -162,9 +178,9 @@ namespace MRL.SSL.Ai.Engine
                         }
                     }
 
-                 
-                    SendVisualizerData(referee?.RefereePacket, model);
-                    
+
+                    SendVisualizerData(refs, model);
+
                 }
                 catch (Exception ex)
                 {

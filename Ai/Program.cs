@@ -38,7 +38,7 @@ namespace MRL.SSL.Ai
                 }
                 else if (line.Length == 1)
                 {
-                    em.EnqueueRefereePacket(new RefereeCommand(line[0]));
+                    em.EnqueueRefereePacket(line[0], RefereeSourceType.CommandLine);
                 }
             }
         }

@@ -89,7 +89,7 @@ namespace MRL.SSL.Common
             var command = CommandType.Halt;
             if (referee.RefereePacket != null)
                 command = referee.RefereePacket.Command;
-            else if (!CharToRefereeCommand(referee.Command, out command))
+            else
                 return LastGameStatus;
 
             switch (command)

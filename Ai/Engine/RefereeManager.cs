@@ -66,8 +66,8 @@ namespace MRL.SSL.Ai.Engine
                     if (packet == null || lastCounter == packet.CommandCounter)
                         continue;
                     lastCounter = packet.CommandCounter;
-                    EngineManager.Manager.EnqueueRefereePacket(new RefereeCommand(packet));
-                    // Thread.Sleep(16);
+                    EngineManager.Manager.EnqueueRefereePacket(new RefereeCommand(packet, RefereeSourceType.Refbox));
+
                 }
                 catch (Exception ex)
                 {

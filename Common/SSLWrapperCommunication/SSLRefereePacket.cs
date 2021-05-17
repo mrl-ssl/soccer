@@ -96,7 +96,7 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         private int? __pbn__CurrentActionTimeRemaining;
 
         [ProtoContract()]
-        public partial class TeamInfo : IExtensible, ICloneable
+        public partial class TeamInfo : IExtensible
         {
             private IExtension __pbn__extensionData;
             IExtension IExtensible.GetExtensionObject(bool createIfMissing)
@@ -184,11 +184,6 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
             }
             public bool ShouldSerializeBallPlacementFailuresReached() => __pbn__BallPlacementFailuresReached != null;
             public void ResetBallPlacementFailuresReached() => __pbn__BallPlacementFailuresReached = null;
-
-            public object Clone()
-            {
-                return this.MemberwiseClone();
-            }
 
             private bool? __pbn__BallPlacementFailuresReached;
 
