@@ -5,6 +5,7 @@ using System.IO;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using ProtoBuf;
+using static MRL.SSL.Common.Drawings.DrawableObject;
 
 namespace MRL.SSL.Common.Drawings
 {
@@ -23,12 +24,19 @@ namespace MRL.SSL.Common.Drawings
             }
         }
 
-        public static void AddObject(string text, Color color, float fontSize = 12f, float opacity = 1f)
+        public static void AddObject(string text, VectorF2D position, Color color = new Color(), float fontSize = 12f, float opacity = 1f)
         {
-            AddObject(new DrawableObject { Text = text, FillColor = color.ToArgb(), FontSize = fontSize, Opacity = opacity });
+            AddObject(new DrawableObject
+            {
+                String = new DrawableString { Position = position, Text = text },
+                FillColor = color.ToArgb(),
+                FontSize = fontSize,
+                Opacity = opacity,
+                Type = DrawableType.String
+            });
         }
 
-        public static void AddObject(Circle circle, Color strokeColor, float strokeWidth = 0.1f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
+        public static void AddObject(Circle circle, Color strokeColor=new Color(), float strokeWidth = 0.01f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
@@ -37,39 +45,42 @@ namespace MRL.SSL.Common.Drawings
                 Fill = isFilled,
                 StrokeColor = strokeColor.ToArgb(),
                 StrokeWidth = strokeWidth,
-                Opacity = opacity
+                Opacity = opacity,
+                Type = DrawableType.Circle
             });
         }
 
-        public static void AddObject(VectorF2D center, float radius, Color strokeColor, float strokeWidth = 0.1f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
+        public static void AddObject(VectorF2D center, float radius, Color strokeColor = new Color(), float strokeWidth = 0.01f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
         {
             AddObject(new Circle(center, radius), strokeColor, strokeWidth, isFilled, fillColor, opacity);
         }
 
-        public static void AddObject(Line line, Color strokeColor, float strokeWidth = 0.1f, float opacity = 1f)
+        public static void AddObject(Line line, Color strokeColor, float strokeWidth = 0.01f, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
                 Line = line,
                 StrokeColor = strokeColor.ToArgb(),
                 StrokeWidth = strokeWidth,
-                Opacity = opacity
+                Opacity = opacity,
+                Type = DrawableType.Line
             });
         }
 
-        public static void AddObject(VectorF2D p1, VectorF2D p2, Color strokeColor, float strokeWidth = 0.1f, float opacity = 1f)
+        public static void AddObject(VectorF2D p1, VectorF2D p2, Color strokeColor = new Color(), float strokeWidth = 0.01f, float opacity = 1f)
         {
             AddObject(new Line(p1, p2), strokeColor, strokeWidth, opacity);
         }
 
-        public static void AddObject(VectorF2D position, float width, float height, Color strokeColor, float strokeWidth = 0.1f, float opacity = 1f)
+        public static void AddObject(List<VectorF2D> points, Color strokeColor = new Color(), float strokeWidth = 0.01f, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
-                Region = new List<Vector2D<float>> { position, new VectorF2D(position.X + width, position.Y), new VectorF2D(position.X, position.Y - height) },
+                Region = points,
                 StrokeColor = strokeColor.ToArgb(),
                 StrokeWidth = strokeWidth,
-                Opacity = opacity
+                Opacity = opacity,
+                Type = DrawableType.Region
             });
         }
 

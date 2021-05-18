@@ -36,9 +36,19 @@ namespace MRL.SSL.Common.Drawings
 
         public DrawableType Type { get; set; }
         public Circle Circle { get; set; }
-        public List<Vector2D<float>> Region { get; set; }
-        public List<Vector2D<float>> Path { get; set; }
+        public List<VectorF2D> Region { get; set; }
+        public List<VectorF2D> Path { get; set; }
         public Line Line { get; set; }
+        public DrawableString String { get; set; }
+    }
+
+    [ProtoContract]
+    public class DrawableString
+    {
+        [ProtoMember(1, IsRequired = true)]
+        public VectorF2D Position { get; set; }
+
+        [ProtoMember(2, IsRequired = true)]
         public string Text { get; set; }
     }
 }
