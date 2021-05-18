@@ -4,6 +4,15 @@ using ProtoBuf;
 
 namespace MRL.SSL.Common.Drawings
 {
+    [ProtoContract]
+    public enum DrawableType
+    {
+        Circle = 0,
+        Line,
+        String,
+        Path,
+        Region
+    }
     public class DrawableObject
     {
         [ProtoMember(1)]
@@ -25,21 +34,46 @@ namespace MRL.SSL.Common.Drawings
         public float Opacity { get; set; }
 
 
-        public enum DrawableType
+
+        [ProtoMember(7, IsRequired = true)]
+        public DrawableType Type { get; set; }
+
+
+        private DiscriminatedUnionObject __pbn__event;
+
+        [ProtoMember(8)]
+        public Circle Circle
         {
-            Circle = 0,
-            Line,
-            String,
-            Path,
-            Region
+            get => __pbn__event.Is(8) ? ((Circle)__pbn__event.Object) : default;
+            set => __pbn__event = new DiscriminatedUnionObject(8, value);
+        }
+        [ProtoMember(9)]
+        public List<VectorF2D> Region
+        {
+            get => __pbn__event.Is(9) ? ((List<VectorF2D>)__pbn__event.Object) : default;
+            set => __pbn__event = new DiscriminatedUnionObject(9, value);
         }
 
-        public DrawableType Type { get; set; }
-        public Circle Circle { get; set; }
-        public List<VectorF2D> Region { get; set; }
-        public List<VectorF2D> Path { get; set; }
-        public Line Line { get; set; }
-        public DrawableString String { get; set; }
+        [ProtoMember(10)]
+        public List<VectorF2D> Path
+        {
+            get => __pbn__event.Is(10) ? ((List<VectorF2D>)__pbn__event.Object) : default;
+            set => __pbn__event = new DiscriminatedUnionObject(10, value);
+        }
+
+        [ProtoMember(11)]
+        public Line Line
+        {
+            get => __pbn__event.Is(11) ? ((Line)__pbn__event.Object) : default;
+            set => __pbn__event = new DiscriminatedUnionObject(11, value);
+        }
+
+        [ProtoMember(12)]
+        public DrawableString String
+        {
+            get => __pbn__event.Is(12) ? ((DrawableString)__pbn__event.Object) : default;
+            set => __pbn__event = new DiscriminatedUnionObject(12, value);
+        }
     }
 
     [ProtoContract]

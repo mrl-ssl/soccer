@@ -7,12 +7,12 @@ namespace MRL.SSL.Common
     public class Circle
     {
         [ProtoMember(1, IsRequired = true)]
-        public Vector2D<float> Position { get; set; }
-        
+        public VectorF2D Position { get; set; }
+
         [ProtoMember(2, IsRequired = true)]
         public float Radius { get; set; }
 
-        public Circle(Vector2D<float> position, float radius)
+        public Circle(VectorF2D position, float radius)
         {
             Position = position;
             Radius = radius;
