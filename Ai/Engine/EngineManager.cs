@@ -183,6 +183,15 @@ namespace MRL.SSL.Ai.Engine
                     }
 
                     DrawingPacket.AddObject(model.Ball.Location, 0.05f, System.Drawing.Color.Red, 0.01f, true);
+                    DrawingPacket.AddObject("Fucking ball", model.Ball.Location, System.Drawing.Color.Blue);
+                    DrawingPacket.AddObject(model.Opponents[1].Location, model.Ball.Location, System.Drawing.Color.Green);
+                    DrawingPacket.AddObject(new List<Common.Math.VectorF2D>{
+                        new Common.Math.VectorF2D(0,0),
+                        new Common.Math.VectorF2D(0,1),
+                        new Common.Math.VectorF2D(-1,0),
+                        new Common.Math.VectorF2D(-1,1)
+                    }, System.Drawing.Color.Black);
+
                     SendVisualizerData(refs, model);
 
                 }

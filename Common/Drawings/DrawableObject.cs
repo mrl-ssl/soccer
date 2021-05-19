@@ -27,7 +27,7 @@ namespace MRL.SSL.Common.Drawings
         public float StrokeWidth { get; set; }
 
         [ProtoMember(4)]
-        public float? FontSize { get; set; }
+        public string FontSize { get; set; }
 
         [ProtoMember(5, IsRequired = true)]
         public bool Fill { get; set; }

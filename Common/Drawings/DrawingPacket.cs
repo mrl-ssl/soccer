@@ -33,13 +33,13 @@ namespace MRL.SSL.Common.Drawings
             return Convert.ToHexString(argbBytes[1..]);
         }
 
-        public static void AddObject(string text, VectorF2D position, Color color = new Color(), float fontSize = 12f, float opacity = 1f)
+        public static void AddObject(string text, VectorF2D position, Color color = new Color(), int fontSize = 12, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
                 String = new DrawableString { Position = position, Text = text },
                 FillColor = Convert2HexRGB(color),
-                FontSize = fontSize,
+                FontSize = fontSize.ToString(),
                 Opacity = opacity,
                 Type = DrawableType.String
             });
