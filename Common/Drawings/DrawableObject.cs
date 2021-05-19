@@ -17,10 +17,10 @@ namespace MRL.SSL.Common.Drawings
     [ProtoContract]
     public class DrawableObject
     {
-        [ProtoMember(1)]
+        [ProtoMember(1, IsRequired = true)]
         public string StrokeColor { get; set; }
 
-        [ProtoMember(2, IsRequired = true)]
+        [ProtoMember(2)]
         public string FillColor { get; set; }
 
         [ProtoMember(3, IsRequired = true)]

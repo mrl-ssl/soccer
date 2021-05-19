@@ -14,6 +14,7 @@ using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MRL.SSL.Common.Drawings;
+using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -182,9 +183,9 @@ namespace MRL.SSL.Ai.Engine
                         }
                     }
 
-                    DrawingPacket.AddObject(model.Ball.Location, 0.05f, System.Drawing.Color.Red, 0.01f, true);
-                    DrawingPacket.AddObject("Fucking ball", model.Ball.Location, System.Drawing.Color.Blue);
-                    DrawingPacket.AddObject(model.Opponents[1].Location, model.Ball.Location, System.Drawing.Color.Green);
+                    DrawingPacket.AddObject(new VectorF2D(1, 1),0.05f,System.Drawing.Color.Red,0.01f,true,System.Drawing.Color.Red);
+                    DrawingPacket.AddObject("Fucking ball", model.Ball.Location.Scale(1/1000f), System.Drawing.Color.Blue);
+                    DrawingPacket.AddObject(model.Opponents[1].Location.Scale(1/1000f), model.Ball.Location.Scale(1/1000f), System.Drawing.Color.Green);
                     DrawingPacket.AddObject(new List<Common.Math.VectorF2D>{
                         new Common.Math.VectorF2D(0,0),
                         new Common.Math.VectorF2D(0,1),
