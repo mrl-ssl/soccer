@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -23,26 +24,35 @@ namespace MRL.SSL.Common.Drawings
             }
         }
 
+        private static string Convert2HexRGB(Color color)
+        {
+            int intArgb = color.ToArgb();
+            byte[] argbBytes = new byte[4];
+            for (int i = 0; i < argbBytes.Length; i++)
+                argbBytes[i] = Convert.ToByte((intArgb >> (8 * (argbBytes.Length - 1 - i))) & 0xff);
+            return Convert.ToHexString(argbBytes[1..]);
+        }
+
         public static void AddObject(string text, VectorF2D position, Color color = new Color(), float fontSize = 12f, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
                 String = new DrawableString { Position = position, Text = text },
-                FillColor = color.ToArgb(),
+                FillColor = Convert2HexRGB(color),
                 FontSize = fontSize,
                 Opacity = opacity,
                 Type = DrawableType.String
             });
         }
 
-        public static void AddObject(Circle circle, Color strokeColor=new Color(), float strokeWidth = 0.01f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
+        public static void AddObject(Circle circle, Color strokeColor = new Color(), float strokeWidth = 0.01f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
                 Circle = circle,
-                FillColor = fillColor.ToArgb(),
+                FillColor = Convert2HexRGB(fillColor),
                 Fill = isFilled,
-                StrokeColor = strokeColor.ToArgb(),
+                StrokeColor = Convert2HexRGB(strokeColor),
                 StrokeWidth = strokeWidth,
                 Opacity = opacity,
                 Type = DrawableType.Circle
@@ -59,7 +69,7 @@ namespace MRL.SSL.Common.Drawings
             AddObject(new DrawableObject
             {
                 Line = line,
-                StrokeColor = strokeColor.ToArgb(),
+                StrokeColor = Convert2HexRGB(strokeColor),
                 StrokeWidth = strokeWidth,
                 Opacity = opacity,
                 Type = DrawableType.Line
@@ -76,7 +86,7 @@ namespace MRL.SSL.Common.Drawings
             AddObject(new DrawableObject
             {
                 Region = points,
-                StrokeColor = strokeColor.ToArgb(),
+                StrokeColor = Convert2HexRGB(strokeColor),
                 StrokeWidth = strokeWidth,
                 Opacity = opacity,
                 Type = DrawableType.Region
