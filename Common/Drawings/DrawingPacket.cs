@@ -5,15 +5,14 @@ using System.IO;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using ProtoBuf;
-using static MRL.SSL.Common.Drawings.DrawableObject;
 
 namespace MRL.SSL.Common.Drawings
 {
-    public class DrawingPacket
+    public static class DrawingPacket
     {
         private static object _lock = new object();
 
-        public static List<DrawableObject> Objects { get; set; }
+        public static List<DrawableObject> Objects { get; set; } = new List<DrawableObject>();
 
         private static void AddObject(DrawableObject obj)
         {
