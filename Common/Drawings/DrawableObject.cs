@@ -13,6 +13,8 @@ namespace MRL.SSL.Common.Drawings
         Path,
         Region
     }
+
+    [ProtoContract]
     public class DrawableObject
     {
         [ProtoMember(1)]
