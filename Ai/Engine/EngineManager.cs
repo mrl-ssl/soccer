@@ -184,14 +184,14 @@ namespace MRL.SSL.Ai.Engine
                     }
 
                     DrawingPacket.AddCircle(new VectorF2D(1, 1), 0.05f, System.Drawing.Color.Red, true);
-                    DrawingPacket.AddCircle(new VectorF2D(3, 3), 0.05f, System.Drawing.Color.Green);
+                    DrawingPacket.AddCircle(new VectorF2D(3, 3), 0.05f, System.Drawing.Color.DarkBlue);
                     DrawingPacket.AddText("Fucking ball", model.Ball.Location.Scale(1 / 1000f), System.Drawing.Color.Blue);
                     DrawingPacket.AddLine(model.Opponents[1].Location.Scale(1 / 1000f), model.Ball.Location.Scale(1 / 1000f), System.Drawing.Color.Green);
                     DrawingPacket.AddRegion(new List<VectorF2D>{
                         new VectorF2D(0,0),
-                        new VectorF2D(0,1),
-                        new VectorF2D(-1,0),
-                        new VectorF2D(-1,1)
+                        new VectorF2D(0.5f,1.3f),
+                        new VectorF2D(-1.2f,0.9f),
+                        new VectorF2D(-1.1f,4f)
                     }, System.Drawing.Color.Black);
 
                     SendVisualizerData(refs, model);

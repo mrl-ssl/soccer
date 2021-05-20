@@ -33,13 +33,13 @@ namespace MRL.SSL.Common.Drawings
             return '#' + Convert.ToHexString(argbBytes[1..]);
         }*/
 
-        private static int Convert2Argb(Color color, float opacity)
+        private static uint Convert2Argb(Color color, float opacity)
         {
             int a = 0;
             if (opacity >= 1f) a = 255;
             else if (opacity <= 0f) a = 0;
             else a = (int)(opacity * 255);
-            return Color.FromArgb(a, color.R, color.G, color.B).ToArgb();
+            return (uint)Color.FromArgb(a, color.R, color.G, color.B).ToArgb();
         }
 
         public static void AddText(string text, VectorF2D position, Color color = default, int fontSize = 12, float opacity = 1f)
@@ -55,7 +55,7 @@ namespace MRL.SSL.Common.Drawings
 
         public static void AddCircle(Circle circle, Color color = default, bool fill = false, float strokeWidth = 0.01f, float opacity = 1f)
         {
-            int c = Convert2Argb(color, opacity);
+            uint c = Convert2Argb(color, opacity);
             AddObject(new DrawableObject
             {
                 Circle = circle,
