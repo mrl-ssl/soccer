@@ -47,7 +47,7 @@ namespace MRL.SSL.Common.Drawings
             {
                 String = new DrawableString { Position = position, Text = text },
                 StrokeColor = Convert2Argb(color, opacity),
-                FontSize = (byte)fontSize,
+                FontSize = fontSize,
                 Type = DrawableType.String
             });
         }
