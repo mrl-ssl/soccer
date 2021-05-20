@@ -24,71 +24,75 @@ namespace MRL.SSL.Common.Drawings
             }
         }
 
-        private static string Convert2HexRGB(Color color)
+        /*private static string Convert2HexARGB(Color color, float opacity)
         {
             int intArgb = color.ToArgb();
             byte[] argbBytes = new byte[4];
             for (int i = 0; i < argbBytes.Length; i++)
                 argbBytes[i] = Convert.ToByte((intArgb >> (8 * (argbBytes.Length - 1 - i))) & 0xff);
-            return Convert.ToHexString(argbBytes[1..]);
+            return '#' + Convert.ToHexString(argbBytes[1..]);
+        }*/
+
+        private static int Convert2Argb(Color color, float opacity)
+        {
+            byte a = 0;
+            if (opacity > 0f || opacity < 1f) a = (byte)(opacity * 255);
+            else if (opacity == 1f) a = 255;
+            return Color.FromArgb(a, color.R, color.G, color.B).ToArgb();
         }
 
-        public static void AddObject(string text, VectorF2D position, Color color = new Color(), int fontSize = 12, float opacity = 1f)
+        public static void AddText(string text, VectorF2D position, Color color = default, int fontSize = 12, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
                 String = new DrawableString { Position = position, Text = text },
-                FillColor = Convert2HexRGB(color),
-                FontSize = fontSize.ToString(),
-                Opacity = opacity,
+                StrokeColor = Convert2Argb(color, opacity),
+                FontSize = (byte)fontSize,
                 Type = DrawableType.String
             });
         }
 
-        public static void AddObject(Circle circle, Color strokeColor = new Color(), float strokeWidth = 0.01f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
+        public static void AddCircle(Circle circle, Color color = default, bool fill = false, float strokeWidth = 0.01f, float opacity = 1f)
         {
+            int c = Convert2Argb(color, opacity);
             AddObject(new DrawableObject
             {
                 Circle = circle,
-                FillColor = Convert2HexRGB(fillColor),
-                Fill = isFilled,
-                StrokeColor = Convert2HexRGB(strokeColor),
+                StrokeColor = c,
+                FillColor = fill ? c : null,
                 StrokeWidth = strokeWidth,
-                Opacity = opacity,
                 Type = DrawableType.Circle
             });
         }
 
-        public static void AddObject(VectorF2D center, float radius, Color strokeColor = new Color(), float strokeWidth = 0.01f, bool isFilled = false, Color fillColor = new Color(), float opacity = 1f)
+        public static void AddCircle(VectorF2D center, float radius, Color color = default, bool fill = false, float strokeWidth = 0.01f, float opacity = 1f)
         {
-            AddObject(new Circle(center, radius), strokeColor, strokeWidth, isFilled, fillColor, opacity);
+            AddCircle(new Circle(center, radius), color, fill, strokeWidth, opacity);
         }
 
-        public static void AddObject(Line line, Color strokeColor, float strokeWidth = 0.01f, float opacity = 1f)
+        public static void AddLine(Line line, Color strokeColor = default, float strokeWidth = 0.01f, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
                 Line = line,
-                StrokeColor = Convert2HexRGB(strokeColor),
+                StrokeColor = Convert2Argb(strokeColor, opacity),
                 StrokeWidth = strokeWidth,
-                Opacity = opacity,
                 Type = DrawableType.Line
             });
         }
 
-        public static void AddObject(VectorF2D p1, VectorF2D p2, Color strokeColor = new Color(), float strokeWidth = 0.01f, float opacity = 1f)
+        public static void AddLine(VectorF2D p1, VectorF2D p2, Color strokeColor = default, float strokeWidth = 0.01f, float opacity = 1f)
         {
-            AddObject(new Line(p1, p2), strokeColor, strokeWidth, opacity);
+            AddLine(new Line(p1, p2), strokeColor, strokeWidth, opacity);
         }
 
-        public static void AddObject(List<VectorF2D> points, Color strokeColor = new Color(), float strokeWidth = 0.01f, float opacity = 1f)
+        public static void AddRegion(List<VectorF2D> points, Color color = default, float strokeWidth = 0.01f, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
                 Region = points,
-                StrokeColor = Convert2HexRGB(strokeColor),
+                StrokeColor = Convert2Argb(color, opacity),
                 StrokeWidth = strokeWidth,
-                Opacity = opacity,
                 Type = DrawableType.Region
             });
         }
