@@ -27,7 +27,7 @@ namespace MRL.SSL.Common.Drawings
         public float StrokeWidth { get; set; }
 
         [ProtoMember(4)]
-        public byte FontSize { get; set; }
+        public int? FontSize { get; set; }
 
         [ProtoMember(5, IsRequired = true)]
         public DrawableType Type { get; set; }
@@ -49,9 +49,9 @@ namespace MRL.SSL.Common.Drawings
         }
 
         [ProtoMember(8)]
-        public List<VectorF2D> Path
+        public VectorF2D Path
         {
-            get => __pbn__event.Is(8) ? ((List<VectorF2D>)__pbn__event.Object) : default;
+            get => __pbn__event.Is(8) ? ((VectorF2D)__pbn__event.Object) : default;
             set => __pbn__event = new DiscriminatedUnionObject(8, value);
         }
 
