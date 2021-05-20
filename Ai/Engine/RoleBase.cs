@@ -11,12 +11,9 @@ namespace MRL.SSL.Ai.Engine
         private static IDictionary<string, object> sharedData = new Dictionary<string, object>();
         public T GetSharedData<T>() where T : new()
         {
-            var key = Key;
-            if (!sharedData.ContainsKey(key))
-                sharedData.Add(key, new T());
-            var d = sharedData[key];
-
-            return sharedData[key].As<T>();
+            if (!sharedData.ContainsKey(Key))
+                sharedData.Add(Key, new T());
+            return sharedData[Key].As<T>();
         }
         public int ID { get; protected set; }
         public virtual string Key { get { return GetType().ToString() + ID.ToString(); } }
