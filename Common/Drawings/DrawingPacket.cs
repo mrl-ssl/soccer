@@ -35,9 +35,10 @@ namespace MRL.SSL.Common.Drawings
 
         private static int Convert2Argb(Color color, float opacity)
         {
-            byte a = 0;
-            if (opacity > 0f || opacity < 1f) a = (byte)(opacity * 255);
-            else if (opacity == 1f) a = 255;
+            int a = 0;
+            if (opacity >= 1f) a = 255;
+            else if (opacity <= 0f) a = 0;
+            else a = (int)(opacity * 255);
             return Color.FromArgb(a, color.R, color.G, color.B).ToArgb();
         }
 
