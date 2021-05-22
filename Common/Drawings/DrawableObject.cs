@@ -49,9 +49,9 @@ namespace MRL.SSL.Common.Drawings
         }
 
         [ProtoMember(8)]
-        public VectorF2D Path
+        public Region Path
         {
-            get => __pbn__event.Is(8) ? ((VectorF2D)__pbn__event.Object) : default;
+            get => __pbn__event.Is(8) ? ((Region)__pbn__event.Object) : default;
             set => __pbn__event = new DiscriminatedUnionObject(8, value);
         }
 

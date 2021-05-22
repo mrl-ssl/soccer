@@ -193,6 +193,11 @@ namespace MRL.SSL.Ai.Engine
                         new VectorF2D(-1.2f,0.9f),
                         new VectorF2D(-1.1f,4f)
                     }, System.Drawing.Color.Black);
+                    DrawingPacket.AddPath(new List<VectorF2D>{
+                        new VectorF2D(0,0),
+                        new VectorF2D(1,1),
+                        new VectorF2D(3.2f,-3.1f)
+                    }, System.Drawing.Color.Red);
 
                     SendVisualizerData(refs, model);
 

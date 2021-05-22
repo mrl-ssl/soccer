@@ -98,6 +98,17 @@ namespace MRL.SSL.Common.Drawings
             });
         }
 
+        public static void AddPath(List<VectorF2D> points, Color color = default, float strokeWidth = 0.01f, float opacity = 1f)
+        {
+            AddObject(new DrawableObject
+            {
+                Path = points,
+                StrokeColor = Convert2Argb(color, opacity),
+                StrokeWidth = strokeWidth,
+                Type = DrawableType.Path
+            });
+        }
+
         public static void Serialize(MemoryStream memoryStream, PrefixStyle style, int fieldNumber)
         {
             lock (_lock)
