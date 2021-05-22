@@ -110,9 +110,11 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
 
             [ProtoMember(3, Name = @"red_cards", IsRequired = true)]
             public uint RedCards { get; set; }
+            
+            //TODO: IsPacked must be true but has some known conflicts with js
 
-            [ProtoMember(4, Name = @"yellow_card_times", IsPacked = true)]
-            public uint[] YellowCardTimes { get; set; }
+            [ProtoMember(4, Name = @"yellow_card_times", IsPacked = false)]
+            public List<uint> YellowCardTimes { get; set; }
 
             [ProtoMember(5, Name = @"yellow_cards", IsRequired = true)]
             public uint YellowCards { get; set; }

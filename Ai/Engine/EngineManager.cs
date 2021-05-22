@@ -13,6 +13,8 @@ using System.Net.WebSockets;
 using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
+using MRL.SSL.Common.Drawings;
+using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -110,7 +112,10 @@ namespace MRL.SSL.Ai.Engine
                     GameParameters.IsUpdated = false;
                 }
                 if (refs != null && refs.Count > 0)
-                    Serializer.SerializeWithLengthPrefix<IList<RefereeCommand>>(stream, refs, PrefixStyle.Base128, 3);
+                    foreach (var item in refs)
+                        Serializer.SerializeWithLengthPrefix<RefereeCommand>(stream, item, PrefixStyle.Base128, 3);
+
+                DrawingPacket.Serialize(stream, PrefixStyle.Base128, 4);
 
                 _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
             }
@@ -178,6 +183,7 @@ namespace MRL.SSL.Ai.Engine
                         }
                     }
 
+                  
 
                     SendVisualizerData(refs, model);
 
