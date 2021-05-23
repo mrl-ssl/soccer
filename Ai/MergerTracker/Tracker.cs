@@ -16,12 +16,15 @@ namespace MRL.SSL.Ai.MergerTracker
         public IDictionary<uint, SSLGeometryCameraCalibration> Cameras { get; set; }
 
         public RobotKalman[,] Robots { get; set; }
+        VectorF2D lastBallLoc;
+
         public Tracker()
         {
             id2index = new int[MergerTrackerConfig.Default.TeamsCount, MergerTrackerConfig.Default.MaxRobotId];
             index2id = new int[MergerTrackerConfig.Default.TeamsCount, MergerTrackerConfig.Default.MaxTeamRobots];
             robots = new RobotKalman[MergerTrackerConfig.Default.TeamsCount, MergerTrackerConfig.Default.MaxTeamRobots];
             ball = new BallKalman();
+            lastBallLoc = VectorF2D.Zero;
 
             for (int t = 0; t < MergerTrackerConfig.Default.TeamsCount; t++)
             {
@@ -79,10 +82,10 @@ namespace MRL.SSL.Ai.MergerTracker
         }
         private SingleObjectState GetRobotState(int team, int indx, double dt)
         {
-            var loc = robots[team, indx].Position(dt);
+            var loc = robots[team, indx].Position(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             var angle = robots[team, indx].Direction(dt);
 
-            var speed = robots[team, indx].RawVelocity(dt);
+            var speed = robots[team, indx].RawVelocity(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             var angularSpeed = robots[team, indx].AngularVelocity(dt);
             float stuck = 0;
             if (team == 0) stuck = ((OurRobotKalman)robots[team, indx]).Stuck(dt);
@@ -96,7 +99,7 @@ namespace MRL.SSL.Ai.MergerTracker
         private SingleObjectState GetBallState(double dt, ref BallObservationMeta meta)
         {
             var loc = ball.Position(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
-            var speed = ball.Velocity(dt);
+            var speed = ball.Velocity(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             if (meta != null)
             {
                 int team = -1, robot = -1;
@@ -105,7 +108,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 meta.Occluded = ball.Occluded;
                 meta.OccludingTeam = ball.OccludingTeam;
                 meta.OccludingId = index2id[ball.OccludingTeam, ball.OccludingRobot];
-                meta.OccludingOffset = ball.OccludingOffset;
+                meta.OccludingOffset = ball.OccludingOffset.ToAiCoordinate(GameConfig.Default.IsFieldInverted);
                 meta.Covariances = cov;
                 meta.HasCollision = col;
                 meta.CollidedTeam = team;
@@ -123,7 +126,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 if (idx >= 0)
                 {
                     var r = model.Teammates[key];
-                    ((OurRobotKalman)robots[0, idx]).PushCommand(new VectorF3D(cmd.Vy * 1000, cmd.Vx * 1000, cmd.W),
+                    ((OurRobotKalman)robots[0, idx]).PushCommand(new VectorF3D(cmd.Vx * 1000, cmd.Vy * 1000, cmd.W),
                                                                  r.Time + r.NotSeen * MergerTrackerConfig.Default.FramePeriod);
                 }
             }
@@ -190,9 +193,11 @@ namespace MRL.SSL.Ai.MergerTracker
                 b.ViewState = viewState;
                 model.Ball = state;
             }
-            if (model.Ball == null)
-                model.Ball = new SingleObjectState(VectorF2D.Zero, VectorF2D.Zero);
 
+            if (model.Ball == null)
+                model.Ball = new SingleObjectState(lastBallLoc, VectorF2D.Zero);
+
+            lastBallLoc = model.Ball.Location;
             model.Observations = obsModel;
             return model;
         }

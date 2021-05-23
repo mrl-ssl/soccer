@@ -14,7 +14,6 @@ using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MRL.SSL.Common.Drawings;
-using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Ai.Engine
 {
