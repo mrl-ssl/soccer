@@ -184,7 +184,6 @@ namespace MRL.SSL.Ai.Engine
                     }
 
                     Commands = gameEngine.PlayGame(model);
-
                     SendVisualizerData(refs, model);
 
                 }
