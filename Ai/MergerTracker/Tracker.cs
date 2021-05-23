@@ -95,7 +95,7 @@ namespace MRL.SSL.Ai.MergerTracker
         }
         private SingleObjectState GetBallState(double dt, ref BallObservationMeta meta)
         {
-            var loc = ball.Position(dt);
+            var loc = ball.Position(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             var speed = ball.Velocity(dt);
             if (meta != null)
             {

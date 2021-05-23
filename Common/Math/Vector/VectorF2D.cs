@@ -190,20 +190,13 @@ namespace MRL.SSL.Common.Math
             return (n.Dot(v));
         }
 
-        public override VectorF2D PrependecularPoint(Vector2D<float> start, Vector2D<float> from)
+        public override VectorF2D PrependecularPoint(Vector2D<float> lHead, Vector2D<float> lTail)
         {
-            var startFromVec = from - start;
-            var fromStartVec = start - from;
-            float teta = AngleBetweenInRadians(startFromVec);
-            float s = 1F;
-            if (MathF.Abs(teta) > MathF.PI / 2F)
-            {
-                s = -1F;
-                teta = (MathF.PI - MathF.Abs(teta)) * MathF.Sign(teta);
-            }
-            float d = MathF.Abs(startFromVec.Length() * MathF.Sin(teta));
-            float alfa = MathF.PI / 2F - MathF.Abs(teta);
-            return (VectorF2D)(from + FromAngleSize(fromStartVec.AngleInRadians() - s * MathF.Sign(teta) * alfa, d));
+            var c = new VectorF2D(this.Y - lHead.Y, lHead.X - this.X);
+            var d1 = (lTail - lHead);
+            var d2 = d1.GetPerp();
+            var t = -(c.Dot(d2) / d1.Dot(d1));
+            return (VectorF2D)(lHead + d1 * t);
         }
 
         public override bool IsBetween(Vector2D<float> other, Vector2D<float> v)
@@ -267,13 +260,13 @@ namespace MRL.SSL.Common.Math
             return dx * dx + dy * dy;
         }
 
+        public override float SqDistanceToLine(Vector2D<float> lHead, Vector2D<float> lTail)
+        {
+            return SqDistance(PrependecularPoint(lHead, lTail));
+        }
         public override float DistanceToLine(Vector2D<float> lHead, Vector2D<float> lTail)
         {
-            Vector2D<float> r;
-            float t;
-            t = ((x - lHead.X) + (y - lHead.Y)) / (lTail.X + lTail.Y);
-            r = lHead + (lTail - lHead) * t;
-            return r.Distance(this);
+            return Distance(PrependecularPoint(lHead, lTail));
         }
 
         public override VectorF2D Extend(float x, float y)

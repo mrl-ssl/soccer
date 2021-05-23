@@ -183,8 +183,6 @@ namespace MRL.SSL.Ai.Engine
                         }
                     }
 
-                  
-
                     SendVisualizerData(refs, model);
 
                 }

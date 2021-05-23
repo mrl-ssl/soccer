@@ -28,6 +28,7 @@ namespace MRL.SSL.Common.Math
         public abstract T Distance(Vector2D<T> v);
         public abstract T SqDistance(Vector2D<T> v);
         public abstract T DistanceToLine(Vector2D<T> lHead, Vector2D<T> lTail);
+        public abstract T SqDistanceToLine(Vector2D<T> lHead, Vector2D<T> lTail);
         public abstract Vector2D<T> SegmentNearLine(Vector2D<T> a1, Vector2D<T> b0, Vector2D<T> b1);
         public abstract Vector2D<T> Extend(T x, T y);
         public abstract T OffsetToLine(Vector2D<T> x1, Vector2D<T> p);
@@ -71,6 +72,7 @@ namespace MRL.SSL.Common.Math
         public static T Distance(Vector2D<T> v1, Vector2D<T> v2) { return v1.Distance(v2); }
         public static T SqDistance(Vector2D<T> v1, Vector2D<T> v2) { return v1.SqDistance(v2); }
         public static T DistanceToLine(Vector2D<T> p, Vector2D<T> lHead, Vector2D<T> lTail) { return p.DistanceToLine(lHead, lTail); }
+        public static T SqDistanceToLine(Vector2D<T> p, Vector2D<T> lHead, Vector2D<T> lTail) { return p.SqDistanceToLine(lHead, lTail); }
         public static Vector2D<T> Intersection(Vector2D<T> a1, Vector2D<T> a2, Vector2D<T> b1, Vector2D<T> b2) { return a1.Intersection(a2, b1, b2); }
         public static Vector2D<T> SegmentNearLine(Vector2D<T> a0, Vector2D<T> a1, Vector2D<T> b0, Vector2D<T> b1) { return a0.SegmentNearLine(a1, b0, b1); }
         public static T OffsetToLine(Vector2D<T> x0, Vector2D<T> x1, Vector2D<T> p) { return x0.OffsetToLine(x1, p); }

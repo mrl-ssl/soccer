@@ -1,4 +1,6 @@
+using System.Drawing;
 using MRL.SSL.Common.Configuration;
+using MRL.SSL.Common.Drawings;
 using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Common
@@ -47,7 +49,7 @@ namespace MRL.SSL.Common
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
         {
             Vector2D<float> v = S1.Location - state.Location;
-            return v.SqLength() < (obstacleRadi + radius) * (obstacleRadi + radius) + margin;
+            return v.SqLength() < (obstacleRadi + radius + margin) * (obstacleRadi + radius + margin);
         }
     }
 
@@ -55,6 +57,7 @@ namespace MRL.SSL.Common
     {
         protected VectorF2D[] c = new VectorF2D[4];
         public override ObstacleType Type => ObstacleType.Rectangle;
+        protected float width, height;
 
         public RectObstacle(VectorF2D c0, VectorF2D c1, VectorF2D c2, VectorF2D c3, VectorF2D speed) : base(new SingleObjectState(c0.Interpolate(c2, 0.5f), speed))
         {
@@ -62,6 +65,8 @@ namespace MRL.SSL.Common
             c[1] = c1;
             c[2] = c2;
             c[3] = c3;
+            width = (c0 - c1).Length();
+            height = (c1 - c2).Length();
         }
 
         public override bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f)
@@ -78,10 +83,16 @@ namespace MRL.SSL.Common
 
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
         {
-            var v = S1.Location - c[0];
-            var p = c[2] - c[0];
-            return System.MathF.Abs(v.X) < System.MathF.Abs(p.X) + obstacleRadi + margin
-                   && System.MathF.Abs(v.Y) < System.MathF.Abs(p.Y) + obstacleRadi + margin;
+            var sqW = (width + margin + obstacleRadi) * (width + margin + obstacleRadi);
+            var sqH = (height + margin + obstacleRadi) * (height + margin + obstacleRadi);
+
+            for (int i = 0; i < 4; i++)
+            {
+                var d = VectorF2D.SqDistanceToLine(S1.Location, c[i], c[(i + 1) % 4]);
+                if ((i == 0 || i == 2) && d > sqH) return false;
+                if ((i == 1 || i == 3) && d > sqW) return false;
+            }
+            return true;
         }
     }
 

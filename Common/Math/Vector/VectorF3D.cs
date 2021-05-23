@@ -65,11 +65,13 @@ namespace MRL.SSL.Common.Math
 
         public override float DistanceToLine(Vector3D<float> lHead, Vector3D<float> lTail)
         {
-            Vector3D<float> r = new VectorF3D();
+            //To do...
+            /*Vector3D<float> r = new VectorF3D();
             float t;
             t = ((x - lHead.X) + (y - lHead.Y) + (z - lHead.Z)) / (lTail.X + lTail.Y + lTail.Z);
             r = lHead + (lTail - lHead) * t;
-            return r.Distance(this);
+            return r.Distance(this);*/
+            return 0f;
         }
         public override float TripleProdcut(Vector2D<float> v, Vector2D<float> y)
         {
