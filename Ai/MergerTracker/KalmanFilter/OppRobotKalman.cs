@@ -112,10 +112,12 @@ namespace MRL.SSL.Ai.MergerTracker
             }
             else
             {
+                x[2, 0] += step * x[5, 0];
                 x[0, 0] += step * (x[3, 0] * MathF.Cos(x[2, 0]) - x[4, 0] * MathF.Sin(x[2, 0]));
                 x[1, 0] += step * (x[3, 0] * MathF.Sin(x[2, 0]) + x[4, 0] * MathF.Cos(x[2, 0]));
-                x[2, 0] += step * x[5, 0];
             }
+
+            x[2, 0] = MathHelper.AngleMod(x[2, 0]);
             return x;
         }
 
