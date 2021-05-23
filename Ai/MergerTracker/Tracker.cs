@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MRL.SSL.Ai.Utils;
 using MRL.SSL.Common;
@@ -84,8 +85,12 @@ namespace MRL.SSL.Ai.MergerTracker
         {
             var loc = robots[team, indx].Position(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             var angle = robots[team, indx].Direction(dt);
+            if (GameConfig.Default.IsFieldInverted)
+            {
+                angle = MathHelper.AngleMod(angle + MathF.PI);
+            }
 
-            var speed = robots[team, indx].RawVelocity(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
+            var speed = robots[team, indx].Velocity(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             var angularSpeed = robots[team, indx].AngularVelocity(dt);
             float stuck = 0;
             if (team == 0) stuck = ((OurRobotKalman)robots[team, indx]).Stuck(dt);
