@@ -3,6 +3,7 @@ using MRL.SSL.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MRL.SSL.Common.Utils.Extensions;
+using System;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -11,12 +12,9 @@ namespace MRL.SSL.Ai.Engine
         private static IDictionary<string, object> sharedData = new Dictionary<string, object>();
         public T GetSharedData<T>() where T : new()
         {
-            var key = Key;
-            if (!sharedData.ContainsKey(key))
-                sharedData.Add(key, new T());
-            var d = sharedData[key];
-
-            return sharedData[key].As<T>();
+            if (!sharedData.ContainsKey(Key))
+                sharedData.Add(Key, new T());
+            return sharedData[Key].As<T>();
         }
         public int ID { get; protected set; }
         public virtual string Key { get { return GetType().ToString() + ID.ToString(); } }
@@ -37,7 +35,7 @@ namespace MRL.SSL.Ai.Engine
             }
         }
 
-        public abstract Task<SingleWirelessCommand> Run(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> assignedRoles);
+        public abstract Func<SingleWirelessCommand> Run(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> assignedRoles);
         public abstract void DetermineNextState(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> assignedRoles);
         public abstract float CalculateCost(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> previouslyAssignedRoles);
         public abstract IList<RoleBase> SwichToRole(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> previouslyAssignedRoles);

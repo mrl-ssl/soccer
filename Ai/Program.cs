@@ -26,7 +26,6 @@ namespace MRL.SSL.Ai
             {
                 string line = Console.ReadLine();
 
-
                 // Stop the server
                 if (line == "!")
                 {

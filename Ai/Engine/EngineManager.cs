@@ -14,7 +14,6 @@ using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MRL.SSL.Common.Drawings;
-using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -183,6 +182,7 @@ namespace MRL.SSL.Ai.Engine
                         }
                     }
 
+                    Commands = gameEngine.PlayGame(model);
                     SendVisualizerData(refs, model);
 
                 }
@@ -250,6 +250,9 @@ namespace MRL.SSL.Ai.Engine
             _cmcCancelationSource.Cancel();
             _cmcThread.Join();
             _cmcCancelationSource.Dispose();
+
+            Console.WriteLine("Stopping Game Engine...");
+            gameEngine.Dispose();
 
             Console.WriteLine("Stopping Vision Socket...");
             _visionClient.LeaveMulticastGroup(ConnectionConfig.Default.VisionName);

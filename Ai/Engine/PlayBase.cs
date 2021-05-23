@@ -6,6 +6,14 @@ using MRL.SSL.Common;
 
 namespace MRL.SSL.Ai.Engine
 {
+    public enum PlayResult
+    {
+        InPlay,
+        Aborted,
+        Success,
+        Fail,
+        Completed
+    }
     public abstract class PlayBase
     {
         protected RoleMatcher _roleMatcher = new RoleMatcher();
@@ -28,19 +36,17 @@ namespace MRL.SSL.Ai.Engine
 
         protected virtual bool AssignRole(WorldModel Model, int robotID, Type RoleType, ref IDictionary<int, RoleBase> currentlyAssignedRoles)
         {
-            RoleBase RoleToBeAssigned = RoleType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as RoleBase;
             if (Model.Teammates.ContainsKey(robotID))
             {
-
                 if (PreviouslyAssignedRoles != null && PreviouslyAssignedRoles.ContainsKey(robotID) && PreviouslyAssignedRoles[robotID].GetType() == RoleType)
                     currentlyAssignedRoles[robotID] = PreviouslyAssignedRoles[robotID];
                 else
-                    currentlyAssignedRoles[robotID] = RoleToBeAssigned;
+                    currentlyAssignedRoles[robotID] = RoleType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as RoleBase;
                 return true;
             }
             return false;
         }
-        // public abstract PlayResult QueryPlayResult();
+        public abstract PlayResult QueryPlayResult();
 
         public virtual void ResetPlay(WorldModel Model, GameStrategyEngine engine, IDictionary<int, RoleBase> lastPlayRoles)
         {

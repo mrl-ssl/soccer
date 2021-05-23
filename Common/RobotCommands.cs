@@ -12,5 +12,12 @@ namespace MRL.SSL.Common
         {
             Commands = new Dictionary<int, SingleWirelessCommand>();
         }
+        public void AddCommand(int robotId, SingleWirelessCommand swc)
+        {
+            if (!Commands.ContainsKey(robotId))
+                Commands.Add(robotId, swc);
+            else
+                Commands[robotId] = swc;
+        }
     }
 }
