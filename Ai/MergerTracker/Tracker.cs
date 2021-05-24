@@ -113,7 +113,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 meta.Occluded = ball.Occluded;
                 meta.OccludingTeam = ball.OccludingTeam;
                 meta.OccludingId = index2id[ball.OccludingTeam, ball.OccludingRobot];
-                meta.OccludingOffset = ball.OccludingOffset.ToAiCoordinate(GameConfig.Default.IsFieldInverted);
+                meta.OccludingOffset = ball.OccludingOffset?.ToAiCoordinate(GameConfig.Default.IsFieldInverted);
                 meta.Covariances = cov;
                 meta.HasCollision = col;
                 meta.CollidedTeam = team;
