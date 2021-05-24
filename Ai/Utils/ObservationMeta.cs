@@ -1,6 +1,5 @@
-
-using MRL.SSL.Common;
 using MRL.SSL.Common.Math;
+using MRL.SSL.Common.Utils;
 using ProtoBuf;
 using MatrixF = MRL.SSL.Common.Math.Matrix<float>;
 

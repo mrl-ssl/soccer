@@ -1,5 +1,4 @@
 
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -7,9 +6,9 @@ using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using ProtoBuf;
 
-namespace MRL.SSL.Common.Drawings
+namespace MRL.SSL.Common
 {
-    public static class DrawingPacket
+    public static class Drawings
     {
         private static object _lock = new object();
 

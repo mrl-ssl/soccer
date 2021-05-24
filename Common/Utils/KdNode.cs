@@ -1,10 +1,9 @@
 using MRL.SSL.Common.Math;
 
-namespace MRL.SSL.Common.KdTree
+namespace MRL.SSL.Common.Utils
 {
     public class KdNode
     {
-        public static KdNode NullNode { get => new KdNode(); }
 
         VectorF2D minv, maxv; // bounding box of subtree
         SingleObjectState states;      // list of states stored at this node
@@ -27,7 +26,7 @@ namespace MRL.SSL.Common.KdTree
         /// </summary>
         public KdNode Next { get => child[0]; set => child[0] = value; }
 
-        public KdNode(VectorF2D minv=null, VectorF2D maxv=null,SingleObjectState state=null)
+        public KdNode(VectorF2D minv = null, VectorF2D maxv = null, SingleObjectState state = null)
         {
             this.minv = minv;
             this.maxv = maxv;

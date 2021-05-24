@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using MRL.SSL.Common.SSLWrapperCommunication;
 using ProtoBuf;
-using MRL.SSL.Common;
+using MRL.SSL.Common.Utils;
 
 namespace MRL.SSL.Ai.Engine
 {

@@ -1,7 +1,6 @@
 using MRL.SSL.Ai.Utils;
-using MRL.SSL.Common;
+using MRL.SSL.Common.SSLWrapperCommunication;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using MRL.SSL.Common.Utils.Extensions;
 using System;
 

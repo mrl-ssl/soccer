@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MRL.SSL.Ai.Utils;
-using MRL.SSL.Common;
+using MRL.SSL.Common.Utils;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using MRL.SSL.Common.SSLWrapperCommunication;
@@ -113,7 +113,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 meta.Occluded = ball.Occluded;
                 meta.OccludingTeam = ball.OccludingTeam;
                 meta.OccludingId = index2id[ball.OccludingTeam, ball.OccludingRobot];
-                meta.OccludingOffset = ball.OccludingOffset.ToAiCoordinate(GameConfig.Default.IsFieldInverted);
+                meta.OccludingOffset = ball.OccludingOffset?.ToAiCoordinate(GameConfig.Default.IsFieldInverted);
                 meta.Covariances = cov;
                 meta.HasCollision = col;
                 meta.CollidedTeam = team;

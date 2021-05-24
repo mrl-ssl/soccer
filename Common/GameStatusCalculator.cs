@@ -1,4 +1,5 @@
 
+using MRL.SSL.Common.SSLWrapperCommunication;
 using ProtoBuf;
 using static MRL.SSL.Common.SSLWrapperCommunication.SSLRefereePacket;
 

@@ -1,9 +1,7 @@
-using System.Drawing;
 using MRL.SSL.Common.Configuration;
-using MRL.SSL.Common.Drawings;
 using MRL.SSL.Common.Math;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Common.Utils
 {
     public enum ObstacleType
     {
