@@ -192,7 +192,7 @@ namespace MRL.SSL.Common.Math
 
         public override VectorF2D PrependecularPoint(Vector2D<float> lHead, Vector2D<float> lTail)
         {
-            var c = new VectorF2D(this.Y - lHead.Y, lHead.X - this.X);
+            var c = new VectorF2D(y - lHead.Y, lHead.X - x);
             var d1 = (lTail - lHead);
             var d2 = d1.GetPerp();
             var t = -(c.Dot(d2) / d1.Dot(d1));
@@ -301,14 +301,9 @@ namespace MRL.SSL.Common.Math
 
         public override VectorF2D Intersection(Vector2D<float> a2, Vector2D<float> b1, Vector2D<float> b2)
         {
-            Vector2D<float> a = a2.Sub(this);
-
-            Vector2D<float> b1r = (b1.Sub(this)).GetRotate(-a.AngleInRadians());
-            Vector2D<float> b2r = (b2.Sub(this)).GetRotate(-a.AngleInRadians());
-            Vector2D<float> br = (b1r.Sub(b2r));
-            Vector2D<float> t = new VectorF2D(b2r.X - b2r.Y * (br.X / br.Y), 0F);
-
-            return (VectorF2D)t.GetRotate(a.AngleInRadians()).Add(this);
+            Vector2D<float> d1 = this - a2, d2 = b1 - b2;
+            float t = (this - b1).GetPerp().Dot(d2) / d1.GetPerp().Dot(d2);
+            return (VectorF2D)(this - d1 * t);
         }
 
         public override float AngleModInRadians(float angle)
