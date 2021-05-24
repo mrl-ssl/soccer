@@ -46,7 +46,7 @@ namespace MRL.SSL.Ai.MergerTracker
         public bool Exists(int team, int idx) => (index2id[team, idx] >= 0);
         public RobotKalman GetRobot(int team, int idx) => robots[team, idx];
         public RobotKalman GetRobotById(int team, int id) => id2index[team, id] > 0 ? robots[team, id2index[team, id]] : null;
-        private void ResetForgottens(ObservationModel model)
+        private void ResetForgottens(ObservationModel model, bool isColorChanged)
         {
             for (int t = 0; t < MergerTrackerConfig.Default.TeamsCount; t++)
             {
@@ -75,7 +75,7 @@ namespace MRL.SSL.Ai.MergerTracker
             for (int t = 0; t < MergerTrackerConfig.Default.TeamsCount; t++)
             {
                 for (int i = 0; i < MergerTrackerConfig.Default.MaxTeamRobots; i++)
-                    if (!Exists(t, i)) robots[t, i].Reset();
+                    if (!Exists(t, i) || isColorChanged) robots[t, i].Reset();
             }
             if (model.Ball == null)
                 ball.Reset();
@@ -101,6 +101,12 @@ namespace MRL.SSL.Ai.MergerTracker
             BallObservationMeta m = null;
             return GetBallState(dt, ref m);
         }
+
+        internal void ResetAll()
+        {
+            throw new NotImplementedException();
+        }
+
         private SingleObjectState GetBallState(double dt, ref BallObservationMeta meta)
         {
             var loc = ball.Position(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
@@ -121,9 +127,9 @@ namespace MRL.SSL.Ai.MergerTracker
             }
             return new SingleObjectState(loc, speed);
         }
-        public void ObserveModel(ObservationModel model, RobotCommands commands)
+        public void ObserveModel(ObservationModel model, bool isColorChanged, RobotCommands commands)
         {
-            ResetForgottens(model);
+            ResetForgottens(model, isColorChanged);
             foreach (var key in commands.Commands.Keys)
             {
                 var cmd = commands.Commands[key];
