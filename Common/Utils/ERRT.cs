@@ -17,28 +17,26 @@ namespace MRL.SSL.Common.Utils
 
         private KdTree tree;
         private ThreadLocal<XorShift> rand;
-        private VectorF2D Field;
         private bool useERrrt;
 
         public ERRT(bool _useErrt)
         {
             tree = new KdTree();
             rand = XorShift.CreateInstance();
-            Field = new VectorF2D();
             useERrrt = _useErrt;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected SingleObjectState RandomState()
+        protected SingleObjectState RandomState(VectorF2D field)
         {
 
-            return new SingleObjectState(new VectorF2D(Field.X * (1f - 2f * rand.Value.RandFloat()),
-                                                        Field.Y * (1f - 2f * rand.Value.RandFloat())),
+            return new SingleObjectState(new VectorF2D(field.X * (1f - 2f * rand.Value.RandFloat()),
+                                                        field.Y * (1f - 2f * rand.Value.RandFloat())),
                                                         VectorF2D.Zero);
         }
-        protected SingleObjectState ChoosTarget(SingleObjectState goal, SingleObjectState[] wayPoints)
+        protected SingleObjectState ChoosTarget(VectorF2D field, SingleObjectState goal, SingleObjectState[] wayPoints)
         {
-            double r = rand.Value.RandFloat();
+            var r = rand.Value.RandFloat();
             if (r < goalProbbality)
                 return goal;
             else if (r < (wayPointProbbality + goalProbbality) && useERrrt)
@@ -48,12 +46,12 @@ namespace MRL.SSL.Common.Utils
                     return wayPoints[l];
 
             }
-            return RandomState();
+            return RandomState(field);
         }
         public void FindPath(VectorF2D init, VectorF2D goal, Obstacles obs)
         {
-            Field.X = FieldConfig.Default.FieldLength / 2f + FieldConfig.Default.BoundaryWidth;
-            Field.Y = FieldConfig.Default.FieldWidth / 2f + FieldConfig.Default.BoundaryWidth;
+            var field = new VectorF2D(FieldConfig.Default.FieldLength / 2f + FieldConfig.Default.BoundaryWidth,
+                                      FieldConfig.Default.FieldWidth / 2f + FieldConfig.Default.BoundaryWidth);
 
         }
     }

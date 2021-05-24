@@ -18,6 +18,7 @@ namespace MRL.SSL.Ai.MergerTracker
         private VectorF2D selectedBallLoc;
         private ObservationModel lastObsModel;
         private bool lastIsReverse;
+        private bool lastIsYellow;
         private SSLGeometryFieldSize lastFieldSize;
 
         public WorldGenerator()
@@ -36,6 +37,7 @@ namespace MRL.SSL.Ai.MergerTracker
         }
         private ObservationModel UpdateNotSeensHistory(ObservationModel obsModel)
         {
+
             if (lastObsModel != null)
             {
                 foreach (var key in lastObsModel.Teammates.Keys)
@@ -84,7 +86,7 @@ namespace MRL.SSL.Ai.MergerTracker
         private void UpdateGeometry(SSLVisionPacket packet, bool isReverse)
         {
             bool updateRequired = isReverse != lastIsReverse;
-            lastIsReverse = isReverse;
+
             if (packet.Geometry != null)
             {
                 if (((lastFieldSize == null || GameParameters.ReUpdate) && packet.Geometry.Field != null))
@@ -102,20 +104,29 @@ namespace MRL.SSL.Ai.MergerTracker
         public WorldModel GenerateWorldModel(SSLVisionPacket packet, RobotCommands commands, bool isYellow, bool isReverse)
         {
             UpdateGeometry(packet, isReverse);
-
             var obsModel = merger.Merge(packet, isReverse, isYellow, selectedBallLoc, ref ballIndexChanged);
 
             if (obsModel == null)
                 return null;
 
+            if (lastIsYellow != isYellow)
+            {
+                lastObsModel = null;
+            }
+
             obsModel = UpdateNotSeensHistory(obsModel);
-            tracker.ObserveModel(obsModel, commands);
+            tracker.ObserveModel(obsModel, lastIsYellow != isYellow, commands);
             var model = tracker.GetEstimations(obsModel);
 
             model.Tracker = tracker;
             model.Commands = commands;
+            model.FieldIsInverted = isReverse;
+            model.OurMarkerIsYellow = isYellow;
 
+            lastIsReverse = isReverse;
+            lastIsYellow = isYellow;
             lastObsModel = obsModel;
+
             return model;
         }
 
