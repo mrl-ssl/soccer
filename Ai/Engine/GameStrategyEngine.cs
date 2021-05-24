@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MRL.SSL.Ai.Utils;
 using MRL.SSL.Ai.Utils.Threading;
 using MRL.SSL.Common;
-using System.Linq;
+using MRL.SSL.Common.SSLWrapperCommunication;
 
 namespace MRL.SSL.Ai.Engine
 {

@@ -1,6 +1,6 @@
 using ProtoBuf;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Common.SSLWrapperCommunication
 {
     [ProtoContract]
     public class SingleWirelessCommand

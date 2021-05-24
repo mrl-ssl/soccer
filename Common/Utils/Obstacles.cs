@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using MRL.SSL.Common.Configuration;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Common.Utils
 {
     public class Obstacles
     {

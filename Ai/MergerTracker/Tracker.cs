@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MRL.SSL.Ai.Utils;
-using MRL.SSL.Common;
+using MRL.SSL.Common.Utils;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using MRL.SSL.Common.SSLWrapperCommunication;

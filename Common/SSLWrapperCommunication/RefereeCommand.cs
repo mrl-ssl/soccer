@@ -1,7 +1,7 @@
 using MRL.SSL.Common.SSLWrapperCommunication;
 using ProtoBuf;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Common.SSLWrapperCommunication
 {
     [ProtoContract]
     public enum RefereeSourceType

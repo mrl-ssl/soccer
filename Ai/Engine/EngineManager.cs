@@ -8,12 +8,12 @@ using ProtoBuf;
 using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Ai.MergerTracker;
 using WatsonWebsocket;
-using MRL.SSL.Common;
+using MRL.SSL.Common.Utils;
 using System.Net.WebSockets;
 using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
-using MRL.SSL.Common.Drawings;
+using MRL.SSL.Common;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -114,7 +114,7 @@ namespace MRL.SSL.Ai.Engine
                     foreach (var item in refs)
                         Serializer.SerializeWithLengthPrefix<RefereeCommand>(stream, item, PrefixStyle.Base128, 3);
 
-                DrawingPacket.Serialize(stream, PrefixStyle.Base128, 4);
+                Drawings.Serialize(stream, PrefixStyle.Base128, 4);
 
                 _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
             }

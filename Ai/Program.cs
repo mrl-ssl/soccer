@@ -1,6 +1,6 @@
 ﻿using System;
 using MRL.SSL.Ai.Engine;
-using MRL.SSL.Common;
+using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Common.Configuration;
 
 namespace MRL.SSL.Ai

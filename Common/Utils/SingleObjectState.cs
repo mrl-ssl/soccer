@@ -1,7 +1,7 @@
 using MRL.SSL.Common.Math;
 using ProtoBuf;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Common.Utils
 {
     [ProtoContract]
     public class SingleObjectState

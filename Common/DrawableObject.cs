@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using MRL.SSL.Common.Math;
 using ProtoBuf;
 
-namespace MRL.SSL.Common.Drawings
+namespace MRL.SSL.Common
 {
     [ProtoContract]
     public enum DrawableType

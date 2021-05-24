@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using ProtoBuf;
 
-namespace MRL.SSL.Common
+namespace MRL.SSL.Common.SSLWrapperCommunication
 {
     [ProtoContract]
     public class RobotCommands
