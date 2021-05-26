@@ -1,4 +1,3 @@
-using MRL.SSL.Common.Math;
 using ProtoBuf;
 
 namespace MRL.SSL.Common.Math
@@ -32,6 +31,24 @@ namespace MRL.SSL.Common.Math
             B = p1.X - p2.X;
             C = -(A * p1.X + B * p1.Y);
             Head = p1; Tail = p2;
+        }
+        public Line PerpenducilarLineToPoint(VectorF2D From)
+        {
+            return new Line(this.B, -this.A, -(this.B * From.X + -this.A * From.Y));
+        }
+        public VectorF2D IntersectWithLine(Line l2, out bool HasValue)
+        {
+            VectorF2D a = new VectorF2D(0, 0);
+            float det = this.A * l2.B - l2.A * this.B;
+            if ((float)System.MathF.Abs(det) > 0.0001f)
+            {
+                a.X = ((l2.C * this.B - this.C * l2.B) / det);
+                a.Y = ((this.C * l2.A - l2.C * this.A) / det);
+                HasValue = true;
+            }
+            else
+                HasValue = false;
+            return a;
         }
     }
 }
