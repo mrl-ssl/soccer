@@ -4,7 +4,7 @@ using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 using MRL.SSL.Common.Utils;
 
-namespace MRL.SSL.Ai.Engine
+namespace MRL.SSL.Ai.MotionPlanner
 {
     public class PathPlanner
     {
