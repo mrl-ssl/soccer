@@ -15,6 +15,7 @@ namespace MRL.SSL.Ai.Engine
                 sharedData.Add(Key, new T());
             return sharedData[Key].As<T>();
         }
+        protected RoleBase(int id) { ID = id; }
         public int ID { get; protected set; }
         public virtual string Key { get { return GetType().ToString() + ID.ToString(); } }
         public abstract RoleCategory Category { get; }
