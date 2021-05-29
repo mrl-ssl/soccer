@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using MRL.SSL.Ai.Engine;
+using MRL.SSL.Ai.SkillBook;
 using MRL.SSL.Ai.Utils;
+using MRL.SSL.Common.Math;
 using MRL.SSL.Common.SSLWrapperCommunication;
 
 namespace MRL.SSL.Ai.RoleBook
@@ -27,7 +29,10 @@ namespace MRL.SSL.Ai.RoleBook
 
         public override Func<SingleWirelessCommand> Run(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> assignedRoles)
         {
-
+            if (robotId == 3)
+                return GetSkill<GotoPointSkill>().Go(engine, model, robotId, new VectorF2D(-5.9f, 0f), true, false, true, true,
+                                              true, true);
+            return GetSkill<HaltSkill>().Run();
         }
 
         public override IList<RoleBase> SwichToRole(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> previouslyAssignedRoles)

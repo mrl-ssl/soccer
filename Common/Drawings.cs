@@ -4,7 +4,9 @@ using System.Drawing;
 using System.IO;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
+using MRL.SSL.Common.Utils;
 using ProtoBuf;
+using System.Linq;
 
 namespace MRL.SSL.Common
 {
@@ -97,11 +99,11 @@ namespace MRL.SSL.Common
             });
         }
 
-        public static void AddPath(List<VectorF2D> points, Color color = default, float strokeWidth = 0.01f, float opacity = 1f)
+        public static void AddPath(List<SingleObjectState> points, Color color = default, float strokeWidth = 0.01f, float opacity = 1f)
         {
             AddObject(new DrawableObject
             {
-                Path = points,
+                Path = points.Select(s => s.Location).ToList(),
                 StrokeColor = Convert2Argb(color, opacity),
                 StrokeWidth = strokeWidth,
                 Type = DrawableType.Path

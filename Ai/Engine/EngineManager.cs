@@ -154,8 +154,6 @@ namespace MRL.SSL.Ai.Engine
         {
             CancellationToken ct = (CancellationToken)obj;
             Console.WriteLine("Engine Mangaer Started!");
-            ERRT eRRT = new ERRT(false);
-            XorShift r = new XorShift();
             while (!ct.IsCancellationRequested)
             {
                 try
