@@ -4,7 +4,7 @@ using ProtoBuf;
 namespace MRL.SSL.Common.Math
 {
     [ProtoContract]
-    public class VectorF2D : Vector2D<float>
+    public class VectorF2D : Vector2D<float>, ICloneable
     {
         public VectorF2D() : base() { }
         public VectorF2D(float _x, float _y) : base(_x, _y) { }
@@ -36,7 +36,7 @@ namespace MRL.SSL.Common.Math
             if (l1 < MathHelper.EpsilonF) return v.AngleInRadians();
             else if (l2 < MathHelper.EpsilonF) return AngleInRadians();
 
-            return System.MathF.Acos(MathHelper.BoundF(Cosine(v), -1, 1));
+            return System.MathF.Acos(MathHelper.BoundF(Dot(v) / (l1 * l2), -1, 1));
         }
         public override float AngleBetweenInDegrees(Vector2D<float> v)
         {
@@ -124,6 +124,30 @@ namespace MRL.SSL.Common.Math
 
             return r;
         }
+
+        public override void Extend(float length)
+        {
+            float size = Length();
+            if (size < MathHelper.EpsilonF)
+            {
+                x = y = 0F;
+                return;
+            }
+            x *= (1f + length / size);
+            y *= (1f + length / size);
+        }
+
+        public override VectorF2D GetExtend(float length)
+        {
+            VectorF2D r = new VectorF2D();
+            float size = Length();
+            if (size < MathHelper.EpsilonF)
+                return r;
+
+            r.x = x * (1f + length / size);
+            r.y = y * (1f + length / size);
+            return r;
+        }
         public override VectorF2D Scale(float s)
         {
             return new VectorF2D(x * s, y * s);
@@ -196,6 +220,7 @@ namespace MRL.SSL.Common.Math
             var d1 = (lTail - lHead);
             var d2 = d1.GetPerp();
             var t = -(c.Dot(d2) / d1.Dot(d1));
+            // var f = (VectorF2D)(lHead + d1 * t);
             return (VectorF2D)(lHead + d1 * t);
         }
 
@@ -254,9 +279,8 @@ namespace MRL.SSL.Common.Math
 
         public override float SqDistance(Vector2D<float> v)
         {
-            float dx, dy;
-            dx = x - v.X;
-            dy = y - v.Y;
+            var dx = x - v.X;
+            var dy = y - v.Y;
             return dx * dx + dy * dy;
         }
 
@@ -269,10 +293,6 @@ namespace MRL.SSL.Common.Math
             return Distance(PrependecularPoint(lHead, lTail));
         }
 
-        public override VectorF2D Extend(float x, float y)
-        {
-            return new VectorF2D(this.x + x, this.y + y);
-        }
 
         public override VectorF2D Interpolate(Vector2D<float> end, float amount)
         {
@@ -343,7 +363,7 @@ namespace MRL.SSL.Common.Math
             return (VectorF2D)r;
         }
 
-        public override float ClosestPointTime(Vector2D<float> v1, Vector2D<float> x2, Vector2D<float> v2)
+        public override float ClosestPointTime(Vector2D<float> x2, Vector2D<float> v1, Vector2D<float> v2)
         {
             Vector2D<float> v = v1 - v2;
             float sl = v.SqLength();
@@ -475,6 +495,9 @@ namespace MRL.SSL.Common.Math
             return base.ToString();
         }
 
-
+        public object Clone()
+        {
+            return new VectorF2D(this.x, this.y);
+        }
     }
 }

@@ -137,8 +137,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 if (idx >= 0)
                 {
                     var r = model.Teammates[key];
-                    ((OurRobotKalman)robots[0, idx]).PushCommand(new VectorF3D(cmd.Vx * 1000, cmd.Vy * 1000, cmd.W),
-                                                                 r.Time + r.NotSeen * MergerTrackerConfig.Default.FramePeriod);
+                    ((OurRobotKalman)robots[0, idx]).PushCommand(new VectorF3D(cmd.Vx * 1000, cmd.Vy * 1000, cmd.W), r.Time);
                 }
             }
             foreach (var key in model.Teammates.Keys)

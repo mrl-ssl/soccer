@@ -5,11 +5,15 @@ namespace MRL.SSL.Common.Math
 {
     public class MathHelper
     {
-        public const float EpsilonF = 1e-8F;
+        public const float EpsilonF = 1e-7F;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
         public static bool EqualFloat(float a, float b) => MathF.Abs(a - b) <= EpsilonF;
+        public static bool GreaterThan(float a, float b) => a - b > -EpsilonF;
+        public static bool LessThan(float a, float b) => a - b < EpsilonF;
+        public static bool LessThanEqual(float a, float b) => a - b <= EpsilonF;
+        public static bool GreaterThanEqual(float a, float b) => a - b >= -EpsilonF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float BoundF(float x, float min, float max)

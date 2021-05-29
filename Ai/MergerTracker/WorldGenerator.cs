@@ -37,7 +37,6 @@ namespace MRL.SSL.Ai.MergerTracker
         }
         private ObservationModel UpdateNotSeensHistory(ObservationModel obsModel)
         {
-
             if (lastObsModel != null)
             {
                 foreach (var key in lastObsModel.Teammates.Keys)

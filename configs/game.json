@@ -1,5 +1,6 @@
 {
   "debug": true,
   "ourMarkerIsYellow": false,
-  "isFieldInverted": false
+  "isFieldInverted": false,
+  "stopBallRadi": 0.5
 }

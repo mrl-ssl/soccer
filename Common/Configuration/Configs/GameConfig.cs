@@ -7,6 +7,7 @@ namespace MRL.SSL.Common.Configuration
         public bool Debug { get; set; }
         public bool IsFieldInverted { get; set; }
         public bool OurMarkerIsYellow { get; set; }
+        public float StopBallRadi { get; set; }
 
         public GameConfig()
         {

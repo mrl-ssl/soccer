@@ -14,6 +14,7 @@ using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MRL.SSL.Common;
+using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -153,10 +154,30 @@ namespace MRL.SSL.Ai.Engine
         {
             CancellationToken ct = (CancellationToken)obj;
             Console.WriteLine("Engine Mangaer Started!");
+            ERRT eRRT = new ERRT(false);
+            XorShift r = new XorShift();
             while (!ct.IsCancellationRequested)
             {
                 try
                 {
+                    var obs = new Obstacles();
+                    obs.Add(new BallObstacle(new SingleObjectState(VectorF2D.Zero)));
+                    obs.Add(new CircleObstacle(new SingleObjectState(VectorF2D.Zero), 0.5f));
+                    obs.Add(new OurZoneObstacle());
+                    obs.Add(new OppZoneObstacle());
+                    for (int i = 0; i < 11; i++)
+                    {
+                        obs.Add(new OurRobotObstacle(new SingleObjectState((1f - 2f * r.RandFloat()) * 12f, (1f - 2f * r.RandFloat()) * 9f), i));
+                    }
+                    for (int i = 0; i < 11; i++)
+                    {
+                        obs.Add(new OppRobotObstacle(new SingleObjectState((1f - 2f * r.RandFloat()) * 12f, (1f - 2f * r.RandFloat()) * 9f), i));
+                    }
+                    var st = sw.ElapsedMilliseconds;
+                    var path = eRRT.FindPath(new SingleObjectState(5.9f, 0), new SingleObjectState(-5.9f, 0), obs, 0.1f);
+                    Console.WriteLine(sw.ElapsedMilliseconds - st);
+                    Thread.Sleep(16);
+                    continue;
                     if (!isJoinedVisionMulticastGroup)
                         _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
 
@@ -230,7 +251,7 @@ namespace MRL.SSL.Ai.Engine
 
         public void Start()
         {
-            // sw.Start();
+            sw.Start();
             try
             {
                 Console.WriteLine("Starting Websocket...");
@@ -271,7 +292,7 @@ namespace MRL.SSL.Ai.Engine
 
             visIpPort = null;
             isJoinedVisionMulticastGroup = false;
-            // sw.Stop();
+            sw.Stop();
         }
 
         private void Vision_OnJoinedMulticastGroup(object sender, IPAddress e)

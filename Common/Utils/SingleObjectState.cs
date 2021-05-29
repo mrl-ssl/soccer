@@ -4,13 +4,13 @@ using ProtoBuf;
 namespace MRL.SSL.Common.Utils
 {
     [ProtoContract]
-    public class SingleObjectState
+    public class SingleObjectState : System.ICloneable
     {
         private SingleObjectState parent;
         private SingleObjectState child;
 
-        private Vector2D<float> location;
-        private Vector2D<float> speed;
+        private VectorF2D location;
+        private VectorF2D speed;
         private float angle;
         private float angularSpeed;
         private float stuck;
@@ -33,7 +33,6 @@ namespace MRL.SSL.Common.Utils
         [ProtoMember(5, IsRequired = true)]
         public float Stuck { get => stuck; set => stuck = value; }
 
-
         public SingleObjectState()
         {
 
@@ -49,27 +48,27 @@ namespace MRL.SSL.Common.Utils
             location = new VectorF2D(x, y);
             angle = theta;
         }
-        public SingleObjectState(Vector2D<float> loc)
+        public SingleObjectState(VectorF2D loc)
         {
             location = loc;
         }
-        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp)
+        public SingleObjectState(VectorF2D loc, VectorF2D sp)
         {
             location = loc;
             speed = sp;
         }
-        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp, float stuck)
+        public SingleObjectState(VectorF2D loc, VectorF2D sp, float stuck)
         {
             location = loc;
             speed = sp;
             this.stuck = stuck;
         }
-        public SingleObjectState(Vector2D<float> loc, float theta)
+        public SingleObjectState(VectorF2D loc, float theta)
         {
             location = loc;
             angle = theta;
         }
-        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp, float theta, float w)
+        public SingleObjectState(VectorF2D loc, VectorF2D sp, float theta, float w)
         {
             location = loc;
             speed = sp;
@@ -77,13 +76,21 @@ namespace MRL.SSL.Common.Utils
             angularSpeed = w;
         }
 
-        public SingleObjectState(Vector2D<float> loc, Vector2D<float> sp, float theta, float w, float stuck)
+        public SingleObjectState(VectorF2D loc, VectorF2D sp, float theta, float w, float stuck)
         {
             location = loc;
             speed = sp;
             angle = theta;
             angularSpeed = w;
             this.stuck = stuck;
+        }
+
+        public object Clone()
+        {
+            SingleObjectState other = (SingleObjectState)this.MemberwiseClone();
+            other.Location = (VectorF2D)this.Location?.Clone();
+            other.Speed = (VectorF2D)this.Speed?.Clone();
+            return other;
         }
     }
 }

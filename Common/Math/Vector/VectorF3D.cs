@@ -246,21 +246,6 @@ namespace MRL.SSL.Common.Math
             return new VectorF3D(x * (1F - amount) + end.X * amount, y * (1F - amount) + end.Y * amount, z * (1F - amount) + end.Z * amount);
         }
 
-        public override float ClosestPointTime(Vector3D<float> v1, Vector3D<float> x2, Vector3D<float> v2)
-        {
-            Vector3D<float> v = v1 - v2;
-            float sl = v.SqLength();
-            float t;
-
-            if (sl < MathHelper.EpsilonF) return 0.0F; // parallel tracks, any time is ok.
-
-            t = -v.Dot(this - x2) / sl;
-            if (t < 0.0F) return 0.0F; // nearest time was in the past, now
-                                       // is closest point from now on.
-
-            return t;
-        }
-
         public override float DistanceSegToSeg(Vector3D<float> s1b, Vector3D<float> s2a, Vector3D<float> s2b)
         {
             Vector3D<float> dp;

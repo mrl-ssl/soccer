@@ -23,14 +23,15 @@ namespace MRL.SSL.Common.Math
         public abstract T AngleInRadians();
         public abstract T AngleInDegrees();
         public abstract T Cosine(Vector2D<T> v);
-        public abstract T ClosestPointTime(Vector2D<T> v1, Vector2D<T> x2, Vector2D<T> v2);
+        public abstract T ClosestPointTime(Vector2D<T> x2, Vector2D<T> v1, Vector2D<T> v2);
         public abstract T DistanceSegToSeg(Vector2D<T> s1b, Vector2D<T> s2a, Vector2D<T> s2b);
         public abstract T Distance(Vector2D<T> v);
         public abstract T SqDistance(Vector2D<T> v);
         public abstract T DistanceToLine(Vector2D<T> lHead, Vector2D<T> lTail);
         public abstract T SqDistanceToLine(Vector2D<T> lHead, Vector2D<T> lTail);
         public abstract Vector2D<T> SegmentNearLine(Vector2D<T> a1, Vector2D<T> b0, Vector2D<T> b1);
-        public abstract Vector2D<T> Extend(T x, T y);
+        public abstract void Extend(T length);
+        public abstract Vector2D<T> GetExtend(T length);
         public abstract T OffsetToLine(Vector2D<T> x1, Vector2D<T> p);
         public abstract T OffsetAlongLine(Vector2D<T> x1, Vector2D<T> p);
         public abstract Vector2D<T> GetRotate(T angle);
@@ -65,7 +66,7 @@ namespace MRL.SSL.Common.Math
         public static T Dot(Vector2D<T> v1, Vector2D<T> v2) { return v1.Dot(v2); }
         public static Vector2D<T> Interpolate(Vector2D<T> start, Vector2D<T> end, T amount) { return start.Interpolate(end, amount); }
         public static T Cosine(Vector2D<T> v1, Vector2D<T> v2) { return v1.Cosine(v2); }    // equivalent to Dot(v1.Norm(),v2.Norm())
-        public static T ClosestPointTime(Vector2D<T> x1, Vector2D<T> v1, Vector2D<T> x2, Vector2D<T> v2) { return x1.ClosestPointTime(v1, x2, v2); }   // returns time of closest point of approach of two points
+        public static T ClosestPointTime(Vector2D<T> x1, Vector2D<T> x2, Vector2D<T> v1, Vector2D<T> v2) { return x1.ClosestPointTime(x2, v1, v2); }   // returns time of closest point of approach of two points
         public static T AngleBetweenInRadians(Vector2D<T> v1, Vector2D<T> v2) { return v1.AngleBetweenInRadians(v2); }
         public static T AngleBetweenInDegrees(Vector2D<T> v1, Vector2D<T> v2) { return v1.AngleBetweenInDegrees(v2); }
         public static T DistanceSegToSeg(Vector2D<T> s1a, Vector2D<T> s1b, Vector2D<T> s2a, Vector2D<T> s2b) { return s1a.DistanceSegToSeg(s1b, s2a, s2b); }     // return distnace between segments s1a-s1b and s2a-s2b

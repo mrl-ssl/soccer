@@ -28,7 +28,6 @@ namespace MRL.SSL.Common.Math
         public abstract Vector3D<T> GetRotateX(T angle);
         public abstract Vector3D<T> GetRotateY(T angle);
         public abstract Vector3D<T> GetRotateZ(T angle);
-        public abstract T ClosestPointTime(Vector3D<T> v1, Vector3D<T> x2, Vector3D<T> v2);
         public abstract T DistanceSegToSeg(Vector3D<T> s1b, Vector3D<T> s2a, Vector3D<T> s2b);
         public abstract T Distance(Vector3D<T> v);
         public abstract T SqDistance(Vector3D<T> v);
@@ -54,7 +53,6 @@ namespace MRL.SSL.Common.Math
 
         public static Vector3D<T> Interpolate(Vector3D<T> start, Vector3D<T> end, T amount) { return start.Interpolate(end, amount); }
         public static T Dot(Vector3D<T> v1, Vector3D<T> v2) { return v1.Dot(v2); }
-        public static T ClosestPointTime(Vector3D<T> x1, Vector3D<T> v1, Vector3D<T> x2, Vector3D<T> v2) { return x1.ClosestPointTime(v1, x2, v2); }   // returns time of closest point of approach of two points
         public static Vector3D<T> Cross(Vector3D<T> v1, Vector3D<T> v2) { return v1.Cross(v2); }
         public static T DistanceSegToSeg(Vector3D<T> s1a, Vector3D<T> s1b, Vector3D<T> s2a, Vector3D<T> s2b) { return s1a.DistanceSegToSeg(s1b, s2a, s2b); }     // return distnace between segments s1a-s1b and s2a-s2b
         public static T Distance(Vector3D<T> v1, Vector3D<T> v2) { return v1.Distance(v2); }

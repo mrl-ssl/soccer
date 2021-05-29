@@ -1,3 +1,4 @@
+using System;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 
@@ -17,14 +18,15 @@ namespace MRL.SSL.Common.Utils
     public abstract class ObstacleBase
     {
         protected SingleObjectState state;
-
         public abstract ObstacleType Type { get; }
         public SingleObjectState State { get => state; set => state = value; }
-        public bool Avoid { get; set; }
+        public bool Mask { get; set; }
+        public bool CanRepulse { get; set; }
 
-        protected ObstacleBase(SingleObjectState state) { this.state = state; Avoid = false; }
+        protected ObstacleBase(SingleObjectState state) { this.state = state; Mask = false; }
         // protected ObstacleBase() { this.state = new SingleObjectState(); }
-
+        public abstract VectorF2D Repulse(SingleObjectState s, float obstacleRadi, float margin = 0.01f);
+        public abstract float GetTangents(SingleObjectState from, float obstacleRadi, float margin = 0f);
         public abstract bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f);
         public abstract bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f);
     }
@@ -39,15 +41,31 @@ namespace MRL.SSL.Common.Utils
 
         public override bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f)
         {
-            Vector2D<float> p = VectorF2D.PointOnSegment(from.Location, to.Location, state.Location);
+            var p = VectorF2D.PointOnSegment(from.Location, to.Location, state.Location);
             float d = p.Distance(state.Location);
-            return d <= radius + obstacleRadi + margin;
+            return MathHelper.LessThan(d, radius + obstacleRadi + margin);
+            // return false;
         }
 
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
         {
-            Vector2D<float> v = S1.Location - state.Location;
-            return v.SqLength() < (obstacleRadi + radius + margin) * (obstacleRadi + radius + margin);
+            // return false;
+
+            return MathHelper.LessThan(S1.Location.Distance(state.Location), (obstacleRadi + radius + margin));
+        }
+
+        public override VectorF2D Repulse(SingleObjectState s, float obstacleRadi, float margin = 0.01f)
+        {
+            var v = s.Location - state.Location;
+            v.NormTo(radius + obstacleRadi + margin);
+            return (VectorF2D)v.Add(state.Location);
+        }
+
+        public override float GetTangents(SingleObjectState from, float obstacleRadi, float margin = 0)
+        {
+            var d = from.Location.Distance(state.Location);
+            var tetha = MathF.Asin(MathF.Max(radius + obstacleRadi + margin, d) / d);
+            return tetha;
         }
     }
 
@@ -74,23 +92,74 @@ namespace MRL.SSL.Common.Utils
             for (int i = 0; i < 4; i++)
             {
                 d = VectorF2D.DistanceSegToSeg(from.Location, to.Location, c[i], c[(i + 1) % 4]);
-                if (d < obstacleRadi + margin) return true;
+                if (MathHelper.LessThan(d, obstacleRadi + margin)) return true;
             }
             return Meet(from, obstacleRadi, margin) || Meet(to, obstacleRadi, margin);
         }
 
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
         {
-            var sqW = (width + margin + obstacleRadi) * (width + margin + obstacleRadi);
-            var sqH = (height + margin + obstacleRadi) * (height + margin + obstacleRadi);
+            var w = (width + margin + obstacleRadi);
+            var h = (height + margin + obstacleRadi);
 
             for (int i = 0; i < 4; i++)
             {
-                var d = VectorF2D.SqDistanceToLine(S1.Location, c[i], c[(i + 1) % 4]);
-                if ((i == 0 || i == 2) && d > sqH) return false;
-                if ((i == 1 || i == 3) && d > sqW) return false;
+                var d = VectorF2D.DistanceToLine(S1.Location, c[i], c[(i + 1) % 4]);
+                if ((i == 0 || i == 2) && d >= h) return false;
+                if ((i == 1 || i == 3) && d >= w) return false;
             }
             return true;
+        }
+
+        public override VectorF2D Repulse(SingleObjectState s, float obstacleRadi, float margin = 0.01f)
+        {
+            VectorF2D minV = null;
+            float d = float.MaxValue;
+            for (int i = 0; i < 4; i++)
+            {
+                var v = s.Location.PrependecularPoint(c[i], c[(i + 1) % 4]).Sub(s.Location);
+                if (v.SqLength() < d)
+                {
+                    minV = v;
+                    d = v.SqLength();
+                }
+            }
+            minV.Extend(obstacleRadi + margin);
+            return minV.Add(s.Location);
+        }
+
+        public override float GetTangents(SingleObjectState from, float obstacleRadi, float margin = 0)
+        {
+            int nearestId = 0;
+            float d = c[0].SqDistance(from.Location);
+            float minD = d;
+            for (int i = 1; i < 4; i++)
+            {
+                d = c[i].SqDistance(from.Location);
+                if (d < minD)
+                {
+                    minD = d;
+                    nearestId = i;
+                }
+            }
+            int prev = ((nearestId - 1) + 4) % 4;
+            int next = (nearestId + 1) % 4;
+            var v = from.Location - c[nearestId];
+            var v1 = c[nearestId] - c[prev];
+            var v2 = c[nearestId] - c[next];
+
+            v1.NormTo(margin + obstacleRadi);
+            v2.NormTo(margin + obstacleRadi);
+
+            var t1 = c[prev] + v2;
+            var t2 = c[next] + v1;
+
+            if (v.Dot(v1) < 0)
+                t2 = c[nearestId] + v2;
+            else if (v.Dot(v2) < 0)
+                t1 = c[nearestId] + v1;
+            var a = (t1 - from.Location).AngleBetweenInRadians(t2 - from.Location) / 2f;
+            return a;
         }
     }
 
@@ -119,21 +188,66 @@ namespace MRL.SSL.Common.Utils
     {
         public override ObstacleType Type => ObstacleType.OurZone;
 
+        public static float Margin { get { return MergerTrackerConfig.Default.OurRobotRadius; } }
         public OurZoneObstacle()
-            : base(GameParameters.Field.OurPenaltyRearLeft, GameParameters.Field.OurPenaltyRearRight,
-                   GameParameters.Field.OurPenaltyBackRight, GameParameters.Field.OurPenaltyBackLeft, VectorF2D.Zero)
+            : base(GameParameters.Field.OurPenaltyRearLeft.Add(new VectorF2D(-Margin, -Margin)),
+                   GameParameters.Field.OurPenaltyRearRight.Add(new VectorF2D(-Margin, Margin)),
+                   GameParameters.Field.OurPenaltyBackRight.Add(new VectorF2D(0f, Margin)),
+                   GameParameters.Field.OurPenaltyBackLeft.Add(new VectorF2D(0f, -Margin)),
+                   VectorF2D.Zero)
         {
+            CanRepulse = true;
+        }
+        public override VectorF2D Repulse(SingleObjectState s, float obstacleRadi, float margin = 0)
+        {
+            VectorF2D minV = null;
+            float d = float.MaxValue;
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 2) continue;
+                var v = s.Location.PrependecularPoint(c[i], c[(i + 1) % 4]).Sub(s.Location);
+                if (v.SqLength() < d)
+                {
+                    minV = v;
+                    d = v.SqLength();
+                }
+            }
+            minV.Extend(obstacleRadi + margin);
+            return minV.Add(s.Location);
         }
     }
 
     public class OppZoneObstacle : RectObstacle
     {
         public override ObstacleType Type => ObstacleType.OppZone;
+        public static float Margin { get { return MergerTrackerConfig.Default.OpponentRadius; } }
 
         public OppZoneObstacle()
-            : base(GameParameters.Field.OppPenaltyRearLeft, GameParameters.Field.OppPenaltyRearRight,
-                   GameParameters.Field.OppPenaltyBackRight, GameParameters.Field.OppPenaltyBackLeft, VectorF2D.Zero)
+            : base(
+                  GameParameters.Field.OppPenaltyRearLeft.Add(new VectorF2D(Margin, Margin)),
+                  GameParameters.Field.OppPenaltyRearRight.Add(new VectorF2D(Margin, -Margin)),
+                  GameParameters.Field.OppPenaltyBackRight.Add(new VectorF2D(0, -Margin)),
+                  GameParameters.Field.OppPenaltyBackLeft.Add(new VectorF2D(0, Margin)),
+                  null)
         {
+            CanRepulse = true;
+        }
+        public override VectorF2D Repulse(SingleObjectState s, float obstacleRadi, float margin = 0)
+        {
+            VectorF2D minV = null;
+            float d = float.MaxValue;
+            for (int i = 0; i < 4; i++)
+            {
+                if (i == 2) continue;
+                var v = s.Location.PrependecularPoint(c[i], c[(i + 1) % 4]).Sub(s.Location);
+                if (v.SqLength() < d)
+                {
+                    minV = v;
+                    d = v.SqLength();
+                }
+            }
+            minV.Extend(obstacleRadi + margin);
+            return minV.Add(s.Location);
         }
     }
 
@@ -141,6 +255,9 @@ namespace MRL.SSL.Common.Utils
     {
         public override ObstacleType Type => ObstacleType.Ball;
 
-        public BallObstacle(SingleObjectState state) : base(state, MergerTrackerConfig.Default.BallRadi) { }
+        public BallObstacle(SingleObjectState state)
+            : base(state, MergerTrackerConfig.Default.BallRadi)
+        { }
+
     }
 }

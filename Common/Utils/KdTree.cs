@@ -9,6 +9,7 @@ namespace MRL.SSL.Common.Utils
         KdNode root;
         int leafSize;
         int maxDepth;
+        public int Size { get; set; }
 
         public void Clear()
         {
@@ -21,6 +22,7 @@ namespace MRL.SSL.Common.Utils
 
             root.States = null;
             root.NumStates = 0;
+            Size = 0;
         }
 
 
@@ -44,19 +46,22 @@ namespace MRL.SSL.Common.Utils
             p.States = state;
             p.NumStates++;
 
+            Size++;
+
             // split leaf if not too deep and too many children for one node
             if (level < maxDepth && p.NumStates > leafSize)
             {
                 Split(p, level % 2);
             }
+
             return true;
         }
 
-        public SingleObjectState Nearest(ref float dist, VectorF2D x)
+        public SingleObjectState Nearest(out float dist, VectorF2D x)
         {
             SingleObjectState best = null;
 
-            dist = 12;
+            dist = float.MaxValue;
             best = Nearest(root, ref dist, best, x);
 
             return best;
@@ -85,6 +90,7 @@ namespace MRL.SSL.Common.Utils
                     bestDist = d;
                 }
                 p = p.Child;
+
             }
 
             // recurse on children (nearest first to maximize pruning)
@@ -130,7 +136,8 @@ namespace MRL.SSL.Common.Utils
         }
         private void Split(KdNode t, int splitDim)
         {
-            KdNode a = new KdNode(t.Minv, t.Maxv), b = new KdNode(t.Minv, t.Maxv);
+            var a = new KdNode(new VectorF2D(t.Minv.X, t.Minv.Y), new VectorF2D(t.Maxv.X, t.Maxv.Y));
+            var b = new KdNode(new VectorF2D(t.Minv.X, t.Minv.Y), new VectorF2D(t.Maxv.X, t.Maxv.Y));
             SingleObjectState p, n;
             float splitVal;
 
