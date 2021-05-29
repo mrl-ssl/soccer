@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
 
@@ -39,21 +40,22 @@ namespace MRL.SSL.Common.Utils
 
         public CircleObstacle(SingleObjectState state, float radius) : base(state) { this.radius = radius; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f)
         {
             var p = VectorF2D.PointOnSegment(from.Location, to.Location, state.Location);
             float d = p.Distance(state.Location);
             return MathHelper.LessThan(d, radius + obstacleRadi + margin);
-            // return false;
+
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
         {
-            // return false;
-
             return MathHelper.LessThan(S1.Location.Distance(state.Location), (obstacleRadi + radius + margin));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override VectorF2D Repulse(SingleObjectState s, float obstacleRadi, float margin = 0.01f)
         {
             var v = s.Location - state.Location;
@@ -61,6 +63,7 @@ namespace MRL.SSL.Common.Utils
             return (VectorF2D)v.Add(state.Location);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override float GetTangents(SingleObjectState from, float obstacleRadi, float margin = 0)
         {
             var d = from.Location.Distance(state.Location);
@@ -85,6 +88,7 @@ namespace MRL.SSL.Common.Utils
             height = (c1 - c2).Length();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, float margin = 0f)
         {
             float d = 0;
@@ -97,6 +101,7 @@ namespace MRL.SSL.Common.Utils
             return Meet(from, obstacleRadi, margin) || Meet(to, obstacleRadi, margin);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Meet(SingleObjectState S1, float obstacleRadi, float margin = 0f)
         {
             var w = (width + margin + obstacleRadi);
@@ -111,6 +116,7 @@ namespace MRL.SSL.Common.Utils
             return true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override VectorF2D Repulse(SingleObjectState s, float obstacleRadi, float margin = 0.01f)
         {
             VectorF2D minV = null;
@@ -128,6 +134,7 @@ namespace MRL.SSL.Common.Utils
             return minV.Add(s.Location);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override float GetTangents(SingleObjectState from, float obstacleRadi, float margin = 0)
         {
             int nearestId = 0;

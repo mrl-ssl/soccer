@@ -127,7 +127,7 @@ namespace MRL.SSL.Common.Utils
                 if (!o.Mask && o.Meet(s, obstacleRadi, margin))
                 {
                     obs = o;
-                    // return true;
+                    return true;
                 }
             }
             obs = null;
@@ -146,7 +146,7 @@ namespace MRL.SSL.Common.Utils
                 if (!o.Mask && o.Meet(from, to, obstacleRadi, 0f))
                 {
                     obs = o;
-                    // return true;
+                    return true;
                 }
             }
             obs = null;
@@ -184,8 +184,5 @@ namespace MRL.SSL.Common.Utils
         {
             obstacles[count++] = obstacle;
         }
-
-
-
     }
 }

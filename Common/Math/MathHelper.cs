@@ -10,9 +10,13 @@ namespace MRL.SSL.Common.Math
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
         public static bool EqualFloat(float a, float b) => MathF.Abs(a - b) <= EpsilonF;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterThan(float a, float b) => a - b > -EpsilonF;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool LessThan(float a, float b) => a - b < EpsilonF;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool LessThanEqual(float a, float b) => a - b <= EpsilonF;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterThanEqual(float a, float b) => a - b >= -EpsilonF;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

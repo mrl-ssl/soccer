@@ -15,8 +15,8 @@ namespace MRL.SSL.Common.Utils
         private const int numWayPoints = 15;
         private const float extendSize = 0.15f;
         private const float sqNearDistTresh = 0.01f;
-        private const int maxNodes = 1000;
-        private const int maxTries = 1500;
+        private const int maxNodes = 500;
+        private const int maxTries = 500;
         private const int maxRepulseTries = 10;
         VectorF2D field;
         VectorF2D minv, maxv;
@@ -65,8 +65,8 @@ namespace MRL.SSL.Common.Utils
                         || o.Type != ObstacleType.OppZone))
                     )
                     {
-                        // o.Mask = true;
-                        // obsMasked = true;
+                        o.Mask = true;
+                        obsMasked = true;
                     }
                     else
                     {
@@ -97,6 +97,7 @@ namespace MRL.SSL.Common.Utils
             return new SingleObjectState(new VectorF2D(field.X * (1f - 2f * rand.Value.RandFloat()),
                                                         field.Y * (1f - 2f * rand.Value.RandFloat())));
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected SingleObjectState ChoosTarget(SingleObjectState goal, out TargetType type)
         {
             var r = rand.Value.RandFloat();
@@ -118,10 +119,9 @@ namespace MRL.SSL.Common.Utils
             type = TargetType.Random;
             return RandomState();
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected SingleObjectState Extend(SingleObjectState nearest, SingleObjectState target, Obstacles obs, float obstacleRadi)
         {
-            // try
-            // {
             var t = target.Location.Sub(nearest.Location);
             var l = t.Length();
 
@@ -135,25 +135,21 @@ namespace MRL.SSL.Common.Utils
             n.Location = tt;
 
             ObstacleBase o;
+            var s = new VectorF2D(1, 2);
+
             if (obs.Meet(nearest, n, obstacleRadi, out o))
             {
-                //     // return null;
-                //     var a = o.GetTangents(nearest, obstacleRadi);
-                //     n.Location = (VectorF2D)(nearest.Location + t.GetRotate(a));
+                return null;
+                // var a = o.GetTangents(nearest, obstacleRadi);
+                // n.Location = (VectorF2D)(nearest.Location + t.GetRotate(a));
+                // if (obs.Meet(nearest, n, obstacleRadi, out o))
+                // {
+                //     n.Location = (VectorF2D)(nearest.Location + t.GetRotate(-a));
                 //     if (obs.Meet(nearest, n, obstacleRadi, out o))
-                //     {
-                //         n.Location = (VectorF2D)(nearest.Location + t.GetRotate(-a));
-                //         if (obs.Meet(nearest, n, obstacleRadi, out o))
-                //             return null;
-                //     }
+                //         return null;
+                // }
             }
-            // }
-            // catch (System.Exception ex)
-            // {
-
-            // }
-            // return n;
-            return null;
+            return n;
         }
 
         protected SingleObjectState AddNode(SingleObjectState n, SingleObjectState parent)
@@ -180,17 +176,18 @@ namespace MRL.SSL.Common.Utils
             float nearestDist = 0, lastNodeSqDist = 0;
 
             var initRepulsed = RepulseTarget(init, obs, obstacleRadi, ref obsMasked, out _init);
-            var goalRepulsed = RepulseTarget(goal, obs, obstacleRadi, ref obsMasked, out _goal);
+            _goal = goal;
+            // var goalRepulsed = RepulseTarget(goal, obs, obstacleRadi, ref obsMasked, out _goal);
 
             float d = _init.Location.SqDistance(_goal.Location);
 
             tree.Clear();
+
             nearest = nearestGoal = AddNode(_init, null);
 
-            // if (!obs.Meet(_init, _goal, obstacleRadi, out o))
-            //     nearestGoal = nearest = AddNode(_goal, _init);
-            // else
-            if (d <= sqNearDistTresh)
+            if (!obs.Meet(_init, _goal, obstacleRadi, out o))
+                nearestGoal = nearest = AddNode(_goal, _init);
+            else if (d <= sqNearDistTresh)
             {
                 var target = _goal;
                 float s = 1.0f;
@@ -207,24 +204,24 @@ namespace MRL.SSL.Common.Utils
             else
             {
                 d = nearest.Location.SqDistance(_goal.Location);
-                while (counter < maxTries && tree.Size < maxNodes)
+                while (counter < maxTries && tree.Size < maxNodes && d > sqNearDistTresh)
                 {
                     var target = ChoosTarget(_goal, out type);
-                    // if (type == TargetType.Goal)
-                    nearest = nearestGoal;
-                    // else
-                    //     nearest = tree.Nearest(out nearestDist, target.Location);
+                    if (type == TargetType.Goal)
+                        nearest = nearestGoal;
+                    else
+                        nearest = tree.Nearest(out nearestDist, target.Location);
                     target = Extend(nearest, target, obs, obstacleRadi);
-                    // var n = AddNode(target, nearest);
-                    // if (n != null)
-                    // {
-                    //     lastNodeSqDist = n.Location.SqDistance(_goal.Location);
-                    //     if (lastNodeSqDist < d)
-                    //     {
-                    //         nearestGoal = n;
-                    //         d = lastNodeSqDist;
-                    //     }
-                    // }
+                    var n = AddNode(target, nearest);
+                    if (n != null)
+                    {
+                        lastNodeSqDist = n.Location.SqDistance(_goal.Location);
+                        if (lastNodeSqDist < d)
+                        {
+                            nearestGoal = n;
+                            d = lastNodeSqDist;
+                        }
+                    }
                     counter++;
                 }
                 int i = 0;
@@ -244,10 +241,6 @@ namespace MRL.SSL.Common.Utils
                     i = rand.Value.RandInt() % numWayPoints;
                     wayPoints[i] = RandomState();
                 }
-            }
-            if (counter >= maxTries || tree.Size >= maxNodes)
-            {
-
             }
 
             obs.ClearMasks();

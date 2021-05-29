@@ -349,8 +349,8 @@ namespace MRL.SSL.Common.Math
             Vector2D<float> sx, sp, r;
             float f, l;
 
-            sx = x1 - this;
-            sp = p - this;
+            sx = x1.Sub(this);
+            sp = p.Sub(this);
 
             f = Dot(sx, sp);
             if (f <= 0.0) return this;         // also handles this=x1 case
@@ -358,7 +358,7 @@ namespace MRL.SSL.Common.Math
             l = sx.SqLength();
             if (f >= l) return (VectorF2D)x1;
 
-            r = this + sx * (f / l);
+            r = this.Add(sx.Scale(f / l));
 
             return (VectorF2D)r;
         }
