@@ -12,7 +12,7 @@ namespace MRL.SSL.Ai.Engine
     public class GameStrategyEngine : IDisposable
     {
         private PlayBase[] implementedPlays;
-        private Dictionary<Type, RoleBase> implementedRoles;
+        // private Dictionary<Type, RoleBase> implementedRoles;
         private Dictionary<int, RoleBase> assignedroles;
         // PlayBase lastRunningPlay;
         Random rnd;
@@ -28,15 +28,15 @@ namespace MRL.SSL.Ai.Engine
             EngineId = id;
             var pb = new List<PlayBase>();
             Type[] types = System.Reflection.Assembly.GetAssembly(typeof(GameStrategyEngine)).GetTypes();
-            implementedRoles = new Dictionary<Type, RoleBase>();
+            // implementedRoles = new Dictionary<Type, RoleBase>();
 
             // ImplementedStrategies = new List<StrategyBase>();
             foreach (Type t in types)
             {
                 if (t.IsClass && t.IsSubclassOf(typeof(PlayBase)))
                     pb.Add(t.GetConstructor(new Type[] { }).Invoke(new object[] { }) as PlayBase);
-                else if (t.IsClass && t.IsSubclassOf(typeof(RoleBase)))
-                    implementedRoles.Add(t, t.GetConstructor(BindingFlags.Instance | BindingFlags.Default | BindingFlags.Public, null, Type.EmptyTypes, null).Invoke(new object[] { }) as RoleBase);
+                // else if (t.IsClass && t.IsSubclassOf(typeof(RoleBase)))
+                //     implementedRoles.Add(t, t.GetConstructor(BindingFlags.Instance | BindingFlags.Default | BindingFlags.Public, null, Type.EmptyTypes, null).Invoke(new object[] { }) as RoleBase);
             }
             implementedPlays = pb.ToArray();
             assignedroles = new();

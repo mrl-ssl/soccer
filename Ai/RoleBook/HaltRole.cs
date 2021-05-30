@@ -30,7 +30,7 @@ namespace MRL.SSL.Ai.RoleBook
         public override Func<SingleWirelessCommand> Run(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> assignedRoles)
         {
             if (robotId == 3)
-                return GetSkill<GotoPointSkill>().Go(engine, model, robotId, new VectorF2D(-5.9f, 0f), true, false, true, true,
+                return GetSkill<GotoPointSkill>().Go(engine, model, robotId, new VectorF2D(-5.9f, 0f), true, true, true, true,
                                               true, true);
             return GetSkill<HaltSkill>().Run();
         }

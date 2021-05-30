@@ -13,10 +13,10 @@ namespace MRL.SSL.Common.Utils
         private const float goalProbbality = 0.2f;
         private const float wayPointProbbality = 0.3f;
         private const int numWayPoints = 15;
-        private const float extendSize = 0.15f;
+        private const float extendSize = 0.3f;
         private const float sqNearDistTresh = 0.01f;
-        private const int maxNodes = 500;
-        private const int maxTries = 500;
+        private const int maxNodes = 300;
+        private const int maxTries = 300;
         private const int maxRepulseTries = 10;
         VectorF2D field;
         VectorF2D minv, maxv;
@@ -126,7 +126,7 @@ namespace MRL.SSL.Common.Utils
             var l = t.Length();
 
             if (l >= extendSize)
-                t.Scale(extendSize / l);
+                t = t.Scale(extendSize / l);
             else
                 return null;
 
@@ -225,21 +225,24 @@ namespace MRL.SSL.Common.Utils
                     counter++;
                 }
                 int i = 0;
-                if (!initRepulsed && !obsMasked && ((d <= sqNearDistTresh) || rand.Value.RandFloat() < 0.1f))
+                if (useERrrt)
                 {
-                    var p = nearestGoal;
-                    while (p != null)
+                    if (!initRepulsed && !obsMasked && ((d <= sqNearDistTresh) || rand.Value.RandFloat() < 0.1f))
+                    {
+                        var p = nearestGoal;
+                        while (p != null)
+                        {
+                            i = rand.Value.RandInt() % numWayPoints;
+                            wayPoints[i] = p;
+                            wayPoints[i].Parent = null;
+                            p = p.Parent;
+                        }
+                    }
+                    else
                     {
                         i = rand.Value.RandInt() % numWayPoints;
-                        wayPoints[i] = p;
-                        wayPoints[i].Parent = null;
-                        p = p.Parent;
+                        wayPoints[i] = RandomState();
                     }
-                }
-                else
-                {
-                    i = rand.Value.RandInt() % numWayPoints;
-                    wayPoints[i] = RandomState();
                 }
             }
 

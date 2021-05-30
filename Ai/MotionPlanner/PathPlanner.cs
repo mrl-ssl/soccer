@@ -29,7 +29,7 @@ namespace MRL.SSL.Ai.MotionPlanner
             if (avoidOpps)
                 foreach (var item in model.Opponents.Keys)
                 {
-                    obs.Add(new OppRobotObstacle(model.Teammates[item], item));
+                    obs.Add(new OppRobotObstacle(model.Opponents[item], item));
                 }
             if (avoidOurZone)
                 obs.Add(new OurZoneObstacle());

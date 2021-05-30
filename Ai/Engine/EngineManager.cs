@@ -182,8 +182,9 @@ namespace MRL.SSL.Ai.Engine
                             model.OppGoalieID = GameConfig.Default.OurMarkerIsYellow ? p.Blue.Goalkeeper : p.Yellow.Goalkeeper;
                         }
                     }
-
+                    // var st = sw.ElapsedMilliseconds;
                     Commands = gameEngine.PlayGame(model);
+                    // Console.WriteLine(sw.ElapsedMilliseconds - st);
                     SendVisualizerData(refs, model);
 
                 }
@@ -231,7 +232,7 @@ namespace MRL.SSL.Ai.Engine
 
         public void Start()
         {
-            sw.Start();
+            // sw.Start();
             try
             {
                 Console.WriteLine("Starting Websocket...");
@@ -272,7 +273,7 @@ namespace MRL.SSL.Ai.Engine
 
             visIpPort = null;
             isJoinedVisionMulticastGroup = false;
-            sw.Stop();
+            // sw.Stop();
         }
 
         private void Vision_OnJoinedMulticastGroup(object sender, IPAddress e)
