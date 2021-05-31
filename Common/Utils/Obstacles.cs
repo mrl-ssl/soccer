@@ -119,6 +119,21 @@ namespace MRL.SSL.Common.Utils
         /// if there is not returns null
         /// </summary>
         /// <param name="s">target state</param> 
+        public bool Meet(ObstacleType type, SingleObjectState from, SingleObjectState to, float obstacleRadi, out ObstacleBase obs, float margin = 0f)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                var o = obstacles[i];
+                if (o.Type != type) continue;
+                if (!o.Mask && o.Meet(from, to, obstacleRadi, 0f))
+                {
+                    obs = o;
+                    return true;
+                }
+            }
+            obs = null;
+            return false;
+        }
         public bool Meet(SingleObjectState s, float obstacleRadi, out ObstacleBase obs, float margin = 0f)
         {
             for (int i = 0; i < count; i++)

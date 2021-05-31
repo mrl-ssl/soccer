@@ -5,7 +5,7 @@ using MRL.SSL.Common.Math;
 using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Common;
 using System.Drawing;
-using System.Linq;
+using MRL.SSL.Common.Utils;
 
 namespace MRL.SSL.Ai.SkillBook
 {
@@ -17,7 +17,7 @@ namespace MRL.SSL.Ai.SkillBook
             planner.SetObstacles(model, robotId, avoidBall, stopBall, avoidOurs, avoidOpps, avoidOurZone, avoidOppZone);
             return () =>
             {
-                var p = planner.GetPath(model, robotId, target);
+                var p = planner.GetPath(model, robotId, new SingleObjectState(target));
                 Drawings.AddPath(p, Color.Red);
                 return new SingleWirelessCommand();
             };

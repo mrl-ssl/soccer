@@ -1,0 +1,21 @@
+{
+  "useErrt": false,
+  "goalProbability": 0.2,
+  "wayPointProbability": 0.3,
+  "numWayPoints": 60,
+  "extendSize": 0.3,
+  "sqNearDistTresh": 0.01,
+  "maxNodes": 300,
+  "maxTries": 300,
+  "maxRepulseTries": 10,
+  "angleWeight": 60,
+  "speedWieght": 4,
+  "countWeight": 0,
+  "lengthWieght": 4,
+  "distanceWeight": 100,
+  "metZoneBaseWeight": 200000,
+  "metBaseWeight": 100000,
+  "notReachedBaseWeight": 5000,
+  "notReachedTresh": 0.01,
+  "refindPathWeightTresh": 10
+}

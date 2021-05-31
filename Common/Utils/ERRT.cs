@@ -10,14 +10,14 @@ namespace MRL.SSL.Common.Utils
 {
     public class ERRT
     {
-        private const float goalProbbality = 0.2f;
-        private const float wayPointProbbality = 0.3f;
-        private const int numWayPoints = 15;
-        private const float extendSize = 0.3f;
-        private const float sqNearDistTresh = 0.01f;
-        private const int maxNodes = 300;
-        private const int maxTries = 300;
-        private const int maxRepulseTries = 10;
+        private float goalProbbality;
+        private float wayPointProbbality;
+        private int numWayPoints;
+        private float extendSize;
+        private float sqNearDistTresh;
+        private int maxNodes;
+        private int maxTries;
+        private int maxRepulseTries;
         VectorF2D field;
         VectorF2D minv, maxv;
         private KdTree tree;
@@ -26,11 +26,23 @@ namespace MRL.SSL.Common.Utils
         private ThreadLocal<XorShift> rand;
         private bool useERrrt;
 
-        public ERRT(bool _useErrt)
+        public ERRT(
+            bool _useErrt = true, int _maxNodes = 500, int _maxTries = 500, int _maxRepulseTries = 10, int _numWayPoints = 60,
+            float _goalProbbality = 0.2f, float _wayPointProbbality = 0.3f, float _sqNearDistTresh = 0.01f,
+            float _extendSize = 0.15f)
         {
+            useERrrt = _useErrt;
+            maxNodes = _maxNodes;
+            maxTries = _maxTries;
+            maxRepulseTries = _maxRepulseTries;
+            numWayPoints = _numWayPoints;
+            goalProbbality = _goalProbbality;
+            wayPointProbbality = _wayPointProbbality;
+            sqNearDistTresh = _sqNearDistTresh;
+            extendSize = _extendSize;
+
             tree = new KdTree();
             rand = XorShift.CreateInstance();
-            useERrrt = _useErrt;
             wayPoints = new SingleObjectState[numWayPoints];
 
             float x = MathF.Max(FieldConfig.Default.OurGoalCenter.X, MathF.Abs(FieldConfig.Default.OppGoalCenter.X));
