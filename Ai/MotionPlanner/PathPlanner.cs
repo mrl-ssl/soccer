@@ -18,7 +18,7 @@ namespace MRL.SSL.Ai.MotionPlanner
         private ThreadLocal<XorShift> rand;
         public PathPlanner()
         {
-            var config = MotionPlannerConfig.Default;
+            var config = PathPlannerConfig.Default;
             eRRT = new ERRT(config.UseERRT, config.MaxNodes, config.MaxTries, config.MaxRepulseTries,
                             config.NumWayPoints, config.GoalProbability, config.WayPointProbability,
                             config.SqNearDistTresh, config.ExtendSize);
@@ -65,7 +65,7 @@ namespace MRL.SSL.Ai.MotionPlanner
                 lastIsSafe = PathWeightCalculator(model, lastPath, robotId, obs, target, out _lastWeight);
                 lastWeight = _lastWeight;
             }
-            if (!lastIsSafe || MathF.Abs(lastWeight - _lastWeight) > MotionPlannerConfig.Default.RefindPathWeightTresh)
+            if (!lastIsSafe || MathF.Abs(lastWeight - _lastWeight) > PathPlannerConfig.Default.RefindPathWeightTresh)
             {
                 var path = eRRT.FindPath(model.Teammates[robotId], target, obs, MergerTrackerConfig.Default.OurRobotRadius);
                 var smoothedPath = RandomInterpolateSmoothing(path, obs);
@@ -90,7 +90,7 @@ namespace MRL.SSL.Ai.MotionPlanner
                 return false;
             }
 
-            var config = MotionPlannerConfig.Default;
+            var config = PathPlannerConfig.Default;
             float speed = 0, angle = 0, length = 0;
             ObstacleBase o;
             VectorF2D v1, v2;
@@ -197,7 +197,7 @@ namespace MRL.SSL.Ai.MotionPlanner
                         ppat.RemoveRange(min + 1, max - min - 1);
                         var v = end.Location.Sub(start.Location);
                         var d = v.Length();
-                        var step = MotionPlannerConfig.Default.ExtendSize;
+                        var step = PathPlannerConfig.Default.ExtendSize;
                         if (d > step)
                         {
                             var t = v.Scale(step);

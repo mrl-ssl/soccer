@@ -3,10 +3,10 @@ using ProtoBuf;
 namespace MRL.SSL.Common.Configuration
 {
     [ProtoContract]
-    public class MotionPlannerConfig : ConfigBase
+    public class PathPlannerConfig : ConfigBase
     {
-        public new static MotionPlannerConfig Default { get => (MotionPlannerConfig)_default[(int)ConfigType.MotionPlanner]; }
-        public override ConfigType Id => ConfigType.MotionPlanner;
+        public new static PathPlannerConfig Default { get => (PathPlannerConfig)_default[(int)ConfigType.PathPlanner]; }
+        public override ConfigType Id => ConfigType.PathPlanner;
         public bool UseERRT { get; set; }
         public float GoalProbability { get; set; }
         public float WayPointProbability { get; set; }
