@@ -8,13 +8,10 @@ using ProtoBuf;
 using MRL.SSL.Common.SSLWrapperCommunication;
 using MRL.SSL.Ai.MergerTracker;
 using WatsonWebsocket;
-using MRL.SSL.Common.Utils;
 using System.Net.WebSockets;
 using MRL.SSL.Ai.Utils;
 using System.Collections.Generic;
-using System.Diagnostics;
 using MRL.SSL.Common;
-using MRL.SSL.Common.Math;
 
 namespace MRL.SSL.Ai.Engine
 {
@@ -38,11 +35,16 @@ namespace MRL.SSL.Ai.Engine
         Queue<RefereeCommand> refereeCommands;
         Thread _cmcThread;
         UdpClient _visionClient;
+        UdpClient _simClient;
+        // UdpClient _robotControlClient;
         WatsonWsServer _visualizerServer;
         CancellationTokenSource _cmcCancelationSource = new CancellationTokenSource();
         WorldGenerator worldGenerator;
         string visIpPort;
         bool isJoinedVisionMulticastGroup;
+        bool isSimStarted;
+        IPEndPoint simEndPoint;
+
         private GameStrategyEngine gameEngine;
         public GameStrategyEngine GameEngine
         {
@@ -98,7 +100,16 @@ namespace MRL.SSL.Ai.Engine
 
             return Serializer.Deserialize<SSLVisionPacket>(stream);
         }
-
+        private void SendCommand(RobotCommands commands)
+        {
+            if (isSimStarted && simEndPoint != null)
+            {
+                RobotControl robotControl = Commands.ToGrSim();
+                using var stream = new MemoryStream();
+                Serializer.Serialize<RobotControl>(stream, robotControl);
+                _simClient.SendAsync(simEndPoint, stream.ToArray());
+            }
+        }
         private void SendVisualizerData(IList<RefereeCommand> refs, WorldModel model)
         {
             if (visIpPort != null)
@@ -164,6 +175,7 @@ namespace MRL.SSL.Ai.Engine
                     if (!isJoinedVisionMulticastGroup)
                         _visionClient.JoinMulticastGroup(ConnectionConfig.Default.VisionName);
 
+
                     var vision = RecieveVisionData();
                     if (vision == null)
                         continue;
@@ -187,7 +199,9 @@ namespace MRL.SSL.Ai.Engine
                     }
                     // var st = sw.ElapsedMilliseconds;
                     Commands = gameEngine.PlayGame(model);
-                    // Console.WriteLine(sw.ElapsedMilliseconds - st);
+
+
+                    SendCommand(Commands);
                     SendVisualizerData(refs, model);
 
                 }
@@ -198,6 +212,8 @@ namespace MRL.SSL.Ai.Engine
             }
             Console.WriteLine("Engine Mangaer Stopped!");
         }
+
+
 
         public void Initialize()
         {
@@ -231,7 +247,29 @@ namespace MRL.SSL.Ai.Engine
             _visionClient.LeftMulticastGroup += Vision_OnLeftMulticastGroup;
             isJoinedVisionMulticastGroup = false;
 
+            if (_simClient != null)
+                _simClient.Dispose();
+
+            IPAddress[] ips = System.Net.Dns.GetHostAddresses(ConnectionConfig.Default.SimName);
+            IPAddress ip = null;
+            foreach (IPAddress p in ips)
+                if (p.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    ip = p;
+                    break;
+                }
+            if (ip != null)
+                simEndPoint = new IPEndPoint(ip, ConnectionConfig.Default.SimControlPort);
+
+            _simClient = new UdpClient(IPAddress.Any, ConnectionConfig.Default.SimStatusPort);
+            _simClient.Error += Sim_OnError;
+            _simClient.Received += Sim_OnReceived;
+            _simClient.Sent += Sim_OnSent;
+            if (ConnectionConfig.Default.ConnectSim)
+                isSimStarted = _simClient.Connect();
+
         }
+
 
         public void Start()
         {
@@ -274,10 +312,18 @@ namespace MRL.SSL.Ai.Engine
             _visualizerServer.MessageReceived -= Visualizer_OnMessageReceived;
             _visualizerServer.Dispose();
 
+            Console.WriteLine("Stopping Simulator Control Client");
+            _simClient.Dispose();
+            _simClient.Error -= Sim_OnError;
+            _simClient.Received -= Sim_OnReceived;
+            _simClient.Sent -= Sim_OnSent;
+
+
             visIpPort = null;
             isJoinedVisionMulticastGroup = false;
-            // sw.Stop();
         }
+
+
 
         private void Vision_OnJoinedMulticastGroup(object sender, IPAddress e)
         {
@@ -309,6 +355,19 @@ namespace MRL.SSL.Ai.Engine
             visIpPort = e.IpPort;
 
             Console.WriteLine("Client Connected " + e.IpPort);
+        }
+        private void Sim_OnError(object sender, System.Net.Sockets.SocketError e)
+        {
+            Console.WriteLine($"Joined Robot Control UDP {e}");
+        }
+
+        private void Sim_OnSent(object sender, UdpSentEventArgs e)
+        {
+        }
+
+        private void Sim_OnReceived(object sender, UdpReceivedEventArgs e)
+        {
+
         }
 
 

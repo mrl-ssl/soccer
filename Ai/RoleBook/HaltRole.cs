@@ -32,7 +32,7 @@ namespace MRL.SSL.Ai.RoleBook
             //     // if (robotId == 3)
             //     return GetSkill<GotoPointSkill>().Go(engine, model, robotId, new VectorF2D(-3.9f, 0f), true, true, true, true,
             //                                   true, true);
-            return GetSkill<HaltSkill>().Run();
+            return GetSkill<HaltSkill>().Run(model, robotId);
         }
 
         public override IList<RoleBase> SwichToRole(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> previouslyAssignedRoles)

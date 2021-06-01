@@ -91,6 +91,15 @@ namespace MRL.SSL.Common.Utils.Sockets
         /// Number of bytes received by the server
         /// </summary>
         public long BytesReceived { get; private set; }
+
+        /// <summary>
+        /// Option: dual mode socket
+        /// </summary>
+        /// <remarks>
+        /// Specifies whether the Socket is a dual-mode socket used for both IPv4 and IPv6.
+        /// Will work only if socket is bound on IPv6 address.
+        /// </remarks>
+        public bool OptionDualMode { get; set; }
         /// <summary>
         /// Number of datagrams sent by the server
         /// </summary>
@@ -119,17 +128,17 @@ namespace MRL.SSL.Common.Utils.Sockets
         /// </summary>
         public int OptionReceiveBufferSize
         {
-            get => Socket.ReceiveBufferSize;
-            set => Socket.ReceiveBufferSize = value;
-        }
+            get;
+            set;
+        } = 8192;
         /// <summary>
         /// Option: send buffer size
         /// </summary>
         public int OptionSendBufferSize
         {
-            get => Socket.SendBufferSize;
-            set => Socket.SendBufferSize = value;
-        }
+            get;
+            set;
+        } = 8192;
         /// <summary>
         /// Option: receive timeout in milliseconds
         /// </summary>
@@ -201,7 +210,9 @@ namespace MRL.SSL.Common.Utils.Sockets
             Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, OptionReuseAddress);
             // Apply the option: exclusive address use
             Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ExclusiveAddressUse, OptionExclusiveAddressUse);
-
+            // Apply the option: dual mode (this option must be applied before recieving)
+            if (Socket.AddressFamily == AddressFamily.InterNetworkV6)
+                Socket.DualMode = OptionDualMode;
             // Bind the server socket to the IP endpoint
             Socket.Bind(Endpoint);
             // Refresh the endpoint property based on the actual endpoint created
@@ -210,6 +221,8 @@ namespace MRL.SSL.Common.Utils.Sockets
             // Prepare receive endpoint
             _receiveEndpoint = new IPEndPoint((Endpoint.AddressFamily == AddressFamily.InterNetworkV6) ? IPAddress.IPv6Any : IPAddress.Any, 0);
 
+
+            Socket.ReceiveBufferSize = OptionReceiveBufferSize;
             // Prepare receive & send buffers
             _receiveBuffer.Reserve(OptionReceiveBufferSize);
 
@@ -278,6 +291,10 @@ namespace MRL.SSL.Common.Utils.Sockets
 
                 // Dispose the session socket
                 Socket.Dispose();
+
+                // Dispose event arguments
+                _receiveEventArg.Dispose();
+                _sendEventArg.Dispose();
             }
             catch (ObjectDisposedException) { }
 

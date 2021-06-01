@@ -7,5 +7,9 @@
   "VisionPort": "10006",
   "refPort": "10009",
   "refName": "224.5.23.3",
-  "ignoreRefbox": false
+  "simName": "127.0.0.1",
+  "simControlPort": "10303",
+  "simStatusPort": "30011",
+  "ignoreRefbox": false,
+  "connectSim": true
 }

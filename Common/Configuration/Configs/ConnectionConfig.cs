@@ -14,6 +14,10 @@ namespace MRL.SSL.Common.Configuration
         public string RefName { get; set; }
         public int RefPort { get; set; }
         public bool IgnoreRefbox { get; set; }
+        public int SimControlPort { get; set; }
+        public int SimStatusPort { get; set; }
+        public bool ConnectSim { get; set; }
+        public string SimName { get; set; }
 
         public ConnectionConfig()
         {

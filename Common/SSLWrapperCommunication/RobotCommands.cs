@@ -20,9 +20,8 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
                 Commands[robotId] = swc;
         }
 
-        public MemoryStream to_grSim()
+        public RobotControl ToGrSim()
         {
-            using var stream = new MemoryStream();
             RobotControl robotControl = new RobotControl();
             foreach (var item in Commands)
             {
@@ -30,16 +29,15 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
                 robotCommand.Id = ((uint)item.Key);
                 robotCommand.KickAngle = item.Value.KickAngle;
                 robotCommand.KickSpeed = item.Value.KickSpeed;
-                robotCommand.DribblerSpeed = item.Value.dribblerSpeed;
+                robotCommand.DribblerSpeed = item.Value.SpinSpeed;
+                robotCommand.MoveCommand = new();
                 robotCommand.MoveCommand.LocalVelocity = new MoveLocalVelocity();
                 robotCommand.MoveCommand.LocalVelocity.Forward = item.Value.Vx;
                 robotCommand.MoveCommand.LocalVelocity.Left = item.Value.Vy;
                 robotCommand.MoveCommand.LocalVelocity.Angular = item.Value.W;
                 robotControl.RobotCommands.Add(robotCommand);
             }
-            Serializer.Serialize<RobotControl>(stream, robotControl);
-            return stream;
-
+            return robotControl;
         }
     }
 

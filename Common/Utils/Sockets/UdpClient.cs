@@ -127,17 +127,17 @@ namespace MRL.SSL.Common.Utils.Sockets
         /// </summary>
         public int OptionReceiveBufferSize
         {
-            get => Socket.ReceiveBufferSize;
-            set => Socket.ReceiveBufferSize = value;
-        }
+            get;
+            set;
+        } = 8192;
         /// <summary>
         /// Option: send buffer size
         /// </summary>
         public int OptionSendBufferSize
         {
-            get => Socket.SendBufferSize;
-            set => Socket.SendBufferSize = value;
-        }
+            get;
+            set;
+        } = 8192;
         /// <summary>
         /// Option: receive timeout in milliseconds
         /// </summary>
@@ -226,6 +226,7 @@ namespace MRL.SSL.Common.Utils.Sockets
             // Prepare receive endpoint
             _receiveEndpoint = new IPEndPoint((Endpoint.AddressFamily == AddressFamily.InterNetworkV6) ? IPAddress.IPv6Any : IPAddress.Any, 0);
 
+            Socket.ReceiveBufferSize = OptionReceiveBufferSize;
             // Prepare receive & send buffers
             _receiveBuffer.Reserve(OptionReceiveBufferSize);
 

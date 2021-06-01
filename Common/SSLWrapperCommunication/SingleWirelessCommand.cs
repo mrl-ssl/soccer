@@ -7,6 +7,6 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
         public float W { get; set; }
         public float KickSpeed { get; set; }
         public float KickAngle { get; set; }
-        public float dribblerSpeed { get; set; }
+        public float SpinSpeed { get; set; }
     }
 }
