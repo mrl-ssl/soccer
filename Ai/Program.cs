@@ -29,10 +29,6 @@ namespace MRL.SSL.Ai
                 // Stop the server
                 if (line == "!")
                 {
-                    rm.Dispose();
-                    em.Dispose();
-
-                    Console.WriteLine("Done!");
                     break;
                 }
                 else if (line.Length == 1)
@@ -40,6 +36,12 @@ namespace MRL.SSL.Ai
                     em.EnqueueRefereePacket(line[0], RefereeSourceType.CommandLine);
                 }
             }
+
+            rm.Dispose();
+            em.Dispose();
+
+            Console.WriteLine("Done!");
+            Environment.Exit(1);
         }
     }
 }

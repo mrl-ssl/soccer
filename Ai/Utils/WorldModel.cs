@@ -29,12 +29,12 @@ namespace MRL.SSL.Ai.Utils
         public ObservationModel Observations { get; set; }
 
 
-        [ProtoMember(8)]
+        // [ProtoMember(8)]
         public RobotCommands Commands { get; set; }
 
-        [ProtoMember(9, IsRequired = true)]
+        [ProtoMember(8, IsRequired = true)]
         public GameStatus Status { get; set; }
-        [ProtoMember(10)]
+        [ProtoMember(9)]
         public uint? OppGoalieID { get; set; }
 
         public MRL.SSL.Ai.MergerTracker.Tracker Tracker { get; set; }

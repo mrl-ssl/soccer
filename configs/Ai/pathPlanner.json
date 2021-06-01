@@ -3,7 +3,7 @@
   "goalProbability": 0.2,
   "wayPointProbability": 0.3,
   "numWayPoints": 60,
-  "extendSize": 0.3,
+  "extendSize": 0.15,
   "sqNearDistTresh": 0.01,
   "maxNodes": 300,
   "maxTries": 300,
@@ -17,5 +17,5 @@
   "metBaseWeight": 100000,
   "notReachedBaseWeight": 5000,
   "notReachedTresh": 0.01,
-  "refindPathWeightTresh": 10
+  "refindPathWeightTresh": 15
 }

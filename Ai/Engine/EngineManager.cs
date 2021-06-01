@@ -53,7 +53,7 @@ namespace MRL.SSL.Ai.Engine
 
         public RobotCommands Commands { get; set; }
 
-        Stopwatch sw = new();
+        // Stopwatch sw = new();
         public EngineManager()
         {
             Commands = new RobotCommands();
@@ -119,7 +119,11 @@ namespace MRL.SSL.Ai.Engine
 
                 _visualizerServer.SendAsync(visIpPort, stream.ToArray(), WebSocketMessageType.Binary);
             }
-            else if (!GameParameters.IsUpdated) GameParameters.ReUpdate = true;
+            else
+            {
+                Drawings.Clear();
+                if (!GameParameters.IsUpdated) GameParameters.ReUpdate = true;
+            }
         }
 
         private IList<RefereeCommand> UpdateGameStatus()
@@ -149,7 +153,6 @@ namespace MRL.SSL.Ai.Engine
 
             return res;
         }
-
         private void EngineManagerRun(object obj)
         {
             CancellationToken ct = (CancellationToken)obj;

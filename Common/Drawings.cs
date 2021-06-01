@@ -120,5 +120,12 @@ namespace MRL.SSL.Common
                 Objects.Clear();
             }
         }
+        public static void Clear()
+        {
+            lock (_lock)
+            {
+                Objects.Clear();
+            }
+        }
     }
 }

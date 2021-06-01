@@ -26,7 +26,7 @@ namespace MRL.SSL.Ai.MotionPlanner
             obs = new Obstacles();
             lastPath = new List<SingleObjectState>();
             rand = XorShift.CreateInstance();
-
+            lastWeight = float.MaxValue;
         }
         public void SetObstacles(WorldModel model, int robotId, bool avoidBall, bool stopBall, bool avoidOurs, bool avoidOpps, bool avoidOurZone, bool avoidOppZone)
         {
@@ -56,34 +56,43 @@ namespace MRL.SSL.Ai.MotionPlanner
         {
             float _lastWeight = float.MaxValue, weight;
             bool lastIsSafe = false;
+            int lastObsIdx = -1, obsIdx = -1;
             List<SingleObjectState> res = null;
 
             if (lastPath.Count > 1)
             {
                 lastPath[lastPath.Count - 1] = model.Teammates[robotId];
                 res = RandomInterpolateSmoothing(lastPath, obs);
-                lastIsSafe = PathWeightCalculator(model, lastPath, robotId, obs, target, out _lastWeight);
-                lastWeight = _lastWeight;
+                // res = lastPath;
+                lastPath = res;
+                lastIsSafe = PathWeightCalculator(model, res, robotId, obs, target, out lastObsIdx, out _lastWeight);
+
             }
             if (!lastIsSafe || MathF.Abs(lastWeight - _lastWeight) > PathPlannerConfig.Default.RefindPathWeightTresh)
             {
                 var path = eRRT.FindPath(model.Teammates[robotId], target, obs, MergerTrackerConfig.Default.OurRobotRadius);
                 var smoothedPath = RandomInterpolateSmoothing(path, obs);
-                PathWeightCalculator(model, lastPath, robotId, obs, target, out weight);
-                if (weight < lastWeight)
+                // var smoothedPath = path;
+                PathWeightCalculator(model, smoothedPath, robotId, obs, target, out obsIdx, out weight);
+                if (weight < _lastWeight || (lastObsIdx != obsIdx && obsIdx != -1 && lastObsIdx != -1))
                 {
                     lastPath = path;
                     lastWeight = weight;
                     res = smoothedPath;
                 }
+                else
+                    lastWeight = _lastWeight;
             }
+            else
+                lastWeight = _lastWeight;
 
 
             return res;
         }
 
-        private bool PathWeightCalculator(WorldModel model, List<SingleObjectState> path, int robotID, Obstacles obs, SingleObjectState goal, out float weight)
+        private bool PathWeightCalculator(WorldModel model, List<SingleObjectState> path, int robotID, Obstacles obs, SingleObjectState goal, out int obsIdx, out float weight)
         {
+            obsIdx = -1;
             if (path.Count < 2)
             {
                 weight = float.MaxValue;
@@ -92,7 +101,6 @@ namespace MRL.SSL.Ai.MotionPlanner
 
             var config = PathPlannerConfig.Default;
             float speed = 0, angle = 0, length = 0;
-            ObstacleBase o;
             VectorF2D v1, v2;
 
             float _angleWeight = config.AngleWeight;
@@ -107,26 +115,31 @@ namespace MRL.SSL.Ai.MotionPlanner
             if (speed < Math.PI / 12)
                 speed = 0;
 
-            var met = obs.Meet(path[1], path[0], MergerTrackerConfig.Default.OurRobotRadius, out o);
             var metZone = obs.Meet(ObstacleType.OurZone, path[1], path[0],
-                                         MergerTrackerConfig.Default.OurRobotRadius, out o);
+                                         MergerTrackerConfig.Default.OurRobotRadius, out obsIdx);
+            var met = !metZone && obs.Meet(path[1], path[0], MergerTrackerConfig.Default.OurRobotRadius, out obsIdx);
 
             v1 = path[1].Location.Sub(path[0].Location);
             length = v1.Length();
 
             for (int i = path.Count - 1; i > 1; i--)
             {
-                if (!met && obs.Meet(path[i], path[i - 1], MergerTrackerConfig.Default.OurRobotRadius, out o))
-                    met = true;
-                if (!metZone && obs.Meet(ObstacleType.OurZone, path[i], path[i - 1],
-                                         MergerTrackerConfig.Default.OurRobotRadius, out o))
+                if (!met && !metZone
+                    && (obs.Meet(ObstacleType.OurZone, path[i], path[i - 1],
+                                           MergerTrackerConfig.Default.OurRobotRadius, out obsIdx)
+                        || obs.Meet(ObstacleType.OppZone, path[i], path[i - 1],
+                                           MergerTrackerConfig.Default.OurRobotRadius, out obsIdx)))
+                {
                     metZone = true;
+                }
+                if (!metZone && !met && obs.Meet(path[i], path[i - 1], MergerTrackerConfig.Default.OurRobotRadius, out obsIdx))
+                    met = true;
+
                 v1 = path[i].Location.Sub(path[i - 1].Location);
                 length += v1.Length();
                 v2 = path[i - 1].Location.Sub(path[i - 2].Location);
                 angle += MathF.Abs(VectorF2D.AngleBetweenInRadians(v1, v2));
             }
-
             angle /= path.Count;
             bool isSafe = false;
             float baseWeight = 0f, d = 0f;
@@ -135,15 +148,17 @@ namespace MRL.SSL.Ai.MotionPlanner
             else if (met)
                 baseWeight = config.MetBaseWeight;
             else
+                isSafe = true;
+
+            d = goal.Location.Sub(path[0].Location).Length();
+            if (d > config.NotReachedTresh)
             {
-                d = goal.Location.Sub(path[0].Location).Length();
-                if (d > config.NotReachedTresh)
-                    baseWeight = config.NotReachedBaseWeight;
-                else
-                {
-                    isSafe = true;
-                    _distanceWeight = 0;
-                }
+                baseWeight += config.NotReachedBaseWeight;
+                isSafe = false;
+            }
+            else
+            {
+                _distanceWeight = 0;
             }
 
             weight = (baseWeight + _angleWeight
@@ -166,19 +181,19 @@ namespace MRL.SSL.Ai.MotionPlanner
             var ppat = path.ToList();
             ObstacleBase o;
 
-            int N = path.Count / 2;
+            int N = path.Count / 2;// Math.Min(20, path.Count / 2);
             for (int i = 0; i < N; i++)
             {
                 var nodes = new List<int>();
                 for (int k = 0; k < ppat.Count; k++)
                     nodes.Add(k);
 
-                int s = rand.Value.RandInt(0, nodes.Count);
+                int s = i < N / 2 ? 0 : rand.Value.RandInt(0, nodes.Count);
 
                 int sKey = nodes[s];
                 SingleObjectState start = ppat[sKey];
                 nodes.RemoveAt(s);
-                if (s > 0 && s < ppat.Count - 1)
+                if (s < nodes.Count)
                     nodes.RemoveAt(s);
                 if (s - 1 >= 0 && nodes.Count > s - 1)
                     nodes.RemoveAt(s - 1);
@@ -194,21 +209,24 @@ namespace MRL.SSL.Ai.MotionPlanner
                     int max = (sKey > eKey) ? sKey : eKey;
                     if (max - min > 1)
                     {
+                        // var lastNode = ppat[min].Location;
+                        // var v = ppat[max].Location.Sub(lastNode);
+
                         ppat.RemoveRange(min + 1, max - min - 1);
-                        var v = end.Location.Sub(start.Location);
-                        var d = v.Length();
-                        var step = PathPlannerConfig.Default.ExtendSize;
-                        if (d > step)
-                        {
-                            var t = v.Scale(step);
-                            int count = (int)(d / step);
-                            var lastNode = start.Location;
-                            for (int j = 0; j < count; j++)
-                            {
-                                lastNode = lastNode.Add(t);
-                                ppat.Add(new SingleObjectState(lastNode));
-                            }
-                        }
+                        // var d = v.Length();
+                        // var step = PathPlannerConfig.Default.ExtendSize;
+                        // if (d > step)
+                        // {
+                        //     var t = v.Scale(step);
+                        //     int count = (int)(d / step);
+                        //     var extra = new List<SingleObjectState>();
+                        //     for (int j = 0; j < count; j++)
+                        //     {
+                        //         lastNode = lastNode.Add(t);
+                        //         extra.Add(new SingleObjectState(lastNode));
+                        //     }
+                        //     ppat.InsertRange(min, extra);
+                        // }
                     }
                 }
                 if (ppat.Count == 2)

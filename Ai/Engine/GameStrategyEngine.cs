@@ -84,7 +84,8 @@ namespace MRL.SSL.Ai.Engine
                 tasks[i] = taskScheduler.Run(assignedroles[RobotID].Run(this, Model, RobotID, assignedroles));
                 ids.Add(i++, RobotID);
             }
-            Task.WaitAll(tasks);
+            if (tasks.Length > 0)
+                Task.WaitAll(tasks);
             RobotCommands rc = new RobotCommands();
             for (int j = 0; j < tasks.Length; j++)
             {

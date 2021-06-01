@@ -17,6 +17,7 @@ namespace MRL.SSL.Ai.SkillBook
             planner.SetObstacles(model, robotId, avoidBall, stopBall, avoidOurs, avoidOpps, avoidOurZone, avoidOppZone);
             return () =>
             {
+
                 var p = planner.GetPath(model, robotId, new SingleObjectState(target));
                 Drawings.AddPath(p, Color.Red);
                 return new SingleWirelessCommand();

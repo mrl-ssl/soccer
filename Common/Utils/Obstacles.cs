@@ -167,8 +167,35 @@ namespace MRL.SSL.Common.Utils
             obs = null;
             return false;
         }
-
-
+        public bool Meet(ObstacleType type, SingleObjectState from, SingleObjectState to, float obstacleRadi, out int idx, float margin = 0f)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                var o = obstacles[i];
+                if (o.Type != type) continue;
+                if (!o.Mask && o.Meet(from, to, obstacleRadi, 0f))
+                {
+                    idx = i;
+                    return true;
+                }
+            }
+            idx = -1;
+            return false;
+        }
+        public bool Meet(SingleObjectState from, SingleObjectState to, float obstacleRadi, out int idx)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                var o = obstacles[i];
+                if (!o.Mask && o.Meet(from, to, obstacleRadi, 0f))
+                {
+                    idx = i;
+                    return true;
+                }
+            }
+            idx = -1;
+            return false;
+        }
         /// <summary>
         /// Clear all obstacles
         /// </summary>

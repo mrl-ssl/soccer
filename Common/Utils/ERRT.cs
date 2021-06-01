@@ -196,8 +196,13 @@ namespace MRL.SSL.Common.Utils
             tree.Clear();
 
             nearest = nearestGoal = AddNode(_init, null);
-
-            if (!obs.Meet(_init, _goal, obstacleRadi, out o))
+            if (nearest == null)
+            {
+                nearest = nearestGoal = _goal;
+                nearest.Parent = _init;
+                nearestGoal.Parent = _init;
+            }
+            else if (!obs.Meet(_init, _goal, obstacleRadi, out o))
                 nearestGoal = nearest = AddNode(_goal, _init);
             else if (d <= sqNearDistTresh)
             {
