@@ -32,8 +32,8 @@ namespace MRL.SSL.Common.SSLWrapperCommunication
                 robotCommand.DribblerSpeed = item.Value.SpinSpeed;
                 robotCommand.MoveCommand = new();
                 robotCommand.MoveCommand.LocalVelocity = new MoveLocalVelocity();
-                robotCommand.MoveCommand.LocalVelocity.Forward = item.Value.Vx;
-                robotCommand.MoveCommand.LocalVelocity.Left = item.Value.Vy;
+                robotCommand.MoveCommand.LocalVelocity.Forward = item.Value.Vy;
+                robotCommand.MoveCommand.LocalVelocity.Left = -item.Value.Vx;
                 robotCommand.MoveCommand.LocalVelocity.Angular = item.Value.W;
                 robotControl.RobotCommands.Add(robotCommand);
             }
