@@ -78,7 +78,6 @@ namespace MRL.SSL.Ai.MotionPlanner
                 }
             }
 
-
             return res;
         }
 
