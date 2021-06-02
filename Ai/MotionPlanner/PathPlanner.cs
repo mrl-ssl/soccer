@@ -86,7 +86,6 @@ namespace MRL.SSL.Ai.MotionPlanner
             else
                 lastWeight = _lastWeight;
 
-
             return res;
         }
 

@@ -52,6 +52,7 @@ namespace MRL.SSL.Common.Configuration
         Field = 2,
         Robot = 3,
         Game = 4,
-        PathPlanner = 5
+        PathPlanner = 5,
+        Control = 6
     }
 }
