@@ -49,5 +49,6 @@ namespace MRL.SSL.Common.Configuration
         public int MaxSearchAngleIterations { get; set; }
         public float MaxPosTunningAccel { get; set; }
         public float MaxAngleTunningAccel { get; set; }
+        public bool EnableMotion1DOp2 { get; set; }
     }
 }
