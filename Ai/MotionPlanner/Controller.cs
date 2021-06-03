@@ -124,7 +124,7 @@ namespace MRL.SSL.Ai.MotionPlanner
                 trajAccel = 0; trajTime = 0;
                 return;
             }
-            var config = MergerTrackerConfig.Default;
+            var framePeriod = MergerTrackerConfig.Default.FramePeriod;
 
             // Need to do some motion.
             aMax /= aFactor;
@@ -132,7 +132,7 @@ namespace MRL.SSL.Ai.MotionPlanner
             var timeToV1 = MathF.Abs(v0 - v1) / aMax;  // Por que?
             var xToV1 = MathF.Abs((v0 + v1) / 2.0f) * timeToV1; //
 
-            var period = accuercyCoef * config.FramePeriod; // Minimum time that vision feedback can be used for precise motion
+            var period = accuercyCoef * framePeriod; // Minimum time that vision feedback can be used for precise motion
 
             v1 = MathHelper.CopySign(v1, -x0);
             // state 0
@@ -148,7 +148,7 @@ namespace MRL.SSL.Ai.MotionPlanner
 
                 // Decelerate
                 if (trajTime < period)
-                    trajAccel = ComputeStop(v0, aMax * aFactor, config.FramePeriod);
+                    trajAccel = ComputeStop(v0, aMax * aFactor, framePeriod);
                 else if (timeToStop < period)
                     trajAccel = timeToStop / period * -MathHelper.CopySign(aMax * aFactor, v0) +
                   (1f - timeToStop / period) * trajAccel;
@@ -198,7 +198,8 @@ namespace MRL.SSL.Ai.MotionPlanner
                               / MathF.Abs(aToV1AtX0);
             // We follow OPTION 2 if t_a is less than a FRAME_PERIOD making it
             // difficult to transition to decelerating and stopping exactly.
-            if (config.EnableMotion1DOp2 && aToV1AtX0 < aMax && aToV1AtX0 > 0f && tToV1AtX0 < 2f * config.FramePeriod)
+
+            if (ControlConfig.Default.EnableMotion1DOp2 && aToV1AtX0 < aMax && aToV1AtX0 > 0f && tToV1AtX0 < 2f * framePeriod)
             {
                 // OPTION 2
                 // Use option 1 time, even though we're not following it.
@@ -225,7 +226,7 @@ namespace MRL.SSL.Ai.MotionPlanner
                 if (tAccel < period && MathHelper.EqualFloat(tDecel, 0f))
                     trajAccel = MathHelper.CopySign(aMax * aFactor, -x0);
                 else if (tAccel < period && tDecel > 0.0)
-                    trajAccel = ComputeStop(v0, aMax * aFactor, config.FramePeriod);
+                    trajAccel = ComputeStop(v0, aMax * aFactor, framePeriod);
                 else if (tAccel < period)
                     trajAccel = MathHelper.CopySign((2f * tAccel / (period) - 1) * aMax * aFactor, v0);
                 else
