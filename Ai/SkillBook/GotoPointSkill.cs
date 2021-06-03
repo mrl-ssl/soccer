@@ -17,14 +17,18 @@ namespace MRL.SSL.Ai.SkillBook
         public bool AvoidOpps { get; set; } = true;
         public bool AvoidOurZone { get; set; } = true;
         public bool AvoidOppZone { get; set; } = true;
+
         public Func<SingleWirelessCommand> Go(GameStrategyEngine engine, WorldModel model, int robotId, VectorF2D target,
                                               float targetAngle)
         {
             planner.SetObstacles(model, robotId, AvoidBall, StopBall, AvoidOurs, AvoidOpps, AvoidOurZone, AvoidOppZone);
+
             return () =>
             {
                 var p = planner.GetPath(model, robotId, new SingleObjectState(target));
+
                 Drawings.AddPath(p, Color.Red);
+
                 return controller.CalculatePathSpeed(p, targetAngle);
             };
         }

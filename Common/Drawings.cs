@@ -25,14 +25,6 @@ namespace MRL.SSL.Common
             }
         }
 
-        /*private static string Convert2HexARGB(Color color, float opacity)
-        {
-            int intArgb = color.ToArgb();
-            byte[] argbBytes = new byte[4];
-            for (int i = 0; i < argbBytes.Length; i++)
-                argbBytes[i] = Convert.ToByte((intArgb >> (8 * (argbBytes.Length - 1 - i))) & 0xff);
-            return '#' + Convert.ToHexString(argbBytes[1..]);
-        }*/
 
         private static uint Convert2Argb(Color color, float opacity)
         {
