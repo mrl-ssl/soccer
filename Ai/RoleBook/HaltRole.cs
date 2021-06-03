@@ -29,9 +29,11 @@ namespace MRL.SSL.Ai.RoleBook
 
         public override Func<SingleWirelessCommand> Run(GameStrategyEngine engine, WorldModel model, int robotId, IDictionary<int, RoleBase> assignedRoles)
         {
-            //     // if (robotId == 3)
-            //     return GetSkill<GotoPointSkill>().Go(engine, model, robotId, new VectorF2D(-3.9f, 0f), true, true, true, true,
-            //                                   true, true);
+            if (robotId == 3)
+            {
+                GetSkill<GotoPointSkill>().StopBall = true;
+                return GetSkill<GotoPointSkill>().Go(engine, model, robotId, new VectorF2D(-3.9f, 0f), MathF.PI);
+            }
             return GetSkill<HaltSkill>().Run(model, robotId);
         }
 

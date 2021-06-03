@@ -160,16 +160,18 @@ namespace MRL.SSL.Ai.MotionPlanner
                 _distanceWeight = 0;
             }
 
-            weight = (baseWeight + _angleWeight
-                        * angle
-                        + _countWeight
-                        * path.Count
-                        + _speedWieght
-                        * speed
-                        + _lengthWieght
-                        * length
-                        + d
-                        * _distanceWeight);
+            weight = (baseWeight
+                      + _angleWeight
+                      * angle
+                      + _countWeight
+                      * path.Count
+                      + _speedWieght
+                      * speed
+                      + _lengthWieght
+                      * length
+                      + d
+                      * _distanceWeight);
+
             return isSafe;
         }
         public List<SingleObjectState> RandomInterpolateSmoothing(List<SingleObjectState> path, Obstacles obs)

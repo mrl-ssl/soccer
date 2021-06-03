@@ -473,6 +473,14 @@ namespace MRL.SSL.Common.Math
         {
             return Scale(isReverse ? -1000f : 1000f);
         }
+        public VectorF2D ToRobotCoordinate(float robotAng)
+        {
+            return GetRotate(MathF.PI / 2f - robotAng);
+        }
+        public VectorF2D FromRobotCoordinate(float robotAng)
+        {
+            return GetRotate(robotAng - MathF.PI / 2f);
+        }
         public override float VertexAngle(Vector2D<float> b, Vector2D<float> c)
         {
             return AngleModInRadians((this - b).AngleInRadians() - (c - b).AngleInRadians());

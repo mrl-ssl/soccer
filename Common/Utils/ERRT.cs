@@ -145,7 +145,6 @@ namespace MRL.SSL.Common.Utils
             var tt = nearest.Location.Add(t);
             var n = new SingleObjectState();
             n.Location = tt;
-
             ObstacleBase o;
             var s = new VectorF2D(1, 2);
 

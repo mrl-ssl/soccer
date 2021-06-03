@@ -1,6 +1,7 @@
 using System;
 using MRL.SSL.Common.Configuration;
 using MRL.SSL.Common.Math;
+using MRL.SSL.Common.Utils;
 
 namespace MRL.SSL.Ai.MotionPlanner
 {
@@ -17,11 +18,11 @@ namespace MRL.SSL.Ai.MotionPlanner
             pid = new PID[count];
             vcc = new VelocityCoefCalculaterBase[count];
 
-            vcc[0] = new VelocityCoefCalculatorPos(config.MinDistTresh, config.PosMinVelocityTresh,
+            vcc[0] = new VelocityCoefCalculatorPos(config.MinPIDDistanceTresh, config.PosMinVelocityTresh,
                                                    config.PosCoefResetValue, config.PosResetCoefTresh, config.MinPosCoef);
-            vcc[1] = new VelocityCoefCalculatorPos(config.MinDistTresh, config.PosMinVelocityTresh,
+            vcc[1] = new VelocityCoefCalculatorPos(config.MinPIDDistanceTresh, config.PosMinVelocityTresh,
                                                    config.PosCoefResetValue, config.PosResetCoefTresh, config.MinPosCoef);
-            vcc[2] = new VelocityCoefCalculatorAngle(config.MinAngleTresh, config.AngleMinVelocityTresh,
+            vcc[2] = new VelocityCoefCalculatorAngle(config.MinPIDAngleTresh, config.AngleMinVelocityTresh,
                                                      config.AngleCoefResetValue, config.AngleResetCoefTresh,
                                                      config.MinAngleCoef);
             for (int i = 0; i < count; i++)
@@ -33,11 +34,11 @@ namespace MRL.SSL.Ai.MotionPlanner
             basePidCoefs[2] = new PIDCoef(config.AngleKp, config.AngleKi, config.AngleKd);
         }
 
-        public void UpdateCoefs(VectorF2D p, VectorF2D v, float angle, float w, VectorF2D target, float targetAngle)
+        public void UpdateCoefs(SingleObjectState init, SingleObjectState target, float targetAngle)
         {
-            vcc[0].UpdateVelocityCoefs(p.X, v.X, target.X);
-            vcc[1].UpdateVelocityCoefs(p.Y, v.Y, target.Y);
-            vcc[2].UpdateVelocityCoefs(angle, w, targetAngle);
+            vcc[0].UpdateVelocityCoefs(init.Location.X, init.Speed.X, target.Location.X);
+            vcc[1].UpdateVelocityCoefs(init.Location.Y, init.Speed.Y, target.Location.Y);
+            vcc[2].UpdateVelocityCoefs(init.Angle, init.AngularSpeed, targetAngle);
         }
         public float Tune(float d, PIDType type)
         {

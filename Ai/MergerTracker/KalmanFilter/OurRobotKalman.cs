@@ -278,7 +278,7 @@ namespace MRL.SSL.Ai.MergerTracker
         public override float Direction(double time)
         {
             var x = Predict(time);
-            return x[2, 0];
+            return x[2, 0] + MathF.PI / 2f;
         }
         public override float AngularVelocity(double time)
         {

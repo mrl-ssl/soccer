@@ -85,15 +85,16 @@ namespace MRL.SSL.Ai.MergerTracker
         {
             var loc = robots[team, indx].Position(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             var angle = robots[team, indx].Direction(dt);
+
             if (GameConfig.Default.IsFieldInverted)
-            {
                 angle = MathHelper.AngleMod(angle + MathF.PI);
-            }
 
             var speed = robots[team, indx].Velocity(dt).ToAiCoordinate(GameConfig.Default.IsFieldInverted);
             var angularSpeed = robots[team, indx].AngularVelocity(dt);
-            float stuck = 0;
+
+            float stuck = 0f;
             if (team == 0) stuck = ((OurRobotKalman)robots[team, indx]).Stuck(dt);
+
             return new SingleObjectState(loc, speed, angle, angularSpeed, 1);
         }
         private SingleObjectState GetBallState(double dt)
