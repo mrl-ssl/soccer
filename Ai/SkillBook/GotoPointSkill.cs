@@ -28,7 +28,7 @@ namespace MRL.SSL.Ai.SkillBook
                 var p = planner.GetPath(model, robotId, new SingleObjectState(target));
 
                 Drawings.AddPath(p, Color.Red);
-
+                Drawings.AddText(model.Teammates[robotId].Speed.ToString(), VectorF2D.Zero);
                 return controller.CalculatePathSpeed(p, targetAngle);
             };
         }

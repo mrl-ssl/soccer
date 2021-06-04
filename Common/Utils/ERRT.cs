@@ -279,9 +279,9 @@ namespace MRL.SSL.Common.Utils
                 res.Add(nearestGoal);
                 nearestGoal = nearestGoal.Parent;
             }
-
             if (initRepulsed)
                 res.Add(init);
+            if (res.Count == 1) res.Add(init);
 
             return res;
         }

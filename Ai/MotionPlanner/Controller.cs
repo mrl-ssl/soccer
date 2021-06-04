@@ -44,7 +44,7 @@ namespace MRL.SSL.Ai.MotionPlanner
             var d = goal.Location.Sub(init.Location);
             var v0 = init.Speed;
             var w0 = init.AngularSpeed;
-            var vf = goal.Speed;
+            var vf = goal.Speed != null ? goal.Speed : VectorF2D.Zero;
             var dAng = MathHelper.AngleMod(targetAngle - init.Angle);
 
             aTunner.UpdateCoefs(init, goal, targetAngle);

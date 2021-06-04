@@ -57,50 +57,6 @@
 //                         obs = item;
 //                         return true;
 //                     }
-//             }
-//             obs = null;
-//             return false;
-//         }
-
-//         public void Remove(ObstacleBase o)
-//         {
-//             var idx = obstacles[o.Type].FindIndex(f => f == o);
-//             if (idx >= 0)
-//                 obstacles[o.Type].RemoveAt(idx);
-//         }
-
-//         /// <summary>
-//         /// Clear all obstacles
-//         /// </summary>
-//         public void Clear()
-//         {
-//             foreach (var item in obstacles.Keys)
-//                 obstacles[item].Clear();
-//         }
-
-//         /// <summary>
-//         /// Avoid all obstacles from given type
-//         /// (Call this before calling "Meet" to apply changes)
-//         /// </summary>
-//         /// <param name="type">type of obstacles you want to avoid from</param>
-//         /// <param name="avoid">set false to not avoid</param>
-//         public void ClearMasks()
-//         {
-//             foreach (var type in obstacles.Keys)
-//                 foreach (var item in obstacles[type])
-//                     item.Mask = false;
-//         }
-
-//         public void Add(ObstacleBase obstacle) => obstacles[obstacle.Type].Add(obstacle);
-
-//         public void Clear(ObstacleType type) => obstacles[type].Clear();
-
-
-//     }
-// }
-using System;
-using System.Collections.Generic;
-using MRL.SSL.Common.Configuration;
 
 namespace MRL.SSL.Common.Utils
 {
