@@ -76,7 +76,7 @@ namespace MRL.SSL.Ai.MergerTracker
         public abstract MatrixF Q(MatrixF x); // Covariance of propagation noise
         public abstract MatrixF R(MatrixF x); // Covariance of observation noise
 
-        public virtual MatrixF h(MatrixF x)// noiseless observation
+        public virtual MatrixF h(MatrixF x) // noiseless observation
         {
             for (int i = 0; i < obsNum; i++)
             {
@@ -177,7 +177,7 @@ namespace MRL.SSL.Ai.MergerTracker
         protected virtual MatrixF PredictCov(double dt)
         {
             int nsteps = (int)SMath.Round(dt / stepSize);
-            while (xs.Count - 1 < nsteps) Propagate();
+            while (Ps.Count - 1 < nsteps) Propagate();
             return Ps.ElementAt(nsteps);
         }
 
@@ -185,7 +185,7 @@ namespace MRL.SSL.Ai.MergerTracker
         {
             int nsteps = (int)SMath.Round(dt / stepSize);
 
-            while (xs.Count - 1 < nsteps) Propagate();
+            while (Is.Count - 1 < nsteps) Propagate();
 
             return Is.ElementAt(nsteps);
         }

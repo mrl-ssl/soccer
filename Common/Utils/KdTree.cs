@@ -70,7 +70,9 @@ namespace MRL.SSL.Common.Utils
         {
             Clear();
             if (root == null)
-                root = new KdNode(minv, maxv);
+                root = new KdNode(maxv);
+            root.Maxv = maxv;
+            root.Minv = minv;
             leafSize = leafSizeN;
             maxDepth = maxDepthN;
         }

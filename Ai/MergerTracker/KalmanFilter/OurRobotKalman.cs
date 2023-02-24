@@ -206,7 +206,7 @@ namespace MRL.SSL.Ai.MergerTracker
                 if (time > latency)
                 {
                     var x = Predict(latency);
-                    return new VectorF2D(x[0, 0] + x[3, 0], x[1, 0] + x[4, 0] * (float)(time - latency));
+                    return new VectorF2D(x[0, 0] + x[3, 0] * (float)(time - latency), x[1, 0] + x[4, 0] * (float)(time - latency));
                 }
                 else
                 {
